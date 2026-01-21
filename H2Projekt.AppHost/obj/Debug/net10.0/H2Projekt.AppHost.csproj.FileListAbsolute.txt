@@ -1,8 +1,0 @@
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\H2Projekt.AppHost.csproj.AssemblyReference.cache
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\H2Projekt.AppHost.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\H2Projekt.AppHost.AssemblyInfoInputs.cache
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\H2Projekt.AppHost.AssemblyInfo.cs
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\H2Projekt.AppHost.csproj.CoreCompileInputs.cache
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\Aspire\references\H2Projekt_API.ProjectMetadata.g.cs
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\Aspire\references\H2Projekt_Web.ProjectMetadata.g.cs
-C:\Users\mikke\source\repos\H2Projekt\H2Projekt.AppHost\obj\Debug\net10.0\Aspire\references\_AppHost.ProjectMetadata.g.cs

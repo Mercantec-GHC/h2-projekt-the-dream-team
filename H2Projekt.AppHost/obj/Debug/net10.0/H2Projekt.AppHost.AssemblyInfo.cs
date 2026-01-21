@@ -11,22 +11,10 @@
 using System;
 using System.Reflection;
 
-[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("08f5acfe-b5ff-4fdb-a2d2-120f681c2a00")]
-[assembly: System.Reflection.AssemblyMetadata("dcpclipath", "C:\\Users\\mikke\\.nuget\\packages\\aspire.hosting.orchestration.win-x64\\9.5.0\\tools\\d" +
-    "cp.exe")]
-[assembly: System.Reflection.AssemblyMetadata("dcpextensionpaths", "C:\\Users\\mikke\\.nuget\\packages\\aspire.hosting.orchestration.win-x64\\9.5.0\\tools\\e" +
-    "xt\\")]
-[assembly: System.Reflection.AssemblyMetadata("dcpbinpath", "C:\\Users\\mikke\\.nuget\\packages\\aspire.hosting.orchestration.win-x64\\9.5.0\\tools\\e" +
-    "xt\\bin\\")]
-[assembly: System.Reflection.AssemblyMetadata("apphostprojectpath", "C:\\Users\\mikke\\source\\repos\\H2Projekt\\H2Projekt.AppHost")]
-[assembly: System.Reflection.AssemblyMetadata("apphostprojectname", "H2Projekt.AppHost.csproj")]
-[assembly: System.Reflection.AssemblyMetadata("aspiredashboardpath", "C:\\Users\\mikke\\.nuget\\packages\\aspire.dashboard.sdk.win-x64\\9.5.0\\tools\\Aspire.Da" +
-    "shboard.exe")]
-[assembly: System.Reflection.AssemblyMetadataAttribute("apphostprojectbaseintermediateoutputpath", "C:\\Users\\mikke\\source\\repos\\H2Projekt\\H2Projekt.AppHost\\obj\\")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("H2Projekt.AppHost")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5a0de6162e4f73c1fd8349895fdfd035367f7397")]
 [assembly: System.Reflection.AssemblyProductAttribute("H2Projekt.AppHost")]
 [assembly: System.Reflection.AssemblyTitleAttribute("H2Projekt.AppHost")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
