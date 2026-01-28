@@ -1,19 +1,76 @@
-﻿@page "/counter"
+﻿@page "/admin"
 @rendermode InteractiveServer
+@using H2Projekt.Domain
+@using H2Projekt.Infrastructure
+@using Microsoft.EntityFrameworkCore
+@inject AppDbContext Db
 
-<PageTitle>Counter</PageTitle>
+<h3>Opret nyt værelse</h3>
 
-<h1>Counter</h1>
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
 
-<p role="status">Current count: @currentCount</p>
+<EditForm Model="@room" OnValidSubmit="@HandleSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+    <div class="mb-2">
+        <label>HotelId</label>
+        <InputNumber @bind-Value="room.HotelId" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Værelsesnummer</label>
+        <InputText @bind-Value="room.Number" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Kapacitet</label>
+        <InputNumber @bind-Value="room.Capacity" class="form-control" />
+    </div>
+
+    <div class="mb-2">
+        <label>Pris pr. nat</label>
+        <InputNumber @bind-Value="room.PricePerNight" class="form-control" />
+    </div>
+
+    <button class="btn btn-primary" type="submit">Opret</button>
+</EditForm>
 
 @code {
-    private int currentCount = 0;
+    private Room room = new();
+    private string? success;
+    private string? error;
 
-    private void IncrementCount()
+    private async Task HandleSubmit()
     {
-        currentCount++;
+        try
+        {
+            // Evt. duplikat-tjek: HotelId+Number
+            var dup = await Db.Rooms.AnyAsync(r => r.HotelId == room.HotelId && r.Number == room.Number);
+            if (dup)
+            {
+                error = "Der findes allerede et værelse med dette nummer på hotellet.";
+                success = null;
+                return;
+            }
+
+            Db.Rooms.Add(room);
+            await Db.SaveChangesAsync();
+            success = $"Værelse #{room.Number} er oprettet.";
+            error = null;
+            room = new Room();
+        }
+        catch (Exception ex)
+        {
+            error = ex.Message;
+            success = null;
+        }
     }
 }

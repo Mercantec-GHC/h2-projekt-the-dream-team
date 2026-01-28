@@ -1,5 +1,8 @@
+using H2Projekt.Infrastructure;
 using H2Projekt.Web;
 using H2Projekt.Web.Components;
+using Microsoft.EntityFrameworkCore;
+using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +13,7 @@ builder.AddServiceDefaults();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
+
 builder.Services.AddOutputCache();
 
 builder.Services.AddHttpClient<WeatherApiClient>(client =>
@@ -18,6 +22,9 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
     });
+
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
 var app = builder.Build();
 
