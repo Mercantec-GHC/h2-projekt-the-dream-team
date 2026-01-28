@@ -13,7 +13,7 @@ builder.AddServiceDefaults();
 builder.Services.AddProblemDetails();
 
 // EF Core
-builder.Services.AddDbContext<AppDbContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("Db")));
+builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
 var app = builder.Build();
 
