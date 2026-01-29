@@ -1,0 +1,48 @@
+﻿@page "/rooms"
+@rendermode InteractiveServer
+@using H2Projekt.Web.Services
+@inject RoomApiClient Api
+
+<h3>Værelser</h3>
+
+@if (rooms is null)
+{
+    <p>Henter data...</p>
+}
+else if (rooms.Count == 0)
+{
+    <em>Ingen værelser fundet.</em>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Nummer</th>
+                <th>Kapacitet</th>
+                <th>Pris pr. nat</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in rooms)
+            {
+                <tr>
+                    <td>@r.Id</td>
+                    <td>@r.Number</td>
+                    <td>@r.Capacity</td>
+                    <td>@r.PricePerNight</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private List<RoomDto>? rooms;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rooms = await Api.GetAllAsync();
+    }
+}

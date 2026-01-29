@@ -2,6 +2,7 @@ using H2Projekt.Infrastructure;
 using H2Projekt.Web;
 using H2Projekt.Web.Components;
 using Microsoft.EntityFrameworkCore;
+using H2Projekt.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +25,13 @@ builder.Services.AddHttpClient<WeatherApiClient>(client =>
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
+
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("https://localhost:7418/")
+});
+
+builder.Services.AddScoped<RoomApiClient>();
 
 var app = builder.Build();
 
