@@ -21,11 +21,6 @@
     <ValidationSummary />
 
     <div class="mb-2">
-        <label>HotelId</label>
-        <InputNumber @bind-Value="room.HotelId" class="form-control" />
-    </div>
-
-    <div class="mb-2">
         <label>Værelsesnummer</label>
         <InputText @bind-Value="room.Number" class="form-control" />
     </div>
@@ -53,7 +48,7 @@
         try
         {
             // Evt. duplikat-tjek: HotelId+Number
-            var dup = await Db.Rooms.AnyAsync(r => r.HotelId == room.HotelId && r.Number == room.Number);
+            var dup = await Db.Rooms.AnyAsync(r => r.Number == room.Number);
             if (dup)
             {
                 error = "Der findes allerede et værelse med dette nummer på hotellet.";

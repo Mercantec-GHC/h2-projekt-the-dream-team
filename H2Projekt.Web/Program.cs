@@ -2,7 +2,6 @@ using H2Projekt.Infrastructure;
 using H2Projekt.Web;
 using H2Projekt.Web.Components;
 using Microsoft.EntityFrameworkCore;
-using System;
 
 var builder = WebApplication.CreateBuilder(args);
 
