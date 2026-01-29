@@ -1,0 +1,170 @@
+[
+  {
+    "Title": "General Conduct",
+    "Rules": [
+      "Guests must present valid government-issued ID at check-in",
+      "Only registered guests are permitted to stay overnight",
+      "Guests must comply with all hotel policies and local laws",
+      "Disorderly conduct is prohibited",
+      "Harassment of staff or other guests will not be tolerated",
+      "Management reserves the right to refuse service",
+      "Hotel property must be treated with care",
+      "Any illegal activity will be reported to authorities",
+      "Guests must follow posted signage at all times",
+      "Hotel rules apply to all guests without exception"
+    ]
+  },
+  {
+    "Title": "Check-In and Check-Out",
+    "Rules": [
+      "Check-in begins at the posted time",
+      "Early check-in is subject to availability",
+      "Check-out must be completed by the designated time",
+      "Late check-out may incur additional fees",
+      "Failure to check out on time may result in an extra night charge",
+      "Keys or key cards must be returned upon departure",
+      "Lost key cards may incur a replacement fee",
+      "All charges must be settled before check-out"
+    ]
+  },
+  {
+    "Title": "Noise and Quiet Hours",
+    "Rules": [
+      "Quiet hours must be observed",
+      "Loud music is prohibited",
+      "Shouting or disruptive behavior is not permitted",
+      "Televisions and devices must be kept at reasonable volume",
+      "Parties or events require prior approval",
+      "Hallway loitering is discouraged",
+      "Noise complaints may result in eviction without refund"
+    ]
+  },
+  {
+    "Title": "Smoking and Substances",
+    "Rules": [
+      "Smoking is prohibited in non-smoking rooms",
+      "Smoking is only allowed in designated areas",
+      "Tampering with smoke detectors is strictly prohibited",
+      "A cleaning fee will be charged for smoking violations",
+      "Illegal drugs are prohibited on hotel property",
+      "Vaping follows the same rules as smoking",
+      "Excessive intoxication is not permitted"
+    ]
+  },
+  {
+    "Title": "Pets and Animals",
+    "Rules": [
+      "Pets are only allowed in designated pet-friendly rooms",
+      "Service animals are permitted as required by law",
+      "Pets must be supervised at all times",
+      "Pets are not allowed in dining areas",
+      "Owners must clean up after their pets",
+      "Excessive pet noise may result in removal",
+      "Pet damage fees may apply"
+    ]
+  },
+  {
+    "Title": "Room Care and Housekeeping",
+    "Rules": [
+      "Rooms must be kept in reasonable condition",
+      "Furniture must not be rearranged",
+      "Towels are for bathroom use only",
+      "Hotel property may not be removed from rooms",
+      "Daily housekeeping is provided unless declined",
+      "Do Not Disturb signs must be respected",
+      "Damages will be charged to the guest",
+      "Trash must be disposed of properly",
+      "Excessive mess may result in cleaning fees"
+    ]
+  },
+  {
+    "Title": "Safety and Security",
+    "Rules": [
+      "Security doors must not be propped open",
+      "Guests are responsible for securing valuables",
+      "The hotel is not liable for unattended belongings",
+      "Fire exits must remain clear",
+      "Candles and open flames are prohibited",
+      "Cooking appliances are not allowed in rooms",
+      "Suspicious activity must be reported to staff",
+      "Emergency instructions must be followed",
+      "Children must be supervised at all times"
+    ]
+  },
+  {
+    "Title": "Food and Beverage",
+    "Rules": [
+      "Outside alcohol may be restricted",
+      "Food preparation in rooms is prohibited unless stated",
+      "Room service items must remain in guest rooms",
+      "Buffet items may not be removed from dining areas",
+      "Proper attire is required in dining areas",
+      "Spills must be reported to staff",
+      "Glassware is not permitted in pool areas"
+    ]
+  },
+  {
+    "Title": "Amenities and Common Areas",
+    "Rules": [
+      "Pool hours must be observed",
+      "No lifeguard on duty where posted",
+      "Guests must shower before entering the pool",
+      "Children must be supervised in pool areas",
+      "Gym equipment must be wiped after use",
+      "Appropriate attire is required in public areas",
+      "Towels must be returned to designated areas",
+      "Lounge chairs may not be reserved",
+      "Amenities are for registered guests only"
+    ]
+  },
+  {
+    "Title": "Parking and Transportation",
+    "Rules": [
+      "Parking is for registered guests only",
+      "Vehicles must be parked in designated areas",
+      "The hotel is not responsible for vehicle damage",
+      "Vehicle repairs are not permitted on property",
+      "Speed limits must be obeyed",
+      "Unauthorized vehicles may be towed"
+    ]
+  },
+  {
+    "Title": "Payments and Fees",
+    "Rules": [
+      "A valid credit card is required at check-in",
+      "Incidental authorization holds may apply",
+      "Guests are responsible for all room charges",
+      "Refunds are subject to cancellation policies",
+      "Chargebacks may incur administrative fees"
+    ]
+  },
+  {
+    "Title": "Privacy and Media",
+    "Rules": [
+      "Photography of other guests without consent is prohibited",
+      "Recording staff without permission is not allowed",
+      "Drones are prohibited on hotel property",
+      "Guest information is confidential",
+      "Social media use must respect guest privacy"
+    ]
+  },
+  {
+    "Title": "Visitors and Access",
+    "Rules": [
+      "Visitors must check in at the front desk",
+      "Visitor access may be restricted after certain hours",
+      "Maximum occupancy limits must be followed",
+      "Room keys may not be shared",
+      "Staff may access rooms in emergencies"
+    ]
+  },
+  {
+    "Title": "Policy Enforcement",
+    "Rules": [
+      "Rule violations may result in warnings or eviction",
+      "No refunds will be issued for policy violations",
+      "Management decisions are final",
+      "Rules are subject to change without notice"
+    ]
+  }
+]
