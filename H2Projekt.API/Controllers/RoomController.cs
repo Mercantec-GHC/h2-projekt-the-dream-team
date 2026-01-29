@@ -28,11 +28,19 @@ namespace H2Projekt.API.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> CreateRoom([FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
         {
-            var roomId = await handler.Handle(createRoomCommand);
+            try
+            {
+                var roomId = await handler.Handle(createRoomCommand);
 
-            return Ok(roomId);
+                return Ok(roomId);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }

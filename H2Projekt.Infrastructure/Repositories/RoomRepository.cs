@@ -18,6 +18,11 @@ namespace H2Projekt.Infrastructure.Repositories
             return await _appDbContext.Rooms.ToListAsync(cancellationToken);
         }
 
+        public async Task<Room?> GetRoomByRoomNumberAsync(string number, CancellationToken cancellationToken)
+        {
+            return await _appDbContext.Rooms.SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
+        }
+
         public async Task<int> AddAsync(Room room, CancellationToken cancellationToken = default)
         {
             await _appDbContext.Rooms.AddAsync(room);

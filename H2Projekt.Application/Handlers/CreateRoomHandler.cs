@@ -15,6 +15,13 @@ namespace H2Projekt.Application.Handlers
 
         public async Task<int> Handle(CreateRoomCommand request, CancellationToken cancellationToken = default)
         {
+            var existingRoom = await _roomRepository.GetRoomByRoomNumberAsync(request.Number, cancellationToken);
+
+            if (existingRoom is not null)
+            {
+                throw new InvalidOperationException($"Room with number {request.Number} already exists.");
+            }
+
             var room = new Room(request.Number, request.Capacity, request.PricePerNight);
 
             await _roomRepository.AddAsync(room, cancellationToken);
