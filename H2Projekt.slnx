@@ -1,6 +1,14 @@
 <Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
   <Project Path="H2Projekt.API/H2Projekt.API.csproj" />
   <Project Path="H2Projekt.AppHost/H2Projekt.AppHost.csproj" />
+  <Project Path="H2Projekt.Application/H2Projekt.Application.csproj" />
+  <Project Path="H2Projekt.Domain/H2Projekt.Domain.csproj" />
+  <Project Path="H2Projekt.Infrastructure/H2Projekt.Infrastructure.csproj" />
   <Project Path="H2Projekt.ServiceDefaults/H2Projekt.ServiceDefaults.csproj" />
   <Project Path="H2Projekt.Web/H2Projekt.Web.csproj" />
 </Solution>

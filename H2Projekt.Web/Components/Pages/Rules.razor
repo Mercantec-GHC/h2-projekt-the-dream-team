@@ -1,0 +1,36 @@
+﻿@page "/rules"
+@rendermode InteractiveServer
+
+@inject CommonApiClient Api
+
+<h3>Regler</h3>
+
+@if (rules is null)
+{
+    <p>Henter regler...</p>
+}
+else
+{
+    @foreach (var rule in rules)
+    {
+        <div class="my-5">
+            <h4>@rule.Title</h4>
+            
+            <ul>
+                @foreach (var item in rule.Rules)
+                {
+                    <li>@item</li>
+                }
+            </ul>
+        </div>
+    }
+}
+
+@code {
+    private List<Rule>? rules;
+
+    protected override async Task OnInitializedAsync()
+    {
+        rules = await Api.GetRulesAsync();
+    }
+}
