@@ -6,6 +6,7 @@
         public string Number { get; set; } = default!;
         public int Capacity { get; set; }
         public decimal PricePerNight { get; set; }  // fast pris!
+        public ICollection<RoomAvailability> Availability { get; private set; } = new List<RoomAvailability>();
 
         public Room() { }
 

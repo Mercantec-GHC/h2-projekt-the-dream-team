@@ -19,5 +19,6 @@ namespace H2Projekt.Domain
             Date = date;
             Status = status;
         }
+        ublic void SetStatus(RoomAvailabilityStatus status) => Status = status;
     }
 }
