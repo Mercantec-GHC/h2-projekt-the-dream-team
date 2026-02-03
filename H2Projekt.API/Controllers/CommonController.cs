@@ -8,6 +8,10 @@ namespace H2Projekt.API.Controllers
     [ApiController]
     public class CommonController : ControllerBase
     {
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<ActionResult<List<Rule>>> GetRules()
         {
             try

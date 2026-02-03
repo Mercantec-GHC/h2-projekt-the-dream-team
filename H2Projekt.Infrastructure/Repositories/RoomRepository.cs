@@ -29,5 +29,12 @@ namespace H2Projekt.Infrastructure.Repositories
 
             return await _appDbContext.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<int> DeleteAsync(Room room, CancellationToken cancellationToken = default)
+        {
+            _appDbContext.Rooms.Remove(room);
+
+            return await _appDbContext.SaveChangesAsync(cancellationToken);
+        }
     }
 }

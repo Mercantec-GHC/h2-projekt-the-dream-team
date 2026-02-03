@@ -7,5 +7,6 @@ namespace H2Projekt.Application.Interfaces
         Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default);
         Task<Room?> GetRoomByRoomNumberAsync(string number, CancellationToken cancellationToken);
         Task<int> AddAsync(Room room, CancellationToken cancellationToken = default);
+        Task<int> DeleteAsync(Room room, CancellationToken cancellationToken = default);
     }
 }

@@ -42,5 +42,22 @@ namespace H2Projekt.API.Controllers
                 return BadRequest(ex.Message);
             }
         }
+
+        [HttpDelete("{number}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<bool>> DeleteRoom([FromServices] DeleteRoomHandler handler, string number)
+        {
+            try
+            {
+                var roomDeleted = await handler.Handle(number);
+
+                return Ok(roomDeleted);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
     }
 }

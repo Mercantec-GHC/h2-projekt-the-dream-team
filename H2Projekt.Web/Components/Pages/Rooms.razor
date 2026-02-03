@@ -1,7 +1,12 @@
 ﻿@page "/rooms"
 @rendermode InteractiveServer
 
-@inject RoomApiClient Api
+@inject ApiClient Api
+
+@if (!string.IsNullOrWhiteSpace(response))
+{
+    <div class="alert alert-success">@response</div>
+}
 
 <h3>Værelser</h3>
 
@@ -22,6 +27,7 @@ else
                 <th>Nummer</th>
                 <th>Kapacitet</th>
                 <th>Pris pr. nat</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
@@ -32,6 +38,9 @@ else
                     <td>@r.Number</td>
                     <td>@r.Capacity</td>
                     <td>@r.PricePerNight</td>
+                    <td>
+                        <button class="btn btn-danger" @onclick="() => DeleteRoom(r)">Delete</button>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -39,10 +48,28 @@ else
 }
 
 @code {
-    private List<Room>? rooms;
+    private string? response;
+    private ICollection<Room> rooms;
 
     protected override async Task OnInitializedAsync()
     {
-        rooms = await Api.GetAllAsync();
+        rooms = await Api.GetAllRoomsAsync();
+    }
+
+    public async Task DeleteRoom(Room room)
+    {
+        var deleted = await Api.DeleteRoomAsync(room.Number);
+
+        if (deleted)
+        {
+            response = $"Værelse #{room.Number} er slettet.";
+        }
+        else
+        {
+            response = $"Kunne ikke slette værelse #{room.Number}.";
+
+        }
+
+        rooms.Remove(room);
     }
 }

@@ -1,8 +1,6 @@
-using H2Projekt.Infrastructure;
 using H2Projekt.Web;
 using H2Projekt.Web.Components;
 using Microsoft.EntityFrameworkCore;
-using H2Projekt.Web.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,29 +14,24 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-builder.Services.AddHttpClient<WeatherApiClient>(client =>
+builder.Services.AddHttpClient<ApiClient>(client =>
     {
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
     });
 
-builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
-
 builder.Services.AddScoped(sp => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7418/")
 });
-
-builder.Services.AddScoped<CommonApiClient>();
-builder.Services.AddScoped<RoomApiClient>();
 
 var app = builder.Build();
 
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
+
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
