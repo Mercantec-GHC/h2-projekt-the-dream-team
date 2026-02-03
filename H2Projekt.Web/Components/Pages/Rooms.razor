@@ -1,6 +1,6 @@
 ﻿@page "/rooms"
 @rendermode InteractiveServer
-@using H2Projekt.Web.Services
+
 @inject RoomApiClient Api
 
 <h3>Værelser</h3>
@@ -39,7 +39,7 @@ else
 }
 
 @code {
-    private List<RoomDto>? rooms;
+    private List<Room>? rooms;
 
     protected override async Task OnInitializedAsync()
     {

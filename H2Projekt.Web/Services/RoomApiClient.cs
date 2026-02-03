@@ -1,24 +1,20 @@
-﻿using System.Net.Http.Json;
+﻿using H2Projekt.Domain;
 
 namespace H2Projekt.Web.Services
 {
     public sealed class RoomApiClient
     {
-        private readonly HttpClient _http;
-        public RoomApiClient(HttpClient http) => _http = http;
+        private readonly HttpClient _httpClient;
 
-        public async Task<List<RoomDto>> GetAllAsync(CancellationToken ct = default)
+        public RoomApiClient(HttpClient httpClient)
         {
-            var rooms = await _http.GetFromJsonAsync<List<RoomDto>>("api/room/getallrooms", ct);
-            return rooms ?? new List<RoomDto>();
+            _httpClient = httpClient;
         }
-    }
 
-    public sealed class RoomDto
-    {
-        public int Id { get; set; }
-        public string Number { get; set; } = "";
-        public int Capacity { get; set; }
-        public decimal PricePerNight { get; set; }
+        public async Task<List<Room>> GetAllAsync(CancellationToken ct = default)
+        {
+            var rooms = await _httpClient.GetFromJsonAsync<List<Room>>("api/room/getallrooms", ct);
+            return rooms ?? new List<Room>();
+        }
     }
 }
