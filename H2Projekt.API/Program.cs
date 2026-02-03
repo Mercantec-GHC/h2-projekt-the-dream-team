@@ -20,6 +20,7 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configu
 
 // Application handlers
 builder.Services.AddScoped<CreateRoomHandler>();
+builder.Services.AddScoped<UpdateRoomHandler>();
 builder.Services.AddScoped<DeleteRoomHandler>();
 
 // Repositories

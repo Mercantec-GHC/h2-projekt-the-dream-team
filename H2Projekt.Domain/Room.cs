@@ -17,5 +17,13 @@ namespace H2Projekt.Domain
             Capacity = capacity;
             PricePerNight = pricePerNight;
         }
+
+        public Room(Room existingRoom)
+        {
+            Id = existingRoom.Id;
+            Number = existingRoom.Number;
+            Capacity = existingRoom.Capacity;
+            PricePerNight = existingRoom.PricePerNight;
+        }
     }
 }

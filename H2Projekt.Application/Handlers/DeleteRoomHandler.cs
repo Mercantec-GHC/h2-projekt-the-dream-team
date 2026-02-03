@@ -1,6 +1,5 @@
-﻿using H2Projekt.Application.Commands;
+﻿using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers
 {
@@ -13,18 +12,16 @@ namespace H2Projekt.Application.Handlers
             _roomRepository = roomRepository;
         }
 
-        public async Task<bool> Handle(string number, CancellationToken cancellationToken = default)
+        public async Task Handle(string number, CancellationToken cancellationToken = default)
         {
             var room = await _roomRepository.GetRoomByRoomNumberAsync(number, cancellationToken);
 
             if (room is null)
             {
-                throw new InvalidOperationException($"Room with number {number} doesn't exist.");
+                throw new RoomNonExistentException($"Room with number {number} doesn't exist.");
             }
 
-            var affectedRows = await _roomRepository.DeleteAsync(room, cancellationToken);
-
-            return affectedRows > 0;
+            await _roomRepository.DeleteAsync(room, cancellationToken);
         }
     }
 }

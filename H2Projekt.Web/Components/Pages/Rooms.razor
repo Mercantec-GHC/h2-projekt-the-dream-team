@@ -39,6 +39,7 @@ else
                     <td>@r.Capacity</td>
                     <td>@r.PricePerNight</td>
                     <td>
+                        <button type="button" class="btn btn-secondary" @onclick="() => EditRoom(r)" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
                         <button class="btn btn-danger" @onclick="() => DeleteRoom(r)">Delete</button>
                     </td>
                 </tr>
@@ -47,8 +48,39 @@ else
     </table>
 }
 
+<div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="editModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4" id="editModalLabel">Redigér Rum</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body my-3 p-0">
+                @if (roomToEdit is not null)
+                {
+                    <RoomForm Model="roomToEdit" HideButton="true" />
+                }
+            </div>
+
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="SaveRoom">Gem</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @code {
     private string? response;
+
+    private Room? roomToEdit;
+
     private ICollection<Room> rooms;
 
     protected override async Task OnInitializedAsync()
@@ -56,20 +88,44 @@ else
         rooms = await Api.GetAllRoomsAsync();
     }
 
+    public void EditRoom(Room room)
+    {
+        roomToEdit = room;
+    }
+
+    public async Task SaveRoom()
+    {
+        if (roomToEdit is null)
+        {
+            return;
+        }
+
+        await Api.UpdateRoomAsync(new UpdateRoomCommand()
+        {
+            Number = roomToEdit.Number,
+            Capacity = roomToEdit.Capacity,
+            PricePerNight = roomToEdit.PricePerNight
+        });
+
+        // Implement save logic here
+        roomToEdit = null;
+
+        StateHasChanged();
+    }
+
     public async Task DeleteRoom(Room room)
     {
-        var deleted = await Api.DeleteRoomAsync(room.Number);
-
-        if (deleted)
+        try
         {
+            await Api.DeleteRoomAsync(room.Number);
+
+            rooms.Remove(room);
+
             response = $"Værelse #{room.Number} er slettet.";
         }
-        else
+        catch (ApiException ex)
         {
-            response = $"Kunne ikke slette værelse #{room.Number}.";
-
+            response = ex.Response;
         }
-
-        rooms.Remove(room);
     }
 }

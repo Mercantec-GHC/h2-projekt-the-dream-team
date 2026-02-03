@@ -1,4 +1,5 @@
 ﻿using H2Projekt.Application.Commands;
+using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
 
@@ -19,7 +20,7 @@ namespace H2Projekt.Application.Handlers
 
             if (existingRoom is not null)
             {
-                throw new InvalidOperationException($"Room with number {request.Number} already exists.");
+                throw new RoomDuplicateException($"Room with number {request.Number} already exists.");
             }
 
             var room = new Room(request.Number, request.Capacity, request.PricePerNight);
