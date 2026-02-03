@@ -12,7 +12,7 @@ namespace H2Projekt.Domain
         public DateOnly Date { get; set; }
         public RoomAvailabilityStatus Status { get; set; }
         public Room Room { get; set; } = default!; 
-        
+        public RoomAvailability() { } // Parameterless constructor for EF Core
         public RoomAvailability(int roomId, DateOnly date, RoomAvailabilityStatus status)
         {
             RoomId = roomId;
