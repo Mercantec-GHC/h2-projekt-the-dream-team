@@ -1,4 +1,6 @@
-﻿namespace H2Projekt.Domain
+﻿using H2Projekt.Domain.Enums;
+
+namespace H2Projekt.Domain
 {
     public class Room
     {
@@ -6,8 +8,7 @@
         public string Number { get; set; } = default!;
         public int Capacity { get; set; }
         public decimal PricePerNight { get; set; }  // fast pris!
-        public ICollection<RoomAvailability> Availability { get; private set; } = new List<RoomAvailability>();
-
+        public RoomAvailabilityStatus Status { get; set; }
         public Room() { }
 
         public Room(string number, int capacity, decimal pricePerNight)
