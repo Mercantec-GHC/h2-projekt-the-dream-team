@@ -24,6 +24,7 @@ builder.Services.AddScoped<CreateRoomHandler>();
 // Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 
+// CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
@@ -35,12 +36,20 @@ builder.Services.AddCors(options =>
         });
 });
 
+// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+builder.Services.AddOpenApi();
+
 var app = builder.Build();
 
 app.UseCors("AllowAllOrigins");
 
 // Configure the HTTP request pipeline.
 app.UseExceptionHandler();
+
+if (app.Environment.IsDevelopment())
+{
+    app.MapOpenApi();
+}
 
 app.MapControllers();
 

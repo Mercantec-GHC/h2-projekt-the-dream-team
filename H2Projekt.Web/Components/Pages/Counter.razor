@@ -1,9 +1,7 @@
 ﻿@page "/admin"
 @rendermode InteractiveServer
-@using H2Projekt.Domain
-@using H2Projekt.Infrastructure
-@using Microsoft.EntityFrameworkCore
-@inject AppDbContext Db
+
+@inject ApiClient Api
 
 <h3>Opret nyt værelse</h3>
 
@@ -47,17 +45,13 @@
     {
         try
         {
-            // Evt. duplikat-tjek: HotelId+Number
-            var dup = await Db.Rooms.AnyAsync(r => r.Number == room.Number);
-            if (dup)
+            await Api.CreateRoomAsync(new CreateRoomCommand()
             {
-                error = "Der findes allerede et værelse med dette nummer på hotellet.";
-                success = null;
-                return;
-            }
+                Number = room.Number,
+                Capacity = room.Capacity,
+                PricePerNight = room.PricePerNight
+            });
 
-            Db.Rooms.Add(room);
-            await Db.SaveChangesAsync();
             success = $"Værelse #{room.Number} er oprettet.";
             error = null;
             room = new Room();

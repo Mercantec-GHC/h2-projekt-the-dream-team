@@ -1,7 +1,7 @@
 ﻿@page "/rooms"
 @rendermode InteractiveServer
 
-@inject RoomApiClient Api
+@inject ApiClient Api
 
 <h3>Værelser</h3>
 
@@ -39,10 +39,10 @@ else
 }
 
 @code {
-    private List<Room>? rooms;
+    private ICollection<Room> rooms;
 
     protected override async Task OnInitializedAsync()
     {
-        rooms = await Api.GetAllAsync();
+        rooms = await Api.GetAllRoomsAsync();
     }
 }
