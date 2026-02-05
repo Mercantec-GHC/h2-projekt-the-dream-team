@@ -355,20 +355,10 @@
       "Room": {
         "type": "object",
         "properties": {
-          "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
           "number": {
             "type": "string"
           },
           "capacity": {
-            "maximum": 2147483647,
-            "minimum": 0,
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",
@@ -377,8 +367,6 @@
             "format": "int32"
           },
           "pricePerNight": {
-            "maximum": 10000,
-            "minimum": 0,
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
               "number",
@@ -388,6 +376,14 @@
           },
           "status": {
             "$ref": "#/components/schemas/RoomAvailabilityStatus"
+          },
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },

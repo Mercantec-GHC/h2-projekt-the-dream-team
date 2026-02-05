@@ -6,10 +6,8 @@ namespace H2Projekt.Domain
     public class Room : EntityBase
     {
         public string Number { get; private set; } = default!;
-        [Range(0, int.MaxValue)]
         public int Capacity { get; private set; }
-        [Range(0, 10000)]
-        public decimal PricePerNight { get; private set; }  // fast pris!
+        public decimal PricePerNight { get; private set; }
         public RoomAvailabilityStatus Status { get; private set; }
 
         public Room() { }

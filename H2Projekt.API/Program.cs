@@ -1,7 +1,11 @@
+using FluentValidation;
 using H2Projekt.Application.Handlers;
 using H2Projekt.Application.Interfaces;
+using H2Projekt.Application.Validators;
+using H2Projekt.Domain;
 using H2Projekt.Infrastructure;
 using H2Projekt.Infrastructure.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,6 +26,10 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configu
 builder.Services.AddScoped<CreateRoomHandler>();
 builder.Services.AddScoped<UpdateRoomHandler>();
 builder.Services.AddScoped<DeleteRoomHandler>();
+
+// Validators
+builder.Services.AddScoped<IValidator<Booking>, BookingValidator>();
+builder.Services.AddScoped<IValidator<Room>, RoomValidator>();
 
 // Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();

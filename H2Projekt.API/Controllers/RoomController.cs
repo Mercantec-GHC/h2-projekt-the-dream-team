@@ -1,4 +1,5 @@
-﻿using H2Projekt.Application.Commands;
+﻿using FluentValidation;
+using H2Projekt.Application.Commands;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers;
 using H2Projekt.Application.Interfaces;
@@ -42,6 +43,10 @@ namespace H2Projekt.API.Controllers
             {
                 return Conflict(ex.Message);
             }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
 
         [HttpPut]
@@ -58,6 +63,10 @@ namespace H2Projekt.API.Controllers
             catch (RoomNonExistentException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
 
