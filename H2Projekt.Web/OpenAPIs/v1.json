@@ -296,13 +296,8 @@
           "number": {
             "type": "string"
           },
-          "capacity": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
+          "type": {
+            "$ref": "#/components/schemas/RoomType"
           },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
@@ -358,13 +353,8 @@
           "number": {
             "type": "string"
           },
-          "capacity": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
+          "type": {
+            "$ref": "#/components/schemas/RoomType"
           },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
@@ -390,6 +380,9 @@
       "RoomAvailabilityStatus": {
         "type": "integer"
       },
+      "RoomType": {
+        "type": "integer"
+      },
       "Rule": {
         "type": "object",
         "properties": {
@@ -410,13 +403,8 @@
           "number": {
             "type": "string"
           },
-          "capacity": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
+          "type": {
+            "$ref": "#/components/schemas/RoomType"
           },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",

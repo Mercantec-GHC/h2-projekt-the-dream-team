@@ -26,7 +26,7 @@ namespace H2Projekt.Application.Handlers
                 throw new RoomNonExistentException($"Room with number {request.Number} doesn't exist.");
             }
 
-            existingRoom.UpdateDetails(request.Number, request.Capacity, request.PricePerNight);
+            existingRoom.UpdateDetails(request.Number, request.Type, request.PricePerNight);
 
             var validationResult = await _validator.ValidateAsync(existingRoom);
 

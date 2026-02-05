@@ -26,7 +26,7 @@ namespace H2Projekt.Application.Handlers
                 throw new RoomDuplicateException($"Room with number {request.Number} already exists.");
             }
 
-            var room = new Room(request.Number, request.Capacity, request.PricePerNight);
+            var room = new Room(request.Number, request.Type, request.PricePerNight);
 
             var validationResult = await _validator.ValidateAsync(room);
 

@@ -1,9 +1,10 @@
-﻿namespace H2Projekt.Domain.Enums
+﻿namespace H2Projekt.Web.Enums
 {
-    public enum RoomTypeEnum
+    public enum RoomType
     {
         Single,
         Double,
+        Quad,
         Penthouse,
         Suite
     }

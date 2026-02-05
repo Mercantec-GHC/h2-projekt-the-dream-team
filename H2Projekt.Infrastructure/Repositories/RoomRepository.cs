@@ -15,7 +15,7 @@ namespace H2Projekt.Infrastructure.Repositories
 
         public async Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Rooms.ToListAsync(cancellationToken);
+            return await _appDbContext.Rooms.OrderBy(r => r.Id).ToListAsync(cancellationToken);
         }
 
         public async Task<Room?> GetRoomByRoomNumberAsync(string number, CancellationToken cancellationToken)

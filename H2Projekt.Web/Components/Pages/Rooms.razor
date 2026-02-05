@@ -25,7 +25,7 @@ else
             <tr>
                 <th>Id</th>
                 <th>Nummer</th>
-                <th>Kapacitet</th>
+                <th>Type</th>
                 <th>Pris pr. nat</th>
                 <th></th>
             </tr>
@@ -36,7 +36,7 @@ else
                 <tr>
                     <td>@r.Id</td>
                     <td>@r.Number</td>
-                    <td>@r.Capacity</td>
+                    <td>@r.Type</td>
                     <td>@r.PricePerNight</td>
                     <td>
                         <button type="button" class="btn btn-secondary" @onclick="() => EditRoom(r)" data-bs-toggle="modal" data-bs-target="#editModal">Edit</button>
@@ -62,6 +62,11 @@ else
             </div>
 
             <div class="modal-body my-3 p-0">
+                @if (!string.IsNullOrWhiteSpace(response))
+                {
+                    <div class="alert alert-success">@response</div>
+                }
+
                 @if (roomToEdit is not null)
                 {
                     <RoomForm Model="roomToEdit" HideButton="true" />
@@ -100,17 +105,24 @@ else
             return;
         }
 
-        await Api.UpdateRoomAsync(new UpdateRoomCommand()
+        try
         {
-            Number = roomToEdit.Number,
-            Capacity = roomToEdit.Capacity,
-            PricePerNight = roomToEdit.PricePerNight
-        });
+            await Api.UpdateRoomAsync(new UpdateRoomCommand()
+            {
+                Number = roomToEdit.Number,
+                Type = roomToEdit.Type,
+                PricePerNight = roomToEdit.PricePerNight
+            });
 
-        // Implement save logic here
-        roomToEdit = null;
+            // Implement save logic here
+            roomToEdit = null;
 
-        StateHasChanged();
+            StateHasChanged();
+        }
+        catch (ApiException ex)
+        {
+            response = ex.Response;
+        }
     }
 
     public async Task DeleteRoom(Room room)

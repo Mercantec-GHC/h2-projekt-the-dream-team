@@ -28,7 +28,7 @@
             await Api.CreateRoomAsync(new CreateRoomCommand()
             {
                 Number = room.Number,
-                Capacity = room.Capacity,
+                Type = room.Type,
                 PricePerNight = room.PricePerNight
             });
 

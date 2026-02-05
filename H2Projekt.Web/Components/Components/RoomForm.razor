@@ -15,9 +15,21 @@
     <div>
         <label class="form-label">Kapacitet</label>
 
-        <InputNumber @bind-Value="Model.Capacity" class="form-control" />
+        <InputSelect @bind-Value="Model.Type" class="form-control">
+            @foreach (var type in keyValuePairs)
+            {
+                @if (type.Value.Equals(Model.Type))
+                {
+                    <option value="@type.Value" selected>@type.Key</option>
 
-        <ValidationMessage For="@(() => Model.Capacity)" />
+                    continue;
+                }
+
+                <option value="@type.Value">@type.Key</option>
+            }
+        </InputSelect>
+
+        <ValidationMessage For="@(() => Model.Type)" />
     </div>
 
     <div>
@@ -43,4 +55,6 @@
 
     [Parameter]
     public bool? HideButton { get; set; }
+
+    private Dictionary<string, int> keyValuePairs => Enum.GetValues<RoomType>().ToDictionary(t => t.ToString(), t => (int)t);
 }
