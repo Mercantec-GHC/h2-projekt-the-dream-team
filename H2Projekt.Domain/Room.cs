@@ -1,14 +1,17 @@
 ﻿using H2Projekt.Domain.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace H2Projekt.Domain
 {
-    public class Room
+    public class Room : EntityBase
     {
-        public int Id { get; set; }
-        public string Number { get; set; } = default!;
-        public int Capacity { get; set; }
-        public decimal PricePerNight { get; set; }  // fast pris!
-        public RoomAvailabilityStatus Status { get; set; }
+        public string Number { get; private set; } = default!;
+        [Range(0, int.MaxValue)]
+        public int Capacity { get; private set; }
+        [Range(0, 10000)]
+        public decimal PricePerNight { get; private set; }  // fast pris!
+        public RoomAvailabilityStatus Status { get; private set; }
+
         public Room() { }
 
         public Room(string number, int capacity, decimal pricePerNight)
@@ -18,12 +21,11 @@ namespace H2Projekt.Domain
             PricePerNight = pricePerNight;
         }
 
-        public Room(Room existingRoom)
+        public void UpdateDetails(string number, int capacity, decimal pricePerNight)
         {
-            Id = existingRoom.Id;
-            Number = existingRoom.Number;
-            Capacity = existingRoom.Capacity;
-            PricePerNight = existingRoom.PricePerNight;
+            Number = number;
+            Capacity = capacity;
+            PricePerNight = pricePerNight;
         }
     }
 }

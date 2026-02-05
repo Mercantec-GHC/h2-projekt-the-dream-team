@@ -21,9 +21,7 @@ namespace H2Projekt.Application.Handlers
                 throw new InvalidOperationException($"Room with number {request.Number} doesn't exist.");
             }
 
-            existingRoom.Number = request.Number;
-            existingRoom.Capacity = request.Capacity;
-            existingRoom.PricePerNight = request.PricePerNight;
+            existingRoom.UpdateDetails(request.Number, request.Capacity, request.PricePerNight);
 
             await _roomRepository.UpdateAsync(existingRoom, cancellationToken);
         }

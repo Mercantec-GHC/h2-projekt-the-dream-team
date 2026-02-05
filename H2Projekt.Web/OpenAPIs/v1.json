@@ -170,8 +170,8 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "409": {
+            "description": "Conflict",
             "content": {
               "text/plain": {
                 "schema": {
@@ -367,6 +367,8 @@
             "type": "string"
           },
           "capacity": {
+            "maximum": 2147483647,
+            "minimum": 0,
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",
@@ -375,14 +377,22 @@
             "format": "int32"
           },
           "pricePerNight": {
+            "maximum": 10000,
+            "minimum": 0,
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
               "number",
               "string"
             ],
             "format": "double"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RoomAvailabilityStatus"
           }
         }
+      },
+      "RoomAvailabilityStatus": {
+        "type": "integer"
       },
       "Rule": {
         "type": "object",
