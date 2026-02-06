@@ -33,6 +33,8 @@ builder.Services.AddScoped<IValidator<Room>, RoomValidator>();
 
 // Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
+builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+
 
 // CORS Policy
 builder.Services.AddCors(options =>
