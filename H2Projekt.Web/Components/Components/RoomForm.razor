@@ -1,0 +1,60 @@
+﻿@rendermode InteractiveServer
+
+<EditForm class="d-flex flex-column gap-3" Model="Model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label class="form-label">Værelsesnummer</label>
+
+        <InputText class="form-control" @bind-Value="Model.Number" />
+
+        <ValidationMessage For="@(() => Model.Number)" />
+    </div>
+
+    <div>
+        <label class="form-label">Kapacitet</label>
+
+        <InputSelect @bind-Value="Model.Type" class="form-control">
+            @foreach (var type in keyValuePairs)
+            {
+                @if (type.Value.Equals(Model.Type))
+                {
+                    <option value="@type.Value" selected>@type.Key</option>
+
+                    continue;
+                }
+
+                <option value="@type.Value">@type.Key</option>
+            }
+        </InputSelect>
+
+        <ValidationMessage For="@(() => Model.Type)" />
+    </div>
+
+    <div>
+        <label class="form-label">Pris pr. nat</label>
+
+        <InputNumber @bind-Value="Model.PricePerNight" class="form-control" />
+
+        <ValidationMessage For="@(() => Model.PricePerNight)" />
+    </div>
+
+    @if (!HideButton.HasValue || HideButton.Value == false)
+    {
+        <button type="submit" class="btn btn-success">Tilføj</button>
+    }
+</EditForm>
+
+@code {
+    [Parameter]
+    public Room Model { get; set; } = new Room();
+
+    [Parameter]
+    public EventCallback<EditContext> OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool? HideButton { get; set; }
+
+    private Dictionary<string, int> keyValuePairs => Enum.GetValues<RoomType>().ToDictionary(t => t.ToString(), t => (int)t);
+}

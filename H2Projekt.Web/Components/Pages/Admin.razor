@@ -1,0 +1,45 @@
+﻿@page "/admin"
+@rendermode InteractiveServer
+
+@inject ApiClient Api
+
+<h3>Opret nyt værelse</h3>
+
+@if (!string.IsNullOrWhiteSpace(success))
+{
+    <div class="alert alert-success">@success</div>
+}
+@if (!string.IsNullOrWhiteSpace(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<RoomForm Model="room" OnValidSubmit="HandleSubmit" />
+
+@code {
+    private Room room = new();
+    private string? success;
+    private string? error;
+
+    private async Task HandleSubmit()
+    {
+        try
+        {
+            await Api.CreateRoomAsync(new CreateRoomCommand()
+            {
+                Number = room.Number,
+                Type = room.Type,
+                PricePerNight = room.PricePerNight
+            });
+
+            success = $"Værelse #{room.Number} er oprettet.";
+            error = null;
+            room = new Room();
+        }
+        catch (ApiException ex)
+        {
+            error = ex.Response;
+            success = null;
+        }
+    }
+}

@@ -1,18 +1,23 @@
-﻿namespace H2Projekt.Domain
+﻿using H2Projekt.Domain.Enums;
+
+namespace H2Projekt.Domain
 {
-    public class Booking
+    public class Booking : EntityBase
     {
-        public int Id { get; set; }
+        public Guest Guest { get; private set; } = default!;
+        public RoomType RoomType { get; private set; }
+        public DateTimeOffset FromDate { get; private set; }
+        public DateTimeOffset ToDate { get; private set; }
+        public Room? AssignedRoom { get; private set; }
 
-        public int GuestId { get; set; }
-        public Guest Guest { get; set; } = default!;
+        public Booking() { }
 
-        public int RoomId { get; set; }
-        public Room Room { get; set; } = default!;
-
-        public DateTime CheckIn { get; set; }
-        public DateTime CheckOut { get; set; }
-
-        public decimal TotalPrice { get; set; }
+        public Booking(Guest guest, RoomType roomType, DateTimeOffset checkInDate, DateTimeOffset checkOutDate)
+        {
+            Guest = guest;
+            RoomType = roomType;
+            FromDate = checkInDate;
+            ToDate = checkOutDate;
+        }
     }
 }

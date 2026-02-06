@@ -3,6 +3,7 @@ using System;
 using H2Projekt.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace H2Projekt.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260203112139_AddStatus")]
+    partial class AddStatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -30,26 +33,26 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AssignedRoomId")
-                        .HasColumnType("integer");
+                    b.Property<DateTime>("CheckIn")
+                        .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTimeOffset>("FromDate")
+                    b.Property<DateTime>("CheckOut")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("GuestId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("RoomType")
+                    b.Property<int>("RoomId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTimeOffset>("ToDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<decimal>("TotalPrice")
+                        .HasColumnType("numeric");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedRoomId");
-
                     b.HasIndex("GuestId");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Bookings");
                 });
@@ -87,6 +90,9 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<int>("Capacity")
+                        .HasColumnType("integer");
+
                     b.Property<string>("Number")
                         .IsRequired()
                         .HasColumnType("text");
@@ -97,32 +103,28 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("Number")
-                        .IsUnique();
 
                     b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Booking", b =>
                 {
-                    b.HasOne("H2Projekt.Domain.Room", "AssignedRoom")
-                        .WithMany()
-                        .HasForeignKey("AssignedRoomId");
-
                     b.HasOne("H2Projekt.Domain.Guest", "Guest")
                         .WithMany()
                         .HasForeignKey("GuestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AssignedRoom");
+                    b.HasOne("H2Projekt.Domain.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Guest");
+
+                    b.Navigation("Room");
                 });
 #pragma warning restore 612, 618
         }

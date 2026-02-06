@@ -1,4 +1,6 @@
-﻿using H2Projekt.Application.Commands;
+﻿using FluentValidation;
+using H2Projekt.Application.Commands;
+using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
@@ -28,7 +30,7 @@ namespace H2Projekt.API.Controllers
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         public async Task<ActionResult<int>> CreateRoom([FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
         {
             try
@@ -37,9 +39,51 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(roomId);
             }
-            catch (InvalidOperationException ex)
+            catch (RoomDuplicateException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (ValidationException ex)
             {
                 return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> UpdateRoom([FromServices] UpdateRoomHandler handler, [FromBody] UpdateRoomCommand updateRoomCommand)
+        {
+            try
+            {
+                await handler.Handle(updateRoomCommand);
+
+                return Ok();
+            }
+            catch (RoomNonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{number}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteRoom([FromServices] DeleteRoomHandler handler, string number)
+        {
+            try
+            {
+                await handler.Handle(number);
+
+                return Ok();
+            }
+            catch (RoomNonExistentException ex)
+            {
+                return NotFound(ex.Message);
             }
         }
     }

@@ -1,7 +1,7 @@
 ﻿@page "/rules"
 @rendermode InteractiveServer
 
-@inject CommonApiClient Api
+@inject ApiClient Api
 
 <h3>Regler</h3>
 
@@ -27,7 +27,7 @@ else
 }
 
 @code {
-    private List<Rule>? rules;
+    private ICollection<Rule>? rules;
 
     protected override async Task OnInitializedAsync()
     {

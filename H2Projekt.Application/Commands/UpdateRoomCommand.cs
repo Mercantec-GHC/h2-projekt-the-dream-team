@@ -2,7 +2,7 @@
 
 namespace H2Projekt.Application.Commands
 {
-    public class CreateRoomCommand
+    public class UpdateRoomCommand
     {
         public string Number { get; set; }
         public RoomType Type { get; set; }
