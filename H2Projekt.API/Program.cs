@@ -26,10 +26,14 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configu
 builder.Services.AddScoped<CreateRoomHandler>();
 builder.Services.AddScoped<UpdateRoomHandler>();
 builder.Services.AddScoped<DeleteRoomHandler>();
+builder.Services.AddScoped<CreateRoomTypeHandler>();
+builder.Services.AddScoped<UpdateRoomTypeHandler>();
+builder.Services.AddScoped<DeleteRoomTypeHandler>();
 
 // Validators
 builder.Services.AddScoped<IValidator<Booking>, BookingValidator>();
 builder.Services.AddScoped<IValidator<Room>, RoomValidator>();
+builder.Services.AddScoped<IValidator<RoomType>, RoomTypeValidator>();
 
 // Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();

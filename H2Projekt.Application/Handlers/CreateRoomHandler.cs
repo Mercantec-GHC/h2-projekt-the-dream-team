@@ -19,14 +19,14 @@ namespace H2Projekt.Application.Handlers
 
         public async Task<int> Handle(CreateRoomCommand request, CancellationToken cancellationToken = default)
         {
-            var roomExists = await _roomRepository.DoesRoomExistAsync(request.Number, cancellationToken);
+            var roomExists = await _roomRepository.RoomExistsAsync(request.Number, cancellationToken);
 
             if (roomExists)
             {
-                throw new RoomDuplicateException($"Room with number {request.Number} already exists.");
+                throw new DuplicateException($"Room with number {request.Number} already exists.");
             }
 
-            var room = new Room(request.Number, request.Type, request.PricePerNight);
+            var room = new Room(request.Number, request.RoomTypeId, request.Status);
 
             var validationResult = await _validator.ValidateAsync(room);
 
@@ -35,7 +35,7 @@ namespace H2Projekt.Application.Handlers
                 throw new ValidationException(validationResult.ToString("\n"));
             }
 
-            await _roomRepository.AddAsync(room, cancellationToken);
+            await _roomRepository.AddRoomAsync(room, cancellationToken);
 
             return room.Id;
         }

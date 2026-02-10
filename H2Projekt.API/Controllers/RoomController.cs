@@ -19,6 +19,8 @@ namespace H2Projekt.API.Controllers
             _roomRepository = roomRepository;
         }
 
+        #region Rooms
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<Room>>> GetAllRooms()
@@ -26,6 +28,21 @@ namespace H2Projekt.API.Controllers
             var rooms = await _roomRepository.GetAllRoomsAsync();
 
             return Ok(rooms);
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<Room?>> GetRoomByNumber(string number)
+        {
+            var room = await _roomRepository.GetRoomByNumberAsync(number);
+
+            if (room is null)
+            {
+                NotFound($"Room with number {number} not found.");
+            }
+
+            return Ok(room);
         }
 
         [HttpPost]
@@ -39,7 +56,7 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(roomId);
             }
-            catch (RoomDuplicateException ex)
+            catch (DuplicateException ex)
             {
                 return Conflict(ex.Message);
             }
@@ -60,7 +77,7 @@ namespace H2Projekt.API.Controllers
 
                 return Ok();
             }
-            catch (RoomNonExistentException ex)
+            catch (NonExistentException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -81,10 +98,84 @@ namespace H2Projekt.API.Controllers
 
                 return Ok();
             }
-            catch (RoomNonExistentException ex)
+            catch (NonExistentException ex)
             {
                 return NotFound(ex.Message);
             }
         }
+
+        #endregion
+
+        #region Room Types
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<RoomType>>> GetAllRoomTypes()
+        {
+            var roomTypes = await _roomRepository.GetAllRoomTypesAsync();
+
+            return Ok(roomTypes);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<int>> CreateRoomType([FromServices] CreateRoomTypeHandler handler, [FromBody] CreateRoomTypeCommand createRoomTypeCommand)
+        {
+            try
+            {
+                var roomId = await handler.Handle(createRoomTypeCommand);
+
+                return Ok(roomId);
+            }
+            catch (DuplicateException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> UpdateRoomType([FromServices] UpdateRoomTypeHandler handler, [FromBody] UpdateRoomTypeCommand updateRoomTypeCommand)
+        {
+            try
+            {
+                await handler.Handle(updateRoomTypeCommand);
+
+                return Ok();
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteRoomType([FromServices] DeleteRoomTypeHandler handler, int id)
+        {
+            try
+            {
+                await handler.Handle(id);
+
+                return Ok();
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        #endregion
     }
 }

@@ -1,50 +1,47 @@
 ﻿@rendermode InteractiveServer
 
-<EditForm class="d-flex flex-column gap-3" Model="Model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@inject ApiClient Api
 
-    <div>
-        <label class="form-label">Værelsesnummer</label>
+@if (roomTypes is not null)
+{
+    <EditForm Enhance class="d-flex flex-column gap-3" Model="Model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-        <InputText class="form-control" @bind-Value="Model.Number" />
+        <div>
+            <label class="form-label">Værelsesnummer</label>
 
-        <ValidationMessage For="@(() => Model.Number)" />
-    </div>
+            <InputText class="form-control" @bind-Value="Model.Number" placeholder="Indtast værelsesnummer" />
 
-    <div>
-        <label class="form-label">Kapacitet</label>
+            <ValidationMessage For="@(() => Model.Number)" />
+        </div>
 
-        <InputSelect @bind-Value="Model.Type" class="form-control">
-            @foreach (var type in keyValuePairs)
-            {
-                @if (type.Value.Equals(Model.Type))
+        <div>
+            <label class="form-label">Værelsestype</label>
+
+            <InputSelect @bind-Value="Model.RoomTypeId" class="form-control">
+                @foreach (var type in roomTypes)
                 {
-                    <option value="@type.Value" selected>@type.Key</option>
+                    @if (type.Id == Model.RoomTypeId)
+                    {
+                        <option value="@type.Id" selected>@type.Name</option>
 
-                    continue;
+                        continue;
+                    }
+
+                    <option value="@type.Id">@type.Name</option>
                 }
+            </InputSelect>
 
-                <option value="@type.Value">@type.Key</option>
-            }
-        </InputSelect>
+            <ValidationMessage For="@(() => Model.RoomType)" />
+        </div>
 
-        <ValidationMessage For="@(() => Model.Type)" />
-    </div>
-
-    <div>
-        <label class="form-label">Pris pr. nat</label>
-
-        <InputNumber @bind-Value="Model.PricePerNight" class="form-control" />
-
-        <ValidationMessage For="@(() => Model.PricePerNight)" />
-    </div>
-
-    @if (!HideButton.HasValue || HideButton.Value == false)
-    {
-        <button type="submit" class="btn btn-success">Tilføj</button>
-    }
-</EditForm>
+        @if (!HideButton.HasValue || HideButton.Value == false)
+        {
+            <button type="submit" class="btn btn-success">Tilføj</button>
+        }
+    </EditForm>
+}
 
 @code {
     [Parameter]
@@ -56,5 +53,17 @@
     [Parameter]
     public bool? HideButton { get; set; }
 
-    private Dictionary<string, int> keyValuePairs => Enum.GetValues<RoomType>().ToDictionary(t => t.ToString(), t => (int)t);
+    private ICollection<RoomType> roomTypes = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        roomTypes = await Api.GetAllRoomTypesAsync();
+
+        StateHasChanged();
+    }
 }

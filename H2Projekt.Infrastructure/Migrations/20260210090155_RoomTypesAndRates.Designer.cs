@@ -3,6 +3,7 @@ using System;
 using H2Projekt.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace H2Projekt.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260210090155_RoomTypesAndRates")]
+    partial class RoomTypesAndRates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -161,9 +164,6 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Name")
-                        .IsUnique();
-
                     b.ToTable("RoomTypes");
                 });
 
@@ -195,7 +195,7 @@ namespace H2Projekt.Infrastructure.Migrations
             modelBuilder.Entity("H2Projekt.Domain.Room", b =>
                 {
                     b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
-                        .WithMany()
+                        .WithMany("Rooms")
                         .HasForeignKey("RoomTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -206,7 +206,7 @@ namespace H2Projekt.Infrastructure.Migrations
             modelBuilder.Entity("H2Projekt.Domain.RoomRate", b =>
                 {
                     b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
-                        .WithMany()
+                        .WithMany("Rates")
                         .HasForeignKey("RoomTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -217,6 +217,13 @@ namespace H2Projekt.Infrastructure.Migrations
             modelBuilder.Entity("H2Projekt.Domain.Room", b =>
                 {
                     b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.RoomType", b =>
+                {
+                    b.Navigation("Rates");
+
+                    b.Navigation("Rooms");
                 });
 #pragma warning restore 612, 618
         }
