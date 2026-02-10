@@ -38,6 +38,7 @@ builder.Services.AddScoped<IValidator<RoomType>, RoomTypeValidator>();
 // Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+builder.Services.AddScoped<IGuestRepository, GuestRepository>();
 
 
 // CORS Policy

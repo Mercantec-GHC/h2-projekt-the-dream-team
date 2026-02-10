@@ -33,6 +33,14 @@ namespace H2Projekt.Infrastructure
             modelBuilder.Entity<Booking>()
                 .Property(r => r.PriceLocked)
                 .HasPrecision(10, 2);
+
+            // Guest
+            modelBuilder.Entity<Guest>(g =>
+            {
+                g.Property(g => g.FirstName).HasMaxLength(100).IsRequired();
+                g.Property(g => g.LastName).HasMaxLength(100).IsRequired();
+                g.Property(g => g.Email).HasMaxLength(255).IsRequired();
+            });
         }
     }
 }
