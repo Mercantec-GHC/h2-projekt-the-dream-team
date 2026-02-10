@@ -54,3 +54,104 @@ h1:focus {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
     text-align: start;
 }
+
+/* Ekstra */
+
+
+.w-fit {
+    width: fit-content !important;
+}
+
+.w-1 {
+    width: 1% !important;
+}
+
+.w-25 {
+    width: 25% !important;
+}
+
+.w-1rem {
+    width: 1rem !important;
+}
+
+.w-2rem {
+    width: 2rem !important;
+}
+
+.w-2_5rem {
+    width: 2.5rem !important;
+}
+
+.w-3rem {
+    width: 3rem !important;
+}
+
+.w-6rem {
+    width: 6rem !important;
+}
+
+.w-20rem {
+    width: 20rem !important;
+}
+
+.min-w-2rem {
+    min-width: 2rem !important;
+}
+
+.min-w-2_5rem {
+    min-width: 2.5rem !important;
+}
+
+.min-w-3rem {
+    min-width: 3rem !important;
+}
+
+.min-w-20rem {
+    min-width: 20rem !important;
+}
+
+.min-w-6rem {
+    min-width: 6rem !important;
+}
+
+.h-fit {
+    height: fit-content !important;
+}
+
+.h-1rem {
+    height: 1rem !important;
+}
+
+.h-2rem {
+    height: 2rem !important;
+}
+
+.h-2_5rem {
+    height: 2.5rem !important;
+}
+
+.h-6rem {
+    height: 6rem !important;
+}
+
+.min-h-2rem {
+    min-height: 2rem !important;
+}
+
+.min-h-2_5rem {
+    min-height: 2.5rem !important;
+}
+
+.min-h-6rem {
+    min-height: 6rem !important;
+}
+
+.fs-7 {
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+.fs-8 {
+    font-size: 0.75rem;
+    line-height: 1rem;
+}

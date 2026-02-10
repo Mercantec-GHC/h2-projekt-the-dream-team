@@ -1,5 +1,5 @@
-﻿using H2Projekt.Domain;
-using H2Projekt.Application.Interfaces;
+﻿using H2Projekt.Application.Interfaces;
+using H2Projekt.Domain;
 using Microsoft.EntityFrameworkCore;
 namespace H2Projekt.Infrastructure.Repositories
 {
@@ -28,7 +28,7 @@ namespace H2Projekt.Infrastructure.Repositories
             throw new NotImplementedException();
         }
 
-        public async Task<IReadOnlyList<Booking>> GetBookingsForRoomsAsync(IEnumerable<int> roomIds, DateTimeOffset from, DateTimeOffset to)
+        public async Task<IReadOnlyList<Booking>> GetBookingsForRoomsAsync(IEnumerable<int> roomIds, DateOnly from, DateOnly to)
         {
             return await _appDbContext.Bookings
                 .Where(b => b.AssignedRoom != null

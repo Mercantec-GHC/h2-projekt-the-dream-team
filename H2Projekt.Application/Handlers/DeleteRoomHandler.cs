@@ -14,14 +14,14 @@ namespace H2Projekt.Application.Handlers
 
         public async Task Handle(string number, CancellationToken cancellationToken = default)
         {
-            var room = await _roomRepository.GetRoomByRoomNumberAsync(number, cancellationToken);
+            var room = await _roomRepository.GetRoomByNumberAsync(number, cancellationToken);
 
             if (room is null)
             {
-                throw new RoomNonExistentException($"Room with number {number} doesn't exist.");
+                throw new NonExistentException($"Room with number {number} doesn't exist.");
             }
 
-            await _roomRepository.DeleteAsync(room, cancellationToken);
+            await _roomRepository.DeleteRoomAsync(room, cancellationToken);
         }
     }
 }

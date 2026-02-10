@@ -1,6 +1,6 @@
-﻿namespace H2Projekt.Web.Enums
+﻿namespace H2Projekt.Domain.Enums
 {
-    public enum RoomType
+    public enum RoomTypeEnum
     {
         Single,
         Double,
