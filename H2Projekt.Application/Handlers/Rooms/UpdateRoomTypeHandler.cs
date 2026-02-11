@@ -35,7 +35,7 @@ namespace H2Projekt.Application.Handlers.Rooms
                 throw new ValidationException(validationResult.ToString("\n"));
             }
 
-            await _roomRepository.UpdateRoomTypeAsync(existingRoomType, cancellationToken);
+            await _roomRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

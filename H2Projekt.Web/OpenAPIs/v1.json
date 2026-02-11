@@ -84,7 +84,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Room"
+                    "$ref": "#/components/schemas/RoomDto"
                   }
                 }
               },
@@ -92,7 +92,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Room"
+                    "$ref": "#/components/schemas/RoomDto"
                   }
                 }
               },
@@ -100,7 +100,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Room"
+                    "$ref": "#/components/schemas/RoomDto"
                   }
                 }
               }
@@ -129,17 +129,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "$ref": "#/components/schemas/Room"
+                  "$ref": "#/components/schemas/RoomDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Room"
+                  "$ref": "#/components/schemas/RoomDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Room"
+                  "$ref": "#/components/schemas/RoomDto"
                 }
               }
             }
@@ -358,7 +358,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RoomType"
+                    "$ref": "#/components/schemas/RoomTypeDto"
                   }
                 }
               },
@@ -366,7 +366,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RoomType"
+                    "$ref": "#/components/schemas/RoomTypeDto"
                   }
                 }
               },
@@ -374,7 +374,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/RoomType"
+                    "$ref": "#/components/schemas/RoomTypeDto"
                   }
                 }
               }
@@ -751,6 +751,34 @@
       "RoomAvailabilityStatus": {
         "type": "integer"
       },
+      "RoomDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "number": {
+            "type": "string"
+          },
+          "roomType": {
+            "$ref": "#/components/schemas/RoomType"
+          },
+          "status": {
+            "$ref": "#/components/schemas/RoomAvailabilityStatus"
+          },
+          "bookings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Booking"
+            }
+          }
+        }
+      },
       "RoomType": {
         "type": "object",
         "properties": {
@@ -772,6 +800,36 @@
             "format": "int32"
           },
           "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "RoomTypeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "maxOccupancy": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",

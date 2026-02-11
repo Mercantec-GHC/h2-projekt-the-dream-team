@@ -40,7 +40,7 @@ else
                     <td class="align-middle">@room.Id</td>
                     <td class="align-middle">@room.Number</td>
                     <td class="align-middle">@room.RoomType.Name</td>
-                    <td>
+                    <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
                             <button type="button" class="btn btn-secondary" @onclick="() => CreateOrEditRoom(room)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
 
@@ -67,9 +67,9 @@ else
             </div>
 
             <div class="modal-body my-3 p-0">
-                @if (!string.IsNullOrWhiteSpace(response))
+                @if (!string.IsNullOrWhiteSpace(modalResponse))
                 {
-                    <div class="alert alert-success">@response</div>
+                    <div class="alert alert-success">@modalResponse</div>
                 }
 
                 @if (roomToEdit is not null)
@@ -109,12 +109,13 @@ else
 
 @code {
     private string? response;
+    private string? modalResponse;
 
-    private Room? roomToEdit;
-    private Room? roomToDelete;
+    private RoomDto? roomToEdit;
+    private RoomDto? roomToDelete;
 
-    private ICollection<RoomType> roomTypes;
-    private ICollection<Room> rooms;
+    private ICollection<RoomTypeDto> roomTypes;
+    private ICollection<RoomDto> rooms;
 
     protected override async Task OnInitializedAsync()
     {
@@ -122,21 +123,23 @@ else
         rooms = await Api.GetAllRoomsAsync();
     }
 
-    public void CreateOrEditRoom(Room? room = null)
+    public void CreateOrEditRoom(RoomDto? room = null)
     {
+        modalResponse = null;
+
         if (room is not null)
         {
             roomToEdit = room;
         }
         else
         {
-            roomToEdit = new Room();
+            roomToEdit = new RoomDto();
         }
     }
 
     public async Task CreateOrSaveRoom()
     {
-        response = null;
+        modalResponse = null;
 
         if (roomToEdit is null)
         {
@@ -150,20 +153,20 @@ else
                 await Api.CreateRoomAsync(new CreateRoomCommand()
                 {
                     Number = roomToEdit.Number,
-                    RoomTypeId = roomToEdit.RoomTypeId,
+                    RoomTypeId = roomToEdit.RoomType.Id,
                     Status = roomToEdit.Status,
                 });
 
                 rooms = await Api.GetAllRoomsAsync();
 
-                response = $"Værelse #{roomToEdit.Number} er oprettet.";
+                modalResponse = $"Værelse #{roomToEdit.Number} er oprettet.";
             }
             else
             {
                 await Api.UpdateRoomAsync(new UpdateRoomCommand()
                 {
                     Number = roomToEdit.Number,
-                    RoomTypeId = roomToEdit.RoomTypeId,
+                    RoomTypeId = roomToEdit.RoomType.Id,
                     Status = roomToEdit.Status,
                 });
 
@@ -172,8 +175,7 @@ else
                 if (room is not null)
                 {
                     room.Number = roomToEdit.Number;
-                    room.RoomTypeId = roomToEdit.RoomTypeId;
-                    room.RoomType = roomTypes.FirstOrDefault(rt => rt.Id == roomToEdit.RoomTypeId);
+                    room.RoomType = roomToEdit.RoomType;
                     room.Status = roomToEdit.Status;
                 }
             }
@@ -184,7 +186,7 @@ else
         }
         catch (ApiException ex)
         {
-            response = ex.Response;
+            modalResponse = ex.Response;
         }
     }
 

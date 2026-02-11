@@ -37,13 +37,6 @@ namespace H2Projekt.Infrastructure.Repositories
             return await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateRoomAsync(Room roomType, CancellationToken cancellationToken = default)
-        {
-            _appDbContext.Rooms.Update(roomType);
-
-            await _appDbContext.SaveChangesAsync(cancellationToken);
-        }
-
         public async Task DeleteRoomAsync(Room room, CancellationToken cancellationToken = default)
         {
             _appDbContext.Rooms.Remove(room);
@@ -77,13 +70,6 @@ namespace H2Projekt.Infrastructure.Repositories
             return await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default)
-        {
-            _appDbContext.RoomTypes.Update(roomType);
-
-            await _appDbContext.SaveChangesAsync(cancellationToken);
-        }
-
         public async Task DeleteRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default)
         {
             _appDbContext.RoomTypes.Remove(roomType);
@@ -92,5 +78,10 @@ namespace H2Projekt.Infrastructure.Repositories
         }
 
         #endregion 
-    }
+
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.SaveChangesAsync(cancellationToken);
+        }
+    } 
 }
