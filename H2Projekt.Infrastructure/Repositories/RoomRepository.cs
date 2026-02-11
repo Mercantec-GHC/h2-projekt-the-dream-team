@@ -4,14 +4,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace H2Projekt.Infrastructure.Repositories
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : BaseRepository, IRoomRepository
     {
-        private readonly AppDbContext _appDbContext;
-
-        public RoomRepository(AppDbContext appDbContext)
-        {
-            _appDbContext = appDbContext;
-        }
+        public RoomRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
         #region Rooms
 
@@ -78,10 +73,5 @@ namespace H2Projekt.Infrastructure.Repositories
         }
 
         #endregion 
-
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            return await _appDbContext.SaveChangesAsync(cancellationToken);
-        }
     }
 }

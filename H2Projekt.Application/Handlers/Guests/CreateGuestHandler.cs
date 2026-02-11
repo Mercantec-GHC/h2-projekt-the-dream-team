@@ -16,21 +16,27 @@ namespace H2Projekt.Application.Handlers.Guests
             _repository = repository;
             _validator = validator;
         }
-        public async Task<int> HandleAsync(CreateGuestCommand request, CancellationToken cancellationToken)
+
+        public async Task<int> HandleAsync(CreateGuestCommand request, CancellationToken cancellationToken = default)
         {
-            var exists = await _repository.GuestExistsAsync(request.Email);
-            if (exists)
+            var guestExists = await _repository.GuestExistsAsync(request.Email, cancellationToken);
+
+            if (guestExists)
             {
                 throw new DuplicateException("A guest with the same email already exists.");
             }
+
             var guest = new Guest(request.FirstName, request.LastName, request.Email);
 
             var validationResult = await _validator.ValidateAsync(guest, cancellationToken);
+
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
             }
+
             await _repository.AddGuestAsync(guest, cancellationToken);
+
             return guest.Id;
         }
     }

@@ -4,18 +4,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace H2Projekt.Infrastructure.Repositories
 {
-    public class GuestRepository : IGuestRepository
+    public class GuestRepository : BaseRepository, IGuestRepository
     {
-        private readonly AppDbContext _appDbContext;
+        public GuestRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
-        public GuestRepository(AppDbContext appDbContext)
+        public async Task<List<Guest>> GetAllGuestsAsync(CancellationToken cancellationToken = default)
         {
-            _appDbContext = appDbContext;
+            return await _appDbContext.Guests.ToListAsync(cancellationToken);
         }
 
-        public async Task<Guest?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Guest?> GetGuestByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await _appDbContext.Guests.SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
+        }
+
+        public async Task<Guest?> GetGuestByEmailAsync(string email, CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.Guests.SingleOrDefaultAsync(g => g.Email == email, cancellationToken);
         }
 
         public async Task<bool> GuestExistsAsync(string email, CancellationToken cancellationToken = default)
@@ -28,6 +33,13 @@ namespace H2Projekt.Infrastructure.Repositories
             await _appDbContext.Guests.AddAsync(guest, cancellationToken);
 
             return await _appDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteGuestAsync(Guest guest, CancellationToken cancellationToken = default)
+        {
+            _appDbContext.Guests.Remove(guest);
+         
+            await _appDbContext.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿@page "/manage-rooms-types"
+﻿@page "/manage-guests"
 @rendermode InteractiveServer
 
 @inject ApiClient Api
@@ -9,18 +9,18 @@
 }
 
 <div class="d-flex gap-3 justify-content-between mb-3">
-    <h3 class="mb-0">Værelsestyper</h3>
+    <h3 class="mb-0">Gæster</h3>
 
-    <button type="button" class="btn btn-success" @onclick="() => CreateOrEditRoomType()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+    <button type="button" class="btn btn-success" @onclick="() => CreateOrEditGuest()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
 </div>
 
-@if (roomTypes is null)
+@if (guests is null)
 {
     <p>Henter data...</p>
 }
-else if (roomTypes.Count == 0)
+else if (guests.Count == 0)
 {
-    <em>Ingen værelsestyper fundet.</em>
+    <em>Ingen gæster fundet.</em>
 }
 else
 {
@@ -28,25 +28,25 @@ else
         <thead>
             <tr>
                 <th width="100">Id</th>
-                <th width="100">Navn</th>
-                <th width="100">Beskrivelse</th>
-                <th width="100">Maks personer</th>
+                <th width="100">Fornavn</th>
+                <th width="100">Efternavn</th>
+                <th width="100">Email</th>
                 <th width="1"></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var roomType in roomTypes)
+            @foreach (var guest in guests)
             {
                 <tr>
-                    <td class="align-middle">@roomType.Id</td>
-                    <td class="align-middle">@roomType.Name</td>
-                    <td class="align-middle">@roomType.Description</td>
-                    <td class="align-middle">@roomType.MaxOccupancy</td>
+                    <td class="align-middle">@guest.Id</td>
+                    <td class="align-middle">@guest.FirstName</td>
+                    <td class="align-middle">@guest.LastName</td>
+                    <td class="align-middle">@guest.Email</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-secondary" @onclick="() => CreateOrEditRoomType(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            <button type="button" class="btn btn-secondary" @onclick="() => CreateOrEditGuest(guest)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
 
-                            <button class="btn btn-danger" @onclick="() => roomTypeToDelete = roomType" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                            <button class="btn btn-danger" @onclick="() => guestToDelete = guest" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
                         </div>
                     </td>
                 </tr>
@@ -59,7 +59,7 @@ else
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-3">
             <div class="d-flex align-items-center justify-content-between">
-                <h5 class="fs-4 mb-0" id="createEditModalLabel">Rediger Værelsestype</h5>
+                <h5 class="fs-4 mb-0" id="createEditModalLabel">Rediger Gæst</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
@@ -74,14 +74,14 @@ else
                     <div class="alert alert-success">@modalResponse</div>
                 }
 
-                @if (roomTypeToEdit is not null)
+                @if (guestToEdit is not null)
                 {
-                    <RoomTypeForm Model="roomTypeToEdit" HideButton="true" />
+                    <GuestForm Model="guestToEdit" HideButton="true" />
                 }
             </div>
 
             <div class="d-flex gap-3">
-                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="CreateOrSaveRoomType">Gem</button>
+                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="CreateOrSaveGuest">Gem</button>
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
             </div>
         </div>
@@ -92,7 +92,7 @@ else
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-3">
             <div class="d-flex align-items-center justify-content-between">
-                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Værelsestype</h5>
+                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Gæst</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@ else
             </div>
 
             <div class="d-flex gap-3 mt-3">
-                <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteRoomType">Slet</button>
+                <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteGuest">Slet</button>
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
             </div>
         </div>
@@ -113,75 +113,75 @@ else
     private string? response;
     private string? modalResponse;
 
-    private RoomTypeDto? roomTypeToEdit;
-    private RoomTypeDto? roomTypeToDelete;
+    private GuestDto? guestToEdit;
+    private GuestDto? guestToDelete;
 
-    private ICollection<RoomTypeDto> roomTypes;
+    private ICollection<GuestDto> guests;
 
     protected override async Task OnInitializedAsync()
     {
-        roomTypes = await Api.GetAllRoomTypesAsync();
+        guests = await Api.GetAllGuestsAsync();
     }
 
-    public void CreateOrEditRoomType(RoomTypeDto? roomType = null)
+    public void CreateOrEditGuest(GuestDto? guest = null)
     {
         modalResponse = null;
 
-        if (roomType is not null)
+        if (guest is not null)
         {
-            roomTypeToEdit = roomType;
+            guestToEdit = guest;
         }
         else
         {
-            roomTypeToEdit = new RoomTypeDto();
+            guestToEdit = new GuestDto();
         }
     }
 
-    public async Task CreateOrSaveRoomType()
+    public async Task CreateOrSaveGuest()
     {
         modalResponse = null;
 
-        if (roomTypeToEdit is null)
+        if (guestToEdit is null)
         {
             return;
         }
 
         try
         {
-            if (roomTypeToEdit.Id == 0)
+            if (guestToEdit.Id == 0)
             {
-                await Api.CreateRoomTypeAsync(new CreateRoomTypeCommand()
+                await Api.CreateGuestAsync(new CreateGuestCommand()
                 {
-                    Name = roomTypeToEdit.Name,
-                    Description = roomTypeToEdit.Description,
-                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    FirstName = guestToEdit.FirstName,
+                    LastName = guestToEdit.LastName,
+                    Email = guestToEdit.Email,
                 });
 
-                roomTypes = await Api.GetAllRoomTypesAsync();
+                guests = await Api.GetAllGuestsAsync();
 
-                modalResponse = $"Værelsestype \"{roomTypeToEdit.Name}\" er oprettet.";
+                modalResponse = $"Gæst \"{guestToEdit.FirstName}\" oprettet.";
             }
             else
             {
-                await Api.UpdateRoomTypeAsync(new UpdateRoomTypeCommand()
+                await Api.UpdateGuestAsync(new UpdateGuestCommand()
                 {
-                    Id = roomTypeToEdit.Id,
-                    Name = roomTypeToEdit.Name,
-                    Description = roomTypeToEdit.Description,
-                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    Id = guestToEdit.Id,
+                    FirstName = guestToEdit.FirstName,
+                    LastName = guestToEdit.LastName,
+                    Email = guestToEdit.Email,
                 });
 
-                var roomType = roomTypes.FirstOrDefault(r => r.Id == roomTypeToEdit.Id);
+                var guest = guests.FirstOrDefault(r => r.Id == guestToEdit.Id);
 
-                if (roomType is not null)
+                if (guest is not null)
                 {
-                    roomType.Name = roomTypeToEdit.Name;
-                    roomType.Description = roomTypeToEdit.Description;
-                    roomType.MaxOccupancy = roomTypeToEdit.MaxOccupancy;
+                    guest.FirstName = guestToEdit.FirstName;
+                    guest.LastName = guestToEdit.LastName;
+                    guest.Email = guestToEdit.Email;
                 }
             }
 
-            roomTypeToEdit = null;
+            guestToEdit = null;
 
             StateHasChanged();
         }
@@ -191,20 +191,20 @@ else
         }
     }
 
-    public async Task DeleteRoomType()
+    public async Task DeleteGuest()
     {
-        if (roomTypeToDelete is null)
+        if (guestToDelete is null)
         {
             return;
         }
 
         try
         {
-            await Api.DeleteRoomTypeAsync(roomTypeToDelete.Id);
+            await Api.DeleteGuestAsync(guestToDelete.Id);
 
-            roomTypes.Remove(roomTypeToDelete);
+            guests.Remove(guestToDelete);
 
-            response = $"Værelsestype {roomTypeToDelete.Name} er slettet.";
+            response = $"Gæst #{guestToDelete.Id} er slettet.";
         }
         catch (ApiException ex)
         {

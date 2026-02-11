@@ -2,7 +2,7 @@
 
 namespace H2Projekt.Application.Interfaces
 {
-    public interface IRoomRepository
+    public interface IRoomRepository : IBaseRepository
     {
         #region Rooms
 
@@ -23,7 +23,5 @@ namespace H2Projekt.Application.Interfaces
         Task DeleteRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default);
 
         #endregion
-
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }
