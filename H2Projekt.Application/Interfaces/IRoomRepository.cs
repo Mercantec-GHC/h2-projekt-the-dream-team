@@ -24,6 +24,6 @@ namespace H2Projekt.Application.Interfaces
 
         #endregion
 
-        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);  
+        Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     }
 }

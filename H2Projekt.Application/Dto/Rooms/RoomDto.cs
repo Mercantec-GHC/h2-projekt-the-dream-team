@@ -11,8 +11,8 @@ namespace H2Projekt.Application.Dto.Rooms
         public RoomAvailabilityStatus Status { get; set; }
         public ICollection<Booking> Bookings { get; set; } = default!;
 
-        public RoomDto(Room room) 
-        { 
+        public RoomDto(Room room)
+        {
             Id = room.Id;
             Number = room.Number;
             RoomType = room.RoomType;

@@ -83,5 +83,5 @@ namespace H2Projekt.Infrastructure.Repositories
         {
             return await _appDbContext.SaveChangesAsync(cancellationToken);
         }
-    } 
+    }
 }

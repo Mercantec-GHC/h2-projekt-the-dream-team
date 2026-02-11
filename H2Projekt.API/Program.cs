@@ -1,12 +1,12 @@
 using FluentValidation;
 using H2Projekt.Application.Handlers.Rooms;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Application.Rooms.Handlers;
 using H2Projekt.Application.Validators.Bookings;
 using H2Projekt.Application.Validators.Rooms;
 using H2Projekt.Domain;
 using H2Projekt.Infrastructure;
 using H2Projekt.Infrastructure.Repositories;
+using H2Projekt.ServiceDefaults;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

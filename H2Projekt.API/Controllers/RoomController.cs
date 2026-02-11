@@ -3,9 +3,6 @@ using H2Projekt.Application.Commands.Rooms;
 using H2Projekt.Application.Dto.Rooms;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Rooms;
-using H2Projekt.Application.Interfaces;
-using H2Projekt.Application.Rooms.Handlers;
-using H2Projekt.Domain;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2Projekt.API.Controllers

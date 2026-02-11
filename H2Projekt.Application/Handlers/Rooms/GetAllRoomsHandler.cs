@@ -1,5 +1,4 @@
-﻿using H2Projekt.Application.Dto.Rooms;
-using H2Projekt.Application.Interfaces;
+﻿using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers.Rooms

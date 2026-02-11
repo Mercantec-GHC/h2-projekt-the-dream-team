@@ -2,7 +2,7 @@
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
 
-namespace H2Projekt.Application.Rooms.Handlers
+namespace H2Projekt.Application.Handlers.Rooms
 {
     public class GetRoomByNumberHandler
     {
