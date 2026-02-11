@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using H2Projekt.Domain;
 
-namespace H2Projekt.Application.Validators
+namespace H2Projekt.Application.Validators.Bookings
 {
     public class BookingValidator : AbstractValidator<Booking>
     {

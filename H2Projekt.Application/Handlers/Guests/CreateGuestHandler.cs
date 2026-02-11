@@ -1,13 +1,10 @@
 ﻿using FluentValidation;
-using H2Projekt.Application.Commands;
+using H2Projekt.Application.Commands.Guests;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace H2Projekt.Application.Handlers
+namespace H2Projekt.Application.Handlers.Guests
 {
     public class CreateGuestHandler
     {

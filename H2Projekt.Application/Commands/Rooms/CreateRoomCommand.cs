@@ -1,9 +1,8 @@
-﻿using H2Projekt.Domain;
-using H2Projekt.Domain.Enums;
+﻿using H2Projekt.Domain.Enums;
 
-namespace H2Projekt.Application.Commands
+namespace H2Projekt.Application.Commands.Rooms
 {
-    public class UpdateRoomCommand
+    public class CreateRoomCommand
     {
         public string Number { get; set; }
         public int RoomTypeId { get; set; }

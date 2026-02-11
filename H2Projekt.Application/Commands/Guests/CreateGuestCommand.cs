@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace H2Projekt.Application.Commands
+﻿namespace H2Projekt.Application.Commands.Guests
 {
     public class CreateGuestCommand
     {

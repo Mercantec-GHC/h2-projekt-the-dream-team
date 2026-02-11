@@ -7,7 +7,7 @@
 
         public DateOnly FromDate { get; private set; }
         public DateOnly ToDate { get; private set; }
-        
+
         public decimal PricePerNight { get; private set; }
 
         public RoomRate() { }

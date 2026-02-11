@@ -1,6 +1,6 @@
 ﻿using H2Projekt.Domain;
 
-namespace H2Projekt.Application.Commands
+namespace H2Projekt.Application.Commands.Bookings
 {
     public class CreateBookingCommand
     {

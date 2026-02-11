@@ -1,10 +1,10 @@
 ﻿using FluentValidation;
-using H2Projekt.Application.Commands;
+using H2Projekt.Application.Commands.Rooms;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
 
-namespace H2Projekt.Application.Handlers
+namespace H2Projekt.Application.Handlers.Rooms
 {
     public class CreateRoomHandler
     {

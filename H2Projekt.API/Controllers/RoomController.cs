@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
-using H2Projekt.Application.Commands;
+using H2Projekt.Application.Commands.Rooms;
+using H2Projekt.Application.Dto.Rooms;
 using H2Projekt.Application.Exceptions;
-using H2Projekt.Application.Handlers;
+using H2Projekt.Application.Handlers.Rooms;
 using H2Projekt.Application.Interfaces;
+using H2Projekt.Application.Rooms.Handlers;
 using H2Projekt.Domain;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,37 +14,32 @@ namespace H2Projekt.API.Controllers
     [ApiController]
     public class RoomController : ControllerBase
     {
-        private readonly IRoomRepository _roomRepository;
-
-        public RoomController(IRoomRepository roomRepository)
-        {
-            _roomRepository = roomRepository;
-        }
-
         #region Rooms
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<Room>>> GetAllRooms()
+        public async Task<ActionResult<List<RoomDto>>> GetAllRooms([FromServices] GetAllRoomsHandler handler)
         {
-            var rooms = await _roomRepository.GetAllRoomsAsync();
+            var rooms = await handler.Handle();
 
-            return Ok(rooms);
+            return Ok(rooms.Select(room => new RoomDto(room)));
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<Room?>> GetRoomByNumber(string number)
+        public async Task<ActionResult<RoomDto?>> GetRoomByNumber([FromServices] GetRoomByNumberHandler handler, string number)
         {
-            var room = await _roomRepository.GetRoomByNumberAsync(number);
-
-            if (room is null)
+            try
             {
-                NotFound($"Room with number {number} not found.");
-            }
+                var room = await handler.Handle(number);
 
-            return Ok(room);
+                return Ok(new RoomDto(room));
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -110,11 +107,11 @@ namespace H2Projekt.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<RoomType>>> GetAllRoomTypes()
+        public async Task<ActionResult<List<RoomTypeDto>>> GetAllRoomTypes([FromServices] GetAllRoomTypesHandler handler)
         {
-            var roomTypes = await _roomRepository.GetAllRoomTypesAsync();
+            var roomTypes = await handler.Handle();
 
-            return Ok(roomTypes);
+            return Ok(roomTypes.Select(roomType => new RoomTypeDto(roomType)));
         }
 
         [HttpPost]

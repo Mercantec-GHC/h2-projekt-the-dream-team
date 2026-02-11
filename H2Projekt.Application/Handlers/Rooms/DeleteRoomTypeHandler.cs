@@ -1,7 +1,7 @@
 ﻿using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 
-namespace H2Projekt.Application.Handlers
+namespace H2Projekt.Application.Handlers.Rooms
 {
     public class DeleteRoomTypeHandler
     {

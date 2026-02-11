@@ -12,15 +12,11 @@ namespace H2Projekt.Infrastructure.Repositories
             _appDbContext = appDbContext;
         }
 
-        public Task AddBookingAsync(Booking booking)
-        {
-            throw new NotImplementedException();
-        }
-
-        public async Task AddBookingSync(Booking booking)
+        public async Task<int> AddBookingAsync(Booking booking)
         {
             await _appDbContext.Bookings.AddAsync(booking);
-            await _appDbContext.SaveChangesAsync();
+
+            return await _appDbContext.SaveChangesAsync();
         }
 
         public Task<IReadOnlyList<Booking>> GetBookingForRoomAsync(IEnumerable<Guid> roomIds, DateTimeOffset from, DateTimeOffset to)
