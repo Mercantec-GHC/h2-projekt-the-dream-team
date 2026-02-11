@@ -1,0 +1,105 @@
+﻿@rendermode InteractiveServer
+
+@inject ApiClient Api
+@inject GuestService GuestService
+
+@if (GuestService.SelectedGuest is null)
+{
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal">Vælg Gæst</button>
+}
+else
+{
+    <button type="button" class="text-nowrap d-flex align-items-center justify-content-center rounded-2 border border-0 py-0 px-2 gap-2 min-w-2_5rem min-h-2_5rem h-2_5rem" data-bs-toggle="dropdown" aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="20" height="20" viewBox="0 0 24 24">
+            <g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+            </g>
+        </svg>
+
+        <span>@GuestService.SelectedGuest.FirstName @GuestService.SelectedGuest.LastName</span>
+    </button>
+
+    <ul class="dropdown-menu dropdown-menu-end px-2">
+        <li class="d-flex flex-column gap-2">
+            <button type="button" class="d-flex align-items-center gap-2 px-3 rounded-2 text-danger min-h-2_5rem h-2_5rem border-0" @onclick="() => GuestService.SelectGuest(null)">
+                <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" focusable="false" width="18" height="18" viewBox="0 0 24 24">
+                    <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m16 17l5-5l-5-5m5 5H9m0 9H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                </svg>
+
+                Log ud
+            </button>
+        </li>
+    </ul>
+}
+
+<div class="modal fade" id="modal" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="modalLabel">Vælg Gæst</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body my-3 p-0">
+                <InputSelect @bind-Value:get="_selectedGuestId" @bind-Value:set="SetSelectedGuest" class="form-control">
+                    @foreach (var guest in guests)
+                    {
+                        @if (guest.Id == _selectedGuestId)
+                        {
+                            <option value="@guest.Id" selected>@guest.FirstName @guest.LastName (@guest.Email)</option>
+
+                            continue;
+                        }
+
+                        <option value="@guest.Id">@guest.FirstName @guest.LastName (@guest.Email)</option>
+                    }
+                </InputSelect>
+            </div>
+
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="SaveSelectedGuest">Gem</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ICollection<GuestDto> guests = [];
+
+    private int _selectedGuestId;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        guests = await Api.GetAllGuestsAsync();
+
+        var selectedGuest = await GuestService.GetGuestFromLocalStorage();
+
+        _selectedGuestId = selectedGuest?.Id ?? guests.FirstOrDefault()?.Id ?? 0;
+
+        StateHasChanged();
+    }
+
+    private void SetSelectedGuest(int id)
+    {
+        _selectedGuestId = id;
+    }
+
+    private async Task SaveSelectedGuest()
+    {
+        await GuestService.SelectGuest(guests.FirstOrDefault(guest => guest.Id == _selectedGuestId));
+
+        StateHasChanged();
+    }
+}

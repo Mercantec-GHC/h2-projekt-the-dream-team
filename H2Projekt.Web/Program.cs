@@ -1,6 +1,7 @@
 using H2Projekt.ServiceDefaults;
 using H2Projekt.Web;
 using H2Projekt.Web.Components;
+using H2Projekt.Web.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,6 +27,8 @@ builder.Services.AddScoped(sp => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7418/")
 });
+
+builder.Services.AddScoped<GuestService>();
 
 var app = builder.Build();
 

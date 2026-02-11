@@ -1,7 +1,16 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@inherits BasePage
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+@if (GuestService.SelectedGuest is not null)
+{
+    <h1>Hello, @GuestService.SelectedGuest.FirstName!</h1>
+}
+else
+{
+    <h1>Hello, world!</h1>
+}
 
 Welcome to your new app.
