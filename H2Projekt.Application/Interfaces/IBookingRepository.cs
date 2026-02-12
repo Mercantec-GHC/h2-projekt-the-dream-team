@@ -4,7 +4,11 @@ namespace H2Projekt.Application.Interfaces
 {
     public interface IBookingRepository
     {
-        Task<IReadOnlyList<Booking>> GetBookingForRoomAsync(IEnumerable<Guid> roomIds, DateTimeOffset from, DateTimeOffset to);
-        Task<int> AddBookingAsync(Booking booking);
+        Task<List<Booking>> GetAllBookingAsync(CancellationToken cancellationToken = default);
+        Task<Booking?> GetBookingByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<bool> CanCreateBookingAsync(RoomType roomType, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken);
+        Task<IReadOnlyList<Booking>> GetBookingsForRoomsAsync(IEnumerable<int> roomIds, DateOnly from, DateOnly to);
+        Task<int> AddBookingAsync(Booking booking, CancellationToken cancellationToken);
+        Task DeleteBookingAsync(Booking booking, CancellationToken cancellationToken = default);
     }
 }
