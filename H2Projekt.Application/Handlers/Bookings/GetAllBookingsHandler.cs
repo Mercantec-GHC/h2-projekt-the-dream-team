@@ -1,23 +1,20 @@
 ﻿using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace H2Projekt.Application.Handlers.Bookings
 {
     public class GetAllBookingsHandler
     {
-        private readonly IBookingRepository _repository;
+        private readonly IBookingRepository _bookingRepository;
 
-        public GetAllBookingsHandler(IBookingRepository repository)
+        public GetAllBookingsHandler(IBookingRepository bookingRepository)
         {
-            _repository = repository;
+            _bookingRepository = bookingRepository;
         }
 
         public async Task<List<Booking>> Handle(CancellationToken cancellationToken = default)
         {
-            var bookings = await _repository.GetAllBookingsAsync(cancellationToken);
+            var bookings = await _bookingRepository.GetAllBookingsAsync(cancellationToken);
 
             return bookings;
         }

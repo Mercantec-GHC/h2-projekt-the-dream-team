@@ -18,7 +18,7 @@ namespace H2Projekt.Infrastructure.Repositories
             return await _appDbContext.Bookings.SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
         }
 
-        public async Task<bool> CanCreateBookingAsync(RoomType roomType, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken)
+        public async Task<bool> IsRoomTypeAvailableAsync(RoomType roomType, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken)
         {
             var rooms = await _appDbContext.Rooms.CountAsync(room => room.RoomTypeId == roomType.Id);
 

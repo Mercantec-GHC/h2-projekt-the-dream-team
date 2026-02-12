@@ -7,6 +7,7 @@ namespace H2Projekt.Application.Interfaces
         #region Rooms
 
         Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default);
+        Task<Room?> GetRoomByIdAsync(int id, CancellationToken cancellationToken = default);
         Task<Room?> GetRoomByNumberAsync(string number, CancellationToken cancellationToken = default);
         Task<bool> RoomExistsAsync(string number, CancellationToken cancellationToken = default);
         Task<int> AddRoomAsync(Room room, CancellationToken cancellationToken = default);

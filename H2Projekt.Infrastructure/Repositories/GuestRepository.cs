@@ -10,17 +10,17 @@ namespace H2Projekt.Infrastructure.Repositories
 
         public async Task<List<Guest>> GetAllGuestsAsync(CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Guests.ToListAsync(cancellationToken);
+            return await _appDbContext.Guests.Include(x => x.Bookings).ToListAsync(cancellationToken);
         }
 
         public async Task<Guest?> GetGuestByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Guests.SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
+            return await _appDbContext.Guests.Include(x => x.Bookings).SingleOrDefaultAsync(g => g.Id == id, cancellationToken);
         }
 
         public async Task<Guest?> GetGuestByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Guests.SingleOrDefaultAsync(g => g.Email == email, cancellationToken);
+            return await _appDbContext.Guests.Include(x => x.Bookings).SingleOrDefaultAsync(g => g.Email == email, cancellationToken);
         }
 
         public async Task<bool> GuestExistsAsync(string email, CancellationToken cancellationToken = default)
@@ -38,7 +38,7 @@ namespace H2Projekt.Infrastructure.Repositories
         public async Task DeleteGuestAsync(Guest guest, CancellationToken cancellationToken = default)
         {
             _appDbContext.Guests.Remove(guest);
-         
+
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }
     }

@@ -3,42 +3,48 @@ using H2Projekt.Application.Commands.Bookings;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace H2Projekt.Application.Handlers.Bookings
 {
     public class CreateBookingHandler
     {
-        private readonly IBookingRepository _bookingrepository;
+        private readonly IBookingRepository _bookingRepository;
         private readonly IGuestRepository _guestRepository;
+        private readonly IRoomRepository _roomRepository;
         private readonly IValidator<Guest> _validator;
 
-        public CreateBookingHandler(IBookingRepository bookingrepository, IGuestRepository guestrepository, IValidator<Guest> validator)
+        public CreateBookingHandler(IBookingRepository bookingRepository, IGuestRepository guestRepository, IRoomRepository roomRepository, IValidator<Guest> validator)
         {
-            _guestRepository = guestrepository;
-            _bookingrepository = bookingrepository;
+            _guestRepository = guestRepository;
+            _bookingRepository = bookingRepository;
+            _roomRepository = roomRepository;
             _validator = validator;
         }
 
         public async Task<int> HandleAsync(CreateBookingCommand request, CancellationToken cancellationToken = default)
         {
-            var canBook = await _bookingrepository.CanCreateBookingAsync(request.RoomType, request.FromDate, request.ToDate, cancellationToken);
+            var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
 
-            if (!canBook)
+            if (roomType is null)
             {
-                throw new Exception("A booking already exists for the specified room and date range.");
+                throw new NonExistentException($"Room type with id {request.RoomTypeId} doesn't exist.");
+            }
+
+            var isRoomTypeAvailable = await _bookingRepository.IsRoomTypeAvailableAsync(roomType, request.FromDate, request.ToDate, cancellationToken);
+
+            if (!isRoomTypeAvailable)
+            {
+                throw new Exception("There are no available rooms of the selected type for the given dates.");
             }
 
             var guest = await _guestRepository.GetGuestByIdAsync(request.GuestId, cancellationToken);
 
             if (guest is null)
             {
-                throw new NonExistentException($"Guest with id{request.GuestId} doesn't exist ");
+                throw new NonExistentException($"Guest with id {request.GuestId} doesn't exist ");
             }
 
-            var booking = new Booking(request.GuestId, request.RoomType.Id, request.FromDate, request.ToDate, request.RoomType.PricePerNight);
+            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, roomType.PricePerNight);
 
             guest.AddBooking(booking);
 
@@ -48,6 +54,7 @@ namespace H2Projekt.Application.Handlers.Bookings
             {
                 throw new ValidationException(validationResult.Errors);
             }
+
             await _guestRepository.SaveChangesAsync(cancellationToken);
 
             return booking.Id;

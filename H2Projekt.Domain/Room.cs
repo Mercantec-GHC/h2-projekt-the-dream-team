@@ -27,5 +27,10 @@ namespace H2Projekt.Domain
             RoomTypeId = roomTypeId;
             Status = status;
         }
+
+        public void UpdateDetails(RoomAvailabilityStatus status)
+        {
+            Status = status;
+        }
     }
 }

@@ -17,13 +17,19 @@
 
         public Booking() { }
 
-        public Booking(int guestid, int roomTypeid, DateOnly fromDate, DateOnly toDate, decimal priceLocked)
+        public Booking(int guestId, int roomTypeId, DateOnly fromDate, DateOnly toDate, decimal priceLocked)
         {
-            GuestId = guestid;
-            RoomTypeId = roomTypeid;
+            GuestId = guestId;
+            RoomTypeId = roomTypeId;
             FromDate = fromDate;
             ToDate = toDate;
             PriceLocked = priceLocked;
+        }
+
+        public void AssignRoom(Room room)
+        {
+            AssignedRoomId = room.Id;
+            AssignedRoom = room;
         }
     }
 }

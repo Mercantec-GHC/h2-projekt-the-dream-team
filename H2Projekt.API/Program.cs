@@ -9,7 +9,6 @@ using H2Projekt.Domain;
 using H2Projekt.Infrastructure;
 using H2Projekt.Infrastructure.Repositories;
 using H2Projekt.ServiceDefaults;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -27,20 +26,25 @@ builder.Services.AddProblemDetails();
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
 // Application handlers
+// - Bookings
 builder.Services.AddScoped<GetAllBookingsHandler>();
 builder.Services.AddScoped<GetBookingByIdHandler>();
 builder.Services.AddScoped<CreateBookingHandler>();
+builder.Services.AddScoped<UpdateBookingHandler>();
 builder.Services.AddScoped<DeleteBookingHandler>();
+// - Guests
 builder.Services.AddScoped<GetAllGuestsHandler>();
 builder.Services.AddScoped<GetGuestByIdHandler>();
 builder.Services.AddScoped<CreateGuestHandler>();
 builder.Services.AddScoped<UpdateGuestHandler>();
 builder.Services.AddScoped<DeleteGuestHandler>();
+// - Rooms
 builder.Services.AddScoped<GetAllRoomsHandler>();
 builder.Services.AddScoped<GetRoomByNumberHandler>();
 builder.Services.AddScoped<CreateRoomHandler>();
 builder.Services.AddScoped<UpdateRoomHandler>();
 builder.Services.AddScoped<DeleteRoomHandler>();
+// - Room types
 builder.Services.AddScoped<GetAllRoomTypesHandler>();
 builder.Services.AddScoped<CreateRoomTypeHandler>();
 builder.Services.AddScoped<UpdateRoomTypeHandler>();
