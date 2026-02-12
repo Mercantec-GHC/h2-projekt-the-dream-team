@@ -1,5 +1,6 @@
 ﻿using H2Projekt.Web.Services;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 
 namespace H2Projekt.Web
 {
@@ -7,6 +8,9 @@ namespace H2Projekt.Web
     {
         [Inject]
         public GuestService GuestService { get; set; }
+
+        [Inject]
+        public IJSRuntime JS { get; set; }
 
         protected override void OnInitialized()
         {
@@ -25,6 +29,8 @@ namespace H2Projekt.Web
             }
 
             await GuestService.GetGuestFromLocalStorage();
+
+            await JS.InvokeVoidAsync("initDataTable");
         }
 
         private void OnSelectedGuestChanged(object? sender, GuestDto? guest) => InvokeAsync(StateHasChanged);
