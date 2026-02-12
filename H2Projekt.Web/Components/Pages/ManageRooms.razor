@@ -1,8 +1,10 @@
-﻿@page "/manage-rooms"
+﻿@page "/admin/manage-rooms"
 @rendermode InteractiveServer
 @inherits BasePage
 
 @inject ApiClient Api
+
+<PageTitle>Admin - Værelser</PageTitle>
 
 @if (!string.IsNullOrWhiteSpace(response))
 {
@@ -10,7 +12,11 @@
 }
 
 <div class="d-flex gap-3 justify-content-between mb-3">
-    <h3 class="mb-0">Værelser</h3>
+    <div class="d-flex gap-3 align-items-center">
+        <a href="/admin" class="btn btn-secondary">Tilbage</a>
+
+        <h3 class="mb-0">Værelser</h3>
+    </div>
 
     <button type="button" class="btn btn-success" @onclick="() => CreateOrEditRoom()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
 </div>
@@ -31,7 +37,7 @@ else
                 <th width="100">Id</th>
                 <th width="100">Nummer</th>
                 <th width="100">Type</th>
-                <th width="1"></th>
+                <th width="1" data-dt-order="disable"></th>
             </tr>
         </thead>
         <tbody>
