@@ -151,14 +151,20 @@ else
         {
             if (roomToEdit.Id == 0)
             {
-                await Api.CreateRoomAsync(new CreateRoomCommand()
+                var roomId = await Api.CreateRoomAsync(new CreateRoomCommand()
                 {
                     Number = roomToEdit.Number,
                     RoomTypeId = roomToEdit.RoomType.Id,
                     Status = roomToEdit.Status,
                 });
 
-                rooms = await Api.GetAllRoomsAsync();
+                rooms.Add(new RoomDto()
+                {
+                    Id = roomId,
+                    Number = roomToEdit.Number,
+                    RoomType = roomToEdit.RoomType,
+                    Status = roomToEdit.Status,
+                });
 
                 modalResponse = $"Værelse #{roomToEdit.Number} er oprettet.";
             }

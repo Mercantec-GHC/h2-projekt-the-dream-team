@@ -151,14 +151,20 @@ else
         {
             if (roomTypeToEdit.Id == 0)
             {
-                await Api.CreateRoomTypeAsync(new CreateRoomTypeCommand()
+                var roomTypeId = await Api.CreateRoomTypeAsync(new CreateRoomTypeCommand()
                 {
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
                 });
 
-                roomTypes = await Api.GetAllRoomTypesAsync();
+                roomTypes.Add(new RoomTypeDto()
+                {
+                    Id = roomTypeId,
+                    Name = roomTypeToEdit.Name,
+                    Description = roomTypeToEdit.Description,
+                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                });
 
                 modalResponse = $"Værelsestype \"{roomTypeToEdit.Name}\" er oprettet.";
             }

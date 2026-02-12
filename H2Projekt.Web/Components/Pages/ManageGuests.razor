@@ -151,14 +151,20 @@ else
         {
             if (guestToEdit.Id == 0)
             {
-                await Api.CreateGuestAsync(new CreateGuestCommand()
+                var guestId = await Api.CreateGuestAsync(new CreateGuestCommand()
                 {
                     FirstName = guestToEdit.FirstName,
                     LastName = guestToEdit.LastName,
                     Email = guestToEdit.Email,
                 });
 
-                guests = await Api.GetAllGuestsAsync();
+                guests.Add(new GuestDto()
+                {
+                    Id = guestId,
+                    FirstName = guestToEdit.FirstName,
+                    LastName = guestToEdit.LastName,
+                    Email = guestToEdit.Email,
+                });
 
                 modalResponse = $"Gæst \"{guestToEdit.FirstName}\" oprettet.";
             }
