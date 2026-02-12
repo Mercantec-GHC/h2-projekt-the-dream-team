@@ -16,6 +16,9 @@ namespace H2Projekt.Application.Validators.Rooms
             RuleFor(roomType => roomType.MaxOccupancy)
                 .GreaterThan(0)
                 .WithMessage("Max occupancy must be greater than 0.");
+            RuleFor(roomType => roomType.PricePerNight)
+                .GreaterThan(0)
+                .WithMessage("Price per night must be greater than 0.");
         }
     }
 }

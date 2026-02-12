@@ -8,6 +8,7 @@ namespace H2Projekt.Application.Dto.Rooms
         public string Name { get; set; } = default!;
         public string? Description { get; set; }
         public int MaxOccupancy { get; set; }
+        public int PricePerNight { get; set; }
 
         public RoomTypeDto(RoomType roomType)
         {
@@ -15,6 +16,7 @@ namespace H2Projekt.Application.Dto.Rooms
             Name = roomType.Name;
             Description = roomType.Description;
             MaxOccupancy = roomType.MaxOccupancy;
+            PricePerNight = roomType.PricePerNight;
         }
     }
 }

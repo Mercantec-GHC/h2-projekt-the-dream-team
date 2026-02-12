@@ -947,6 +947,14 @@
               "string"
             ],
             "format": "int32"
+          },
+          "pricePerNight": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -961,6 +969,15 @@
           },
           "email": {
             "type": "string"
+          },
+          "bookings": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Booking"
+            }
           },
           "id": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1119,6 +1136,14 @@
             ],
             "format": "int32"
           },
+          "pricePerNight": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
           "id": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
@@ -1150,6 +1175,14 @@
             ]
           },
           "maxOccupancy": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",
@@ -1232,6 +1265,14 @@
             "type": "string"
           },
           "maxOccupancy": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
               "integer",

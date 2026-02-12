@@ -30,6 +30,14 @@
         <ValidationMessage For="@(() => Model.MaxOccupancy)" />
     </div>
 
+    <div>
+        <label class="form-label">Pris pr. nat</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
+
+        <ValidationMessage For="@(() => Model.PricePerNight)" />
+    </div>
+
     @if (!HideButton.HasValue || HideButton.Value == false)
     {
         <button type="submit" class="btn btn-success">Tilføj</button>

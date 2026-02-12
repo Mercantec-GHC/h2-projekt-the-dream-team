@@ -38,6 +38,7 @@ else
                 <th width="100">Navn</th>
                 <th width="100">Beskrivelse</th>
                 <th width="100">Maks personer</th>
+                <th width="100">Pris pr. nat</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
         </thead>
@@ -49,6 +50,7 @@ else
                     <td class="align-middle">@roomType.Name</td>
                     <td class="align-middle">@roomType.Description</td>
                     <td class="align-middle">@roomType.MaxOccupancy</td>
+                    <td class="align-middle">@roomType.PricePerNight.ToString("C")</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
                             <button type="button" class="btn btn-secondary" @onclick="() => CreateOrEditRoomType(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
@@ -162,6 +164,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
                 roomTypes.Add(new RoomTypeDto()
@@ -170,6 +173,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
                 modalResponse = $"Værelsestype \"{roomTypeToEdit.Name}\" er oprettet.";
@@ -182,6 +186,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
                 var roomType = roomTypes.FirstOrDefault(r => r.Id == roomTypeToEdit.Id);
@@ -191,6 +196,7 @@ else
                     roomType.Name = roomTypeToEdit.Name;
                     roomType.Description = roomTypeToEdit.Description;
                     roomType.MaxOccupancy = roomTypeToEdit.MaxOccupancy;
+                    roomType.PricePerNight = roomTypeToEdit.PricePerNight;
                 }
             }
 
