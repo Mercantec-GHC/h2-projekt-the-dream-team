@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using H2Projekt.Application.Validators.Bookings;
 using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Validators.Rooms
@@ -17,6 +18,10 @@ namespace H2Projekt.Application.Validators.Rooms
                 .NotEmpty().WithMessage("Email is required.")
                 .EmailAddress().WithMessage("Invalid email format.")
                 .MaximumLength(100).WithMessage("Email cannot exceed 100 characters.");
+            RuleFor(g => g.Bookings)
+                .NotNull()
+                .WithMessage("Bookings collection cannot be null.")
+                .ForEach(booking => booking.SetValidator(new BookingValidator()));
         }
     }
 }

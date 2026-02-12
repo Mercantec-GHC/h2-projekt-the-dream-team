@@ -4,9 +4,9 @@ namespace H2Projekt.Application.Commands.Bookings
 {
     public class CreateBookingCommand
     {
-        public Guid GuestId { get; set; }
+        public int GuestId { get; set; }
         public RoomType RoomType { get; set; }
-        public DateTime FromDate { get; set; }
-        public DateTime ToDate { get; set; }
+        public DateOnly FromDate { get; set; }
+        public DateOnly ToDate { get; set; }
     }
 }

@@ -8,7 +8,7 @@ namespace H2Projekt.Infrastructure.Repositories
 
         public BookingRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
-        public async Task<List<Booking>> GetAllBookingAsync(CancellationToken cancellationToken = default)
+        public async Task<List<Booking>> GetAllBookingsAsync(CancellationToken cancellationToken = default)
         {
             return await _appDbContext.Bookings.ToListAsync(cancellationToken);
         }
@@ -25,20 +25,6 @@ namespace H2Projekt.Infrastructure.Repositories
             var bookings = await _appDbContext.Bookings.CountAsync(booking => booking.RoomType.Id == roomType.Id && booking.FromDate == fromDate && booking.ToDate == toDate);
 
             return bookings < rooms;
-        }
-
-        public async Task<int> AddBookingAsync(Booking booking, CancellationToken cancellationToken = default)
-        {
-            await _appDbContext.Bookings.AddAsync(booking);
-
-            return await _appDbContext.SaveChangesAsync();
-        }
-
-        public async Task DeleteBookingAsync(Booking booking, CancellationToken cancellationToken = default)
-        {
-            _appDbContext.Bookings.Remove(booking);
-
-            await _appDbContext.SaveChangesAsync();
         }
 
         public async Task<IReadOnlyList<Booking>> GetBookingsForRoomsAsync(IEnumerable<int> roomIds, DateOnly from, DateOnly to)

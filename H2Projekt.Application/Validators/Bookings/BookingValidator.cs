@@ -8,14 +8,12 @@ namespace H2Projekt.Application.Validators.Bookings
     {
         public BookingValidator()
         {
-            RuleFor(b => b.Guest)
-                .NotNull()
-                .WithMessage("Guest information is required.")
-                .SetValidator(new GuestValidator());
-            RuleFor(b => b.RoomType)
-                .NotNull()
-                .WithMessage("Room type information is required.")
-                .SetValidator(new RoomTypeValidator());
+            RuleFor(b => b.GuestId)
+                .GreaterThan(0)
+                .WithMessage("GuestId must be a positive integer.");
+            RuleFor(b => b.RoomTypeId)
+                .GreaterThan(0)
+                .WithMessage("RoomTypeId must be a positive integer.");
             RuleFor(b => b.FromDate)
                 .GreaterThan(DateOnly.FromDateTime(DateTime.Now))
                 .WithMessage("FromDate must be in the future.");

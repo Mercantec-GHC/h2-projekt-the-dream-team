@@ -1,4 +1,5 @@
 using FluentValidation;
+using H2Projekt.Application.Handlers.Bookings;
 using H2Projekt.Application.Handlers.Guests;
 using H2Projekt.Application.Handlers.Rooms;
 using H2Projekt.Application.Interfaces;
@@ -26,6 +27,10 @@ builder.Services.AddProblemDetails();
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
 
 // Application handlers
+builder.Services.AddScoped<GetAllBookingsHandler>();
+builder.Services.AddScoped<GetBookingByIdHandler>();
+builder.Services.AddScoped<CreateBookingHandler>();
+builder.Services.AddScoped<DeleteBookingHandler>();
 builder.Services.AddScoped<GetAllGuestsHandler>();
 builder.Services.AddScoped<GetGuestByIdHandler>();
 builder.Services.AddScoped<CreateGuestHandler>();
