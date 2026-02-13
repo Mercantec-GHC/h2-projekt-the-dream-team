@@ -5,19 +5,19 @@ namespace H2Projekt.Application.Dto.Bookings
 {
     public class BookingWithoutGuestDto
     {
-        public RoomType RoomType { get; set; } = default!;
+        public RoomTypeDto RoomType { get; set; } = default!;
         public DateOnly FromDate { get; set; }
         public DateOnly ToDate { get; set; }
         public decimal PriceLocked { get; set; }
-        public RoomWithoutRoomTypeDto? Room { get; set; }
+        public RoomWithoutBookingsDto? Room { get; set; }
 
         public BookingWithoutGuestDto(Booking booking)
         {
-            RoomType = booking.RoomType;
+            RoomType = new RoomTypeDto(booking.RoomType);
             FromDate = booking.FromDate;
             ToDate = booking.ToDate;
             PriceLocked = booking.PriceLocked;
-            Room = new RoomWithoutRoomTypeDto(booking.Room);
+            Room = new RoomWithoutBookingsDto(booking.Room);
         }
     }
 }

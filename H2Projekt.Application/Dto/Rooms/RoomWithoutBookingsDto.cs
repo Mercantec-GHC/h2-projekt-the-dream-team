@@ -3,14 +3,14 @@ using H2Projekt.Domain.Enums;
 
 namespace H2Projekt.Application.Dto.Rooms
 {
-    public class RoomWithoutRoomTypeDto
+    public class RoomWithoutBookingsDto
     {
         public int Id { get; set; }
         public string Number { get; set; } = default!;
+        public RoomTypeDto RoomType { get; set; } = default!;
         public RoomAvailabilityStatus Status { get; set; }
-        public ICollection<Booking> Bookings { get; set; } = default!;
 
-        public RoomWithoutRoomTypeDto(Room? room)
+        public RoomWithoutBookingsDto(Room? room)
         {
             if (room is null)
             {
@@ -19,8 +19,8 @@ namespace H2Projekt.Application.Dto.Rooms
 
             Id = room.Id;
             Number = room.Number;
+            RoomType = new RoomTypeDto(room.RoomType);
             Status = room.Status;
-            Bookings = room.Bookings;
         }
     }
 }
