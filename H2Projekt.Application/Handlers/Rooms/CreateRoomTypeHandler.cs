@@ -17,7 +17,7 @@ namespace H2Projekt.Application.Handlers.Rooms
             _validator = validator;
         }
 
-        public async Task<int> Handle(CreateRoomTypeCommand request, CancellationToken cancellationToken = default)
+        public async Task<int> HandleAsync(CreateRoomTypeCommand request, CancellationToken cancellationToken = default)
         {
             var roomTypeExists = await _roomRepository.RoomTypeExistsAsync(request.Name, cancellationToken);
 

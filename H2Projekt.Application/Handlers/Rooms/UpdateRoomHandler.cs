@@ -17,7 +17,7 @@ namespace H2Projekt.Application.Handlers.Rooms
             _validator = validator;
         }
 
-        public async Task Handle(UpdateRoomCommand request, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(UpdateRoomCommand request, CancellationToken cancellationToken = default)
         {
             var existingRoom = await _roomRepository.GetRoomByNumberAsync(request.Number, cancellationToken);
 

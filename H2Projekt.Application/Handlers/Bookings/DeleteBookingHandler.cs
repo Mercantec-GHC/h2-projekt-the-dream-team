@@ -13,7 +13,7 @@ namespace H2Projekt.Application.Handlers.Bookings
             _guestRepository = guestRepository;
         }
 
-        public async Task Handle(DeleteBookingCommand request, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(DeleteBookingCommand request, CancellationToken cancellationToken = default)
         {
             var guest = await _guestRepository.GetGuestByIdAsync(request.GuestId, cancellationToken);
 

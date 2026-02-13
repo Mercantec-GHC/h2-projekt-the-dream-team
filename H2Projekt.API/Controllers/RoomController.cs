@@ -17,7 +17,7 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<RoomDto>>> GetAllRooms([FromServices] GetAllRoomsHandler handler)
         {
-            var rooms = await handler.Handle();
+            var rooms = await handler.HandleAsync();
 
             return Ok(rooms.Select(room => new RoomDto(room)));
         }
@@ -29,7 +29,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                var room = await handler.Handle(number);
+                var room = await handler.HandleAsync(number);
 
                 return Ok(new RoomDto(room));
             }
@@ -46,7 +46,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                var roomId = await handler.Handle(createRoomCommand);
+                var roomId = await handler.HandleAsync(createRoomCommand);
 
                 return Ok(roomId);
             }
@@ -67,7 +67,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(updateRoomCommand);
+                await handler.HandleAsync(updateRoomCommand);
 
                 return Ok();
             }
@@ -88,7 +88,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(number);
+                await handler.HandleAsync(number);
 
                 return Ok();
             }
@@ -106,7 +106,7 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<RoomTypeDto>>> GetAllRoomTypes([FromServices] GetAllRoomTypesHandler handler)
         {
-            var roomTypes = await handler.Handle();
+            var roomTypes = await handler.HandleAsync();
 
             return Ok(roomTypes.Select(roomType => new RoomTypeDto(roomType)));
         }
@@ -118,7 +118,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                var roomId = await handler.Handle(createRoomTypeCommand);
+                var roomId = await handler.HandleAsync(createRoomTypeCommand);
 
                 return Ok(roomId);
             }
@@ -139,7 +139,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(updateRoomTypeCommand);
+                await handler.HandleAsync(updateRoomTypeCommand);
 
                 return Ok();
             }
@@ -160,7 +160,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(id);
+                await handler.HandleAsync(id);
 
                 return Ok();
             }

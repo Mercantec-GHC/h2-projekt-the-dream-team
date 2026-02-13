@@ -12,7 +12,7 @@ namespace H2Projekt.Application.Handlers.Bookings
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<List<Booking>> Handle(CancellationToken cancellationToken = default)
+        public async Task<List<Booking>> HandleAsync(CancellationToken cancellationToken = default)
         {
             var bookings = await _bookingRepository.GetAllBookingsAsync(cancellationToken);
 

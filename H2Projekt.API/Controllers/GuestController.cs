@@ -15,7 +15,7 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<ActionResult<List<GuestDto>>> GetAllGuests([FromServices] GetAllGuestsHandler handler)
         {
-            var guests = await handler.Handle();
+            var guests = await handler.HandleAsync();
 
             return Ok(guests.Select(guest => new GuestDto(guest)));
         }
@@ -27,7 +27,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                var guest = await handler.Handle(id);
+                var guest = await handler.HandleAsync(id);
 
                 return Ok(new GuestDto(guest));
             }
@@ -65,7 +65,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(updateGuestCommand);
+                await handler.HandleAsync(updateGuestCommand);
 
                 return Ok();
             }
@@ -86,7 +86,7 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(id);
+                await handler.HandleAsync(id);
 
                 return Ok();
             }

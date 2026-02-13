@@ -20,7 +20,7 @@ namespace H2Projekt.Application.Handlers.Bookings
             _validator = validator;
         }
 
-        public async Task Handle(UpdateBookingCommand request, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(UpdateBookingCommand request, CancellationToken cancellationToken = default)
         {
             var guest = await _guestRepository.GetGuestByIdAsync(request.GuestId, cancellationToken);
 
