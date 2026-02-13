@@ -1,0 +1,233 @@
+﻿@page "/admin/manage-room-types"
+@rendermode InteractiveServer
+@inherits BasePage
+
+@inject ApiClient Api
+
+<PageTitle>Admin - Værelsestyper</PageTitle>
+
+@if (!string.IsNullOrWhiteSpace(response))
+{
+    <div class="alert alert-success">@response</div>
+}
+
+<div class="d-flex gap-3 justify-content-between mb-4">
+    <div class="d-flex gap-3 align-items-center">
+        <a href="/admin" class="btn btn-secondary">Tilbage</a>
+
+        <h3 class="mb-0">Værelsestyper</h3>
+    </div>
+
+    <button type="button" class="btn btn-success" @onclick="() => CreateOrEditRoomType()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+</div>
+
+@if (roomTypes is null)
+{
+    <p>Henter data...</p>
+}
+else if (roomTypes.Count == 0)
+{
+    <em>Ingen værelsestyper fundet.</em>
+}
+else
+{
+    <table id="dataTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th width="100">Id</th>
+                <th width="100">Navn</th>
+                <th width="100">Beskrivelse</th>
+                <th width="100">Maks personer</th>
+                <th width="100">Pris pr. nat</th>
+                <th width="1" data-dt-order="disable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var roomType in roomTypes)
+            {
+                <tr>
+                    <td class="align-middle">@roomType.Id</td>
+                    <td class="align-middle">@roomType.Name</td>
+                    <td class="align-middle">@roomType.Description</td>
+                    <td class="align-middle">@roomType.MaxOccupancy</td>
+                    <td class="align-middle">@roomType.PricePerNight.ToString("C")</td>
+                    <td class="align-middle">
+                        <div class="d-flex gap-2 w-100 justify-content-end">
+                            <button type="button" class="btn btn-secondary" @onclick="() => CreateOrEditRoomType(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+
+                            <button class="btn btn-danger" @onclick="() => roomTypeToDelete = roomType" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="modal fade" id="createEditModal" tabindex="-1" aria-labelledby="createEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="createEditModalLabel">@(roomTypeToEdit?.Id > 0 ? "Rediger" : "Tilføj") Værelsestype</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body my-3 p-0">
+                @if (!string.IsNullOrWhiteSpace(modalResponse))
+                {
+                    <div class="alert alert-success">@modalResponse</div>
+                }
+
+                @if (roomTypeToEdit is not null)
+                {
+                    <RoomTypeForm Model="roomTypeToEdit" HideButton="true" />
+                }
+            </div>
+
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="CreateOrSaveRoomType">Gem</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Værelsestype</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="d-flex gap-3 mt-3">
+                <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteRoomType">Slet</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? response;
+    private string? modalResponse;
+
+    private RoomTypeDto? roomTypeToEdit;
+    private RoomTypeDto? roomTypeToDelete;
+
+    private ICollection<RoomTypeDto> roomTypes;
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomTypes = await Api.GetAllRoomTypesAsync();
+    }
+
+    public void CreateOrEditRoomType(RoomTypeDto? roomType = null)
+    {
+        modalResponse = null;
+
+        if (roomType is not null)
+        {
+            roomTypeToEdit = roomType;
+        }
+        else
+        {
+            roomTypeToEdit = new RoomTypeDto();
+        }
+    }
+
+    public async Task CreateOrSaveRoomType()
+    {
+        modalResponse = null;
+
+        if (roomTypeToEdit is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (roomTypeToEdit.Id == 0)
+            {
+                var roomTypeId = await Api.CreateRoomTypeAsync(new CreateRoomTypeCommand()
+                {
+                    Name = roomTypeToEdit.Name,
+                    Description = roomTypeToEdit.Description,
+                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
+                });
+
+                roomTypes.Add(new RoomTypeDto()
+                {
+                    Id = roomTypeId,
+                    Name = roomTypeToEdit.Name,
+                    Description = roomTypeToEdit.Description,
+                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
+                });
+
+                modalResponse = $"Værelsestype \"{roomTypeToEdit.Name}\" er oprettet.";
+            }
+            else
+            {
+                await Api.UpdateRoomTypeAsync(new UpdateRoomTypeCommand()
+                {
+                    Id = roomTypeToEdit.Id,
+                    Name = roomTypeToEdit.Name,
+                    Description = roomTypeToEdit.Description,
+                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
+                });
+
+                var roomType = roomTypes.FirstOrDefault(r => r.Id == roomTypeToEdit.Id);
+
+                if (roomType is not null)
+                {
+                    roomType.Name = roomTypeToEdit.Name;
+                    roomType.Description = roomTypeToEdit.Description;
+                    roomType.MaxOccupancy = roomTypeToEdit.MaxOccupancy;
+                    roomType.PricePerNight = roomTypeToEdit.PricePerNight;
+                }
+            }
+
+            roomTypeToEdit = null;
+
+            StateHasChanged();
+        }
+        catch (ApiException ex)
+        {
+            modalResponse = ex.Response;
+        }
+    }
+
+    public async Task DeleteRoomType()
+    {
+        if (roomTypeToDelete is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await Api.DeleteRoomTypeAsync(roomTypeToDelete.Id);
+
+            roomTypes.Remove(roomTypeToDelete);
+
+            response = $"Værelsestype {roomTypeToDelete.Name} er slettet.";
+        }
+        catch (ApiException ex)
+        {
+            response = ex.Response;
+        }
+    }
+}

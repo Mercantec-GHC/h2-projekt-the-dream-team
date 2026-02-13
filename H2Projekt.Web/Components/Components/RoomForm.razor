@@ -1,54 +1,51 @@
 ﻿@rendermode InteractiveServer
 
-<EditForm class="d-flex flex-column gap-3" Model="Model" OnValidSubmit="OnValidSubmit">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
+@inject ApiClient Api
 
-    <div>
-        <label class="form-label">Værelsesnummer</label>
+@if (roomTypes is not null)
+{
+    <EditForm Enhance class="d-flex flex-column gap-3" Model="Model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
 
-        <InputText class="form-control" @bind-Value="Model.Number" />
+        <div>
+            <label class="form-label">Værelsesnummer</label>
 
-        <ValidationMessage For="@(() => Model.Number)" />
-    </div>
+            <InputText class="form-control" @bind-Value="Model.Number" placeholder="Indtast værelsesnummer" />
 
-    <div>
-        <label class="form-label">Kapacitet</label>
+            <ValidationMessage For="@(() => Model.Number)" />
+        </div>
 
-        <InputSelect @bind-Value="Model.Type" class="form-control">
-            @foreach (var type in keyValuePairs)
-            {
-                @if (type.Value.Equals(Model.Type))
+        <div>
+            <label class="form-label">Værelsestype</label>
+
+            <InputSelect @bind-Value:get="_roomTypeId" @bind-Value:set="SetRoomType" class="form-control">
+                @foreach (var type in roomTypes)
                 {
-                    <option value="@type.Value" selected>@type.Key</option>
+                    @if (type.Id == _roomTypeId)
+                    {
+                        <option value="@type.Id" selected>@type.Name</option>
 
-                    continue;
+                        continue;
+                    }
+
+                    <option value="@type.Id">@type.Name</option>
                 }
+            </InputSelect>
 
-                <option value="@type.Value">@type.Key</option>
-            }
-        </InputSelect>
+            <ValidationMessage For="@(() => Model.RoomType)" />
+        </div>
 
-        <ValidationMessage For="@(() => Model.Type)" />
-    </div>
-
-    <div>
-        <label class="form-label">Pris pr. nat</label>
-
-        <InputNumber @bind-Value="Model.PricePerNight" class="form-control" />
-
-        <ValidationMessage For="@(() => Model.PricePerNight)" />
-    </div>
-
-    @if (!HideButton.HasValue || HideButton.Value == false)
-    {
-        <button type="submit" class="btn btn-success">Tilføj</button>
-    }
-</EditForm>
+        @if (!HideButton.HasValue || HideButton.Value == false)
+        {
+            <button type="submit" class="btn btn-success">Tilføj</button>
+        }
+    </EditForm>
+}
 
 @code {
     [Parameter]
-    public Room Model { get; set; } = new Room();
+    public RoomDto Model { get; set; } = new RoomDto();
 
     [Parameter]
     public EventCallback<EditContext> OnValidSubmit { get; set; }
@@ -56,5 +53,50 @@
     [Parameter]
     public bool? HideButton { get; set; }
 
-    private Dictionary<string, int> keyValuePairs => Enum.GetValues<RoomType>().ToDictionary(t => t.ToString(), t => (int)t);
+    private int _roomTypeId;
+
+    private ICollection<RoomTypeDto> roomTypes = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        roomTypes = await Api.GetAllRoomTypesAsync();
+
+        OnParametersSet();
+
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        _roomTypeId = Model.RoomType?.Id ?? roomTypes.FirstOrDefault()?.Id ?? 1;
+
+        SetRoomType(_roomTypeId);
+    }
+
+    private void SetRoomType(int roomTypeId)
+    {
+        var roomType = roomTypes.FirstOrDefault(rt => rt.Id == roomTypeId);
+
+        if (roomType is null)
+        {
+            return;
+        }
+
+        _roomTypeId = roomTypeId;
+
+        Model.RoomType = new RoomType()
+        {
+            Id = roomType.Id,
+            Name = roomType.Name,
+            Description = roomType.Description,
+            MaxOccupancy = roomType.MaxOccupancy,
+        };
+
+        StateHasChanged();
+    }
 }

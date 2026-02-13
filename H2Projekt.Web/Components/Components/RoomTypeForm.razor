@@ -1,0 +1,56 @@
+﻿@rendermode InteractiveServer
+
+@inject ApiClient Api
+
+<EditForm Enhance class="d-flex flex-column gap-3" Model="Model" OnValidSubmit="OnValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div>
+        <label class="form-label">Navn</label>
+
+        <InputText class="form-control" @bind-Value="Model.Name" placeholder="Indtast navn" />
+
+        <ValidationMessage For="@(() => Model.Name)" />
+    </div>
+
+    <div>
+        <label class="form-label">Beskrivelse</label>
+
+        <InputTextArea class="form-control" @bind-Value="Model.Description" placeholder="Indtast beskrivelse" />
+
+        <ValidationMessage For="@(() => Model.MaxOccupancy)" />
+    </div>
+
+    <div>
+        <label class="form-label">Maks personer</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.MaxOccupancy" placeholder="Indtast maks antal personer" />
+        
+        <ValidationMessage For="@(() => Model.MaxOccupancy)" />
+    </div>
+
+    <div>
+        <label class="form-label">Pris pr. nat</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
+
+        <ValidationMessage For="@(() => Model.PricePerNight)" />
+    </div>
+
+    @if (!HideButton.HasValue || HideButton.Value == false)
+    {
+        <button type="submit" class="btn btn-success">Tilføj</button>
+    }
+</EditForm>
+
+@code {
+    [Parameter]
+    public RoomTypeDto Model { get; set; } = new RoomTypeDto();
+
+    [Parameter]
+    public EventCallback<EditContext> OnValidSubmit { get; set; }
+
+    [Parameter]
+    public bool? HideButton { get; set; }
+}

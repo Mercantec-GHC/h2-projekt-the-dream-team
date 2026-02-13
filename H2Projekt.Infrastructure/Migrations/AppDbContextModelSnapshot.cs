@@ -30,28 +30,39 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("AssignedRoomId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTimeOffset>("FromDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<DateOnly>("FromDate")
+                        .HasColumnType("date");
 
                     b.Property<int>("GuestId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("RoomType")
+                    b.Property<decimal>("PriceLocked")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int?>("RoomId")
                         .HasColumnType("integer");
 
-                    b.Property<DateTimeOffset>("ToDate")
-                        .HasColumnType("timestamp with time zone");
+                    b.Property<int?>("RoomId1")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("RoomTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("ToDate")
+                        .HasColumnType("date");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedRoomId");
-
                     b.HasIndex("GuestId");
 
-                    b.ToTable("Bookings");
+                    b.HasIndex("RoomId");
+
+                    b.HasIndex("RoomId1");
+
+                    b.HasIndex("RoomTypeId");
+
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Guest", b =>
@@ -76,7 +87,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guests");
+                    b.ToTable("Guests", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Room", b =>
@@ -91,13 +102,10 @@ namespace H2Projekt.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("PricePerNight")
-                        .HasColumnType("numeric");
-
-                    b.Property<int>("Status")
+                    b.Property<int>("RoomTypeId")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Type")
+                    b.Property<int>("Status")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -105,24 +113,128 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.HasIndex("Number")
                         .IsUnique();
 
-                    b.ToTable("Rooms");
+                    b.HasIndex("RoomTypeId");
+
+                    b.ToTable("Rooms", (string)null);
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.RoomRate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateOnly>("FromDate")
+                        .HasColumnType("date");
+
+                    b.Property<decimal>("PricePerNight")
+                        .HasPrecision(10, 2)
+                        .HasColumnType("numeric(10,2)");
+
+                    b.Property<int>("RoomTypeId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateOnly>("ToDate")
+                        .HasColumnType("date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RoomTypeId");
+
+                    b.ToTable("RoomRates", (string)null);
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.RoomType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text");
+
+                    b.Property<int>("MaxOccupancy")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("PricePerNight")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name")
+                        .IsUnique();
+
+                    b.ToTable("RoomTypes", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Booking", b =>
                 {
-                    b.HasOne("H2Projekt.Domain.Room", "AssignedRoom")
-                        .WithMany()
-                        .HasForeignKey("AssignedRoomId");
-
                     b.HasOne("H2Projekt.Domain.Guest", "Guest")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("GuestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("AssignedRoom");
+                    b.HasOne("H2Projekt.Domain.Room", "Room")
+                        .WithMany()
+                        .HasForeignKey("RoomId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("H2Projekt.Domain.Room", null)
+                        .WithMany("Bookings")
+                        .HasForeignKey("RoomId1");
+
+                    b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
+                        .WithMany()
+                        .HasForeignKey("RoomTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Guest");
+
+                    b.Navigation("Room");
+
+                    b.Navigation("RoomType");
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.Room", b =>
+                {
+                    b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
+                        .WithMany()
+                        .HasForeignKey("RoomTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RoomType");
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.RoomRate", b =>
+                {
+                    b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
+                        .WithMany()
+                        .HasForeignKey("RoomTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RoomType");
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.Guest", b =>
+                {
+                    b.Navigation("Bookings");
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.Room", b =>
+                {
+                    b.Navigation("Bookings");
                 });
 #pragma warning restore 612, 618
         }

@@ -4,49 +4,91 @@ using Microsoft.EntityFrameworkCore;
 
 namespace H2Projekt.Infrastructure.Repositories
 {
-    public class RoomRepository : IRoomRepository
+    public class RoomRepository : BaseRepository, IRoomRepository
     {
-        private readonly AppDbContext _appDbContext;
+        public RoomRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
-        public RoomRepository(AppDbContext appDbContext)
-        {
-            _appDbContext = appDbContext;
-        }
+        #region Rooms
 
         public async Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Rooms.OrderBy(r => r.Id).ToListAsync(cancellationToken);
+            return await _appDbContext.Rooms
+                .Include(r => r.RoomType)
+                .Include(r => r.Bookings)
+                    .ThenInclude(b => b.RoomType)
+                .OrderBy(r => r.Id).ToListAsync(cancellationToken);
         }
 
-        public async Task<Room?> GetRoomByRoomNumberAsync(string number, CancellationToken cancellationToken)
+        public async Task<Room?> GetRoomByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Rooms.SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
+            return await _appDbContext.Rooms
+                .Include(r => r.RoomType)
+                .Include(r => r.Bookings)
+                    .ThenInclude(b => b.RoomType)
+                .SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
 
-        public async Task<bool> DoesRoomExistAsync(string number, CancellationToken cancellationToken)
+        public async Task<Room?> GetRoomByNumberAsync(string number, CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.Rooms
+                .Include(r => r.RoomType)
+                .Include(r => r.Bookings)
+                    .ThenInclude(b => b.RoomType)
+                .SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
+        }
+
+        public async Task<bool> RoomExistsAsync(string number, CancellationToken cancellationToken = default)
         {
             return await _appDbContext.Rooms.AnyAsync(r => r.Number == number, cancellationToken);
         }
 
-        public async Task<int> AddAsync(Room room, CancellationToken cancellationToken = default)
+        public async Task<int> AddRoomAsync(Room roomType, CancellationToken cancellationToken = default)
         {
-            await _appDbContext.Rooms.AddAsync(room);
+            await _appDbContext.Rooms.AddAsync(roomType);
 
             return await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        public async Task UpdateAsync(Room room, CancellationToken cancellationToken = default)
-        {
-            _appDbContext.Rooms.Update(room);
-
-            await _appDbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task DeleteAsync(Room room, CancellationToken cancellationToken = default)
+        public async Task DeleteRoomAsync(Room room, CancellationToken cancellationToken = default)
         {
             _appDbContext.Rooms.Remove(room);
 
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }
+
+        #endregion
+
+        #region Room Types
+
+        public async Task<List<RoomType>> GetAllRoomTypesAsync(CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.RoomTypes.OrderBy(rt => rt.Id).ToListAsync(cancellationToken);
+        }
+
+        public async Task<RoomType?> GetRoomTypeByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.RoomTypes.SingleOrDefaultAsync(rt => rt.Id == id, cancellationToken);
+        }
+
+        public async Task<bool> RoomTypeExistsAsync(string name, CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.RoomTypes.AnyAsync(rt => rt.Name == name, cancellationToken);
+        }
+
+        public async Task<int> AddRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default)
+        {
+            await _appDbContext.RoomTypes.AddAsync(roomType);
+
+            return await _appDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default)
+        {
+            _appDbContext.RoomTypes.Remove(roomType);
+
+            await _appDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        #endregion 
     }
 }

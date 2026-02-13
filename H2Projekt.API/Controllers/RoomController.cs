@@ -1,9 +1,8 @@
 ﻿using FluentValidation;
-using H2Projekt.Application.Commands;
+using H2Projekt.Application.Commands.Rooms;
+using H2Projekt.Application.Dto.Rooms;
 using H2Projekt.Application.Exceptions;
-using H2Projekt.Application.Handlers;
-using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
+using H2Projekt.Application.Handlers.Rooms;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2Projekt.API.Controllers
@@ -12,20 +11,32 @@ namespace H2Projekt.API.Controllers
     [ApiController]
     public class RoomController : ControllerBase
     {
-        private readonly IRoomRepository _roomRepository;
+        #region Rooms
 
-        public RoomController(IRoomRepository roomRepository)
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<RoomDto>>> GetAllRooms([FromServices] GetAllRoomsHandler handler)
         {
-            _roomRepository = roomRepository;
+            var rooms = await handler.HandleAsync();
+
+            return Ok(rooms.Select(room => new RoomDto(room)));
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<Room>>> GetAllRooms()
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<RoomDto?>> GetRoomByNumber([FromServices] GetRoomByNumberHandler handler, string number)
         {
-            var rooms = await _roomRepository.GetAllRoomsAsync();
+            try
+            {
+                var room = await handler.HandleAsync(number);
 
-            return Ok(rooms);
+                return Ok(new RoomDto(room));
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
         }
 
         [HttpPost]
@@ -35,11 +46,11 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                var roomId = await handler.Handle(createRoomCommand);
+                var roomId = await handler.HandleAsync(createRoomCommand);
 
                 return Ok(roomId);
             }
-            catch (RoomDuplicateException ex)
+            catch (DuplicateException ex)
             {
                 return Conflict(ex.Message);
             }
@@ -56,11 +67,11 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(updateRoomCommand);
+                await handler.HandleAsync(updateRoomCommand);
 
                 return Ok();
             }
-            catch (RoomNonExistentException ex)
+            catch (NonExistentException ex)
             {
                 return NotFound(ex.Message);
             }
@@ -77,14 +88,88 @@ namespace H2Projekt.API.Controllers
         {
             try
             {
-                await handler.Handle(number);
+                await handler.HandleAsync(number);
 
                 return Ok();
             }
-            catch (RoomNonExistentException ex)
+            catch (NonExistentException ex)
             {
                 return NotFound(ex.Message);
             }
         }
+
+        #endregion
+
+        #region Room Types
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<RoomTypeDto>>> GetAllRoomTypes([FromServices] GetAllRoomTypesHandler handler)
+        {
+            var roomTypes = await handler.HandleAsync();
+
+            return Ok(roomTypes.Select(roomType => new RoomTypeDto(roomType)));
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        public async Task<ActionResult<int>> CreateRoomType([FromServices] CreateRoomTypeHandler handler, [FromBody] CreateRoomTypeCommand createRoomTypeCommand)
+        {
+            try
+            {
+                var roomId = await handler.HandleAsync(createRoomTypeCommand);
+
+                return Ok(roomId);
+            }
+            catch (DuplicateException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> UpdateRoomType([FromServices] UpdateRoomTypeHandler handler, [FromBody] UpdateRoomTypeCommand updateRoomTypeCommand)
+        {
+            try
+            {
+                await handler.HandleAsync(updateRoomTypeCommand);
+
+                return Ok();
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteRoomType([FromServices] DeleteRoomTypeHandler handler, int id)
+        {
+            try
+            {
+                await handler.HandleAsync(id);
+
+                return Ok();
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        #endregion
     }
 }

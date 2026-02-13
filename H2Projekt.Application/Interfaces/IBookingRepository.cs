@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using H2Projekt.Domain;
+﻿using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Interfaces
 {
-    public interface IBookingRepository
+    public interface IBookingRepository : IBaseRepository
     {
-        Task<IReadOnlyList<Booking>>GetBookingForRoomAsync(IEnumerable<Guid> roomIds, DateTimeOffset from, DateTimeOffset to);
-        Task AddBookingAsync(Booking booking);
+        Task<List<Booking>> GetAllBookingsAsync(CancellationToken cancellationToken = default);
+        Task<Booking?> GetBookingByIdAsync(int id, CancellationToken cancellationToken = default);
+        Task<bool> IsRoomTypeAvailableAsync(RoomType roomType, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken);
+        Task<IReadOnlyList<Booking>> GetBookingsForRoomsAsync(IEnumerable<int> roomIds, DateOnly from, DateOnly to);
     }
 }
