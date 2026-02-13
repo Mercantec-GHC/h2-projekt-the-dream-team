@@ -4,6 +4,6 @@
     {
         public int GuestId { get; set; }
         public int BookingId { get; set; }
-        public int AssignedRoomId { get; set; }
+        public int RoomId { get; set; }
     }
 }

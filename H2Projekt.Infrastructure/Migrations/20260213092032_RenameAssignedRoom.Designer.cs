@@ -3,6 +3,7 @@ using System;
 using H2Projekt.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace H2Projekt.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260213092032_RenameAssignedRoom")]
+    partial class RenameAssignedRoom
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,7 +65,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Guest", b =>
@@ -87,7 +90,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guests", (string)null);
+                    b.ToTable("Guests");
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Room", b =>
@@ -115,7 +118,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("Rooms", (string)null);
+                    b.ToTable("Rooms");
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.RoomRate", b =>
@@ -143,7 +146,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("RoomRates", (string)null);
+                    b.ToTable("RoomRates");
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.RoomType", b =>
@@ -172,7 +175,7 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("RoomTypes", (string)null);
+                    b.ToTable("RoomTypes");
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Booking", b =>

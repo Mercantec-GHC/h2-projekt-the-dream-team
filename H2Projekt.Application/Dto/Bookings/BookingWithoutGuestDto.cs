@@ -1,4 +1,5 @@
-﻿using H2Projekt.Domain;
+﻿using H2Projekt.Application.Dto.Rooms;
+using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Dto.Bookings
 {
@@ -8,7 +9,7 @@ namespace H2Projekt.Application.Dto.Bookings
         public DateOnly FromDate { get; set; }
         public DateOnly ToDate { get; set; }
         public decimal PriceLocked { get; set; }
-        public Room? AssignedRoom { get; set; }
+        public RoomWithoutRoomTypeDto? Room { get; set; }
 
         public BookingWithoutGuestDto(Booking booking)
         {
@@ -16,7 +17,7 @@ namespace H2Projekt.Application.Dto.Bookings
             FromDate = booking.FromDate;
             ToDate = booking.ToDate;
             PriceLocked = booking.PriceLocked;
-            AssignedRoom = booking.AssignedRoom;
+            Room = new RoomWithoutRoomTypeDto(booking.Room);
         }
     }
 }

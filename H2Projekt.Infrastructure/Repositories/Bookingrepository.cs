@@ -10,12 +10,22 @@ namespace H2Projekt.Infrastructure.Repositories
 
         public async Task<List<Booking>> GetAllBookingsAsync(CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Bookings.ToListAsync(cancellationToken);
+            _appDbContext.Database.EnsureCreated();
+
+            return await _appDbContext.Bookings
+                .Include(b => b.Guest)
+                .Include(b => b.RoomType)
+                .Include(b => b.Room)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<Booking?> GetBookingByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Bookings.SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
+            return await _appDbContext.Bookings
+                .Include(b => b.Guest)
+                .Include(b => b.RoomType)
+                .Include(b => b.Room)
+                .SingleOrDefaultAsync(b => b.Id == id, cancellationToken);
         }
 
         public async Task<bool> IsRoomTypeAvailableAsync(RoomType roomType, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken)
@@ -30,8 +40,8 @@ namespace H2Projekt.Infrastructure.Repositories
         public async Task<IReadOnlyList<Booking>> GetBookingsForRoomsAsync(IEnumerable<int> roomIds, DateOnly from, DateOnly to)
         {
             return await _appDbContext.Bookings
-                .Where(b => b.AssignedRoom != null
-                         && roomIds.Contains(b.AssignedRoom.Id)
+                .Where(b => b.Room != null
+                         && roomIds.Contains(b.Room.Id)
                          && from < b.ToDate
                          && to > b.FromDate)
                 .ToListAsync();

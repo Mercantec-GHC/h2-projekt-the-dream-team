@@ -12,8 +12,8 @@
         public DateOnly ToDate { get; private set; }
         public decimal PriceLocked { get; private set; }
 
-        public int? AssignedRoomId { get; private set; }
-        public Room? AssignedRoom { get; private set; }
+        public int? RoomId { get; private set; }
+        public Room? Room { get; private set; }
 
         public Booking() { }
 
@@ -28,8 +28,8 @@
 
         public void AssignRoom(Room room)
         {
-            AssignedRoomId = room.Id;
-            AssignedRoom = room;
+            RoomId = room.Id;
+            Room = room;
         }
     }
 }

@@ -15,6 +15,8 @@ namespace H2Projekt.Infrastructure
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            base.OnModelCreating(modelBuilder);
+
             // Room numbers must be unique
             modelBuilder.Entity<Room>()
                 .HasIndex(r => r.Number)
@@ -37,10 +39,30 @@ namespace H2Projekt.Infrastructure
             // Guest
             modelBuilder.Entity<Guest>(g =>
             {
-                g.Property(g => g.FirstName).HasMaxLength(100).IsRequired();
-                g.Property(g => g.LastName).HasMaxLength(100).IsRequired();
-                g.Property(g => g.Email).HasMaxLength(255).IsRequired();
+                g.Property(g => g.FirstName)
+                    .HasMaxLength(50)
+                    .IsRequired();
+                g.Property(g => g.LastName)
+                    .HasMaxLength(50)
+                    .IsRequired();
+                g.Property(g => g.Email)
+                    .HasMaxLength(100)
+                    .IsRequired();
             });
+
+            // On delete behavior for bookings when a guest is deleted - cascade delete
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Guest)
+                .WithMany(g => g.Bookings)
+                .HasForeignKey(b => b.GuestId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // On delete behavior for bookings when a room is deleted - restrict delete
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.Room)
+                .WithMany()
+                .HasForeignKey(b => b.RoomId)
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

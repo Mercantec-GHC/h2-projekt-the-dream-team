@@ -12,17 +12,29 @@ namespace H2Projekt.Infrastructure.Repositories
 
         public async Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Rooms.Include(x => x.RoomType).OrderBy(r => r.Id).ToListAsync(cancellationToken);
+            return await _appDbContext.Rooms
+                .Include(r => r.RoomType)
+                .Include(r => r.Bookings)
+                    .ThenInclude(b => b.RoomType)
+                .OrderBy(r => r.Id).ToListAsync(cancellationToken);
         }
 
         public async Task<Room?> GetRoomByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Rooms.Include(x => x.RoomType).SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
+            return await _appDbContext.Rooms
+                .Include(r => r.RoomType)
+                .Include(r => r.Bookings)
+                    .ThenInclude(b => b.RoomType)
+                .SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
 
         public async Task<Room?> GetRoomByNumberAsync(string number, CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.Rooms.Include(x => x.RoomType).SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
+            return await _appDbContext.Rooms
+                .Include(r => r.RoomType)
+                .Include(r => r.Bookings)
+                    .ThenInclude(b => b.RoomType)
+                .SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
         }
 
         public async Task<bool> RoomExistsAsync(string number, CancellationToken cancellationToken = default)

@@ -34,7 +34,7 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             if (!isRoomTypeAvailable)
             {
-                throw new Exception("There are no available rooms of the selected type for the given dates.");
+                throw new NonExistentException("There are no available rooms of the selected type for the given dates.");
             }
 
             var guest = await _guestRepository.GetGuestByIdAsync(request.GuestId, cancellationToken);

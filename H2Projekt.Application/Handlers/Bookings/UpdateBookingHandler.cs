@@ -36,16 +36,16 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             var booking = guest.Bookings.First(b => b.Id == request.BookingId);
 
-            var assignedRoom = await _roomRepository.GetRoomByIdAsync(request.AssignedRoomId, cancellationToken);
+            var room = await _roomRepository.GetRoomByIdAsync(request.RoomId, cancellationToken);
 
-            if (assignedRoom is null)
+            if (room is null)
             {
-                throw new NonExistentException($"Room with id {request.AssignedRoomId} doesn't exist.");
+                throw new NonExistentException($"Room with id {request.RoomId} doesn't exist.");
             }
 
-            booking.AssignRoom(assignedRoom);
+            booking.AssignRoom(room);
 
-            assignedRoom.UpdateDetails(RoomAvailabilityStatus.Occupied);
+            room.UpdateDetails(RoomAvailabilityStatus.Occupied);
 
             var validationResult = await _validator.ValidateAsync(guest, cancellationToken);
 
