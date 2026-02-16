@@ -42,6 +42,7 @@ namespace H2Projekt.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> CreateRoom([FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
         {
             try
@@ -56,13 +57,14 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> UpdateRoom([FromServices] UpdateRoomHandler handler, [FromBody] UpdateRoomCommand updateRoomCommand)
         {
             try
@@ -77,7 +79,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 
@@ -114,6 +116,7 @@ namespace H2Projekt.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> CreateRoomType([FromServices] CreateRoomTypeHandler handler, [FromBody] CreateRoomTypeCommand createRoomTypeCommand)
         {
             try
@@ -128,13 +131,14 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> UpdateRoomType([FromServices] UpdateRoomTypeHandler handler, [FromBody] UpdateRoomTypeCommand updateRoomTypeCommand)
         {
             try
@@ -149,7 +153,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 

@@ -6,9 +6,14 @@
 
 <PageTitle>Admin - Værelsestyper</PageTitle>
 
-@if (!string.IsNullOrWhiteSpace(response))
+@if (exception is not null)
 {
-    <div class="alert alert-success">@response</div>
+    <div class="d-flex flex-column gap-2 mb-4">
+        @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+        {
+            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+        }
+    </div>
 }
 
 <div class="d-flex gap-3 justify-content-between mb-4">
@@ -18,7 +23,7 @@
         <h3 class="mb-0">Værelsestyper</h3>
     </div>
 
-    <button type="button" class="btn btn-success" @onclick="() => CreateOrEditRoomType()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+    <button type="button" class="btn btn-success" @onclick="() => PrepareRoomTypeCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
 </div>
 
 @if (roomTypes is null)
@@ -53,7 +58,7 @@ else
                     <td class="align-middle">@roomType.PricePerNight.ToString("C")</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-secondary" @onclick="() => CreateOrEditRoomType(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            <button type="button" class="btn btn-secondary" @onclick="() => PrepareRoomTypeCreationOrUpdate(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
 
                             <button class="btn btn-danger" @onclick="() => roomTypeToDelete = roomType" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
                         </div>
@@ -78,9 +83,14 @@ else
             </div>
 
             <div class="modal-body my-3 p-0">
-                @if (!string.IsNullOrWhiteSpace(modalResponse))
+                @if (modalException is not null)
                 {
-                    <div class="alert alert-success">@modalResponse</div>
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                        {
+                            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                        }
+                    </div>
                 }
 
                 @if (roomTypeToEdit is not null)
@@ -110,6 +120,16 @@ else
                 </button>
             </div>
 
+            @if (modalException is not null)
+            {
+                <div class="modal-body mt-3 p-0 d-flex flex-column gap-2 mb-3">
+                    @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                    {
+                        <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                    }
+                </div>
+            }
+
             <div class="d-flex gap-3 mt-3">
                 <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteRoomType">Slet</button>
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
@@ -119,8 +139,8 @@ else
 </div>
 
 @code {
-    private string? response;
-    private string? modalResponse;
+    private ApiException? exception;
+    private ApiException? modalException;
 
     private RoomTypeDto? roomTypeToEdit;
     private RoomTypeDto? roomTypeToDelete;
@@ -132,9 +152,9 @@ else
         roomTypes = await Api.GetAllRoomTypesAsync();
     }
 
-    public void CreateOrEditRoomType(RoomTypeDto? roomType = null)
+    public void PrepareRoomTypeCreationOrUpdate(RoomTypeDto? roomType = null)
     {
-        modalResponse = null;
+        modalException = null;
 
         if (roomType is not null)
         {
@@ -146,9 +166,16 @@ else
         }
     }
 
+    public void PrepareRoomTypeDeletion(RoomTypeDto roomType)
+    {
+        modalException = null;
+
+        roomTypeToDelete = roomType;
+    }
+
     public async Task CreateOrSaveRoomType()
     {
-        modalResponse = null;
+        modalException = null;
 
         if (roomTypeToEdit is null)
         {
@@ -176,7 +203,7 @@ else
                     PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
-                modalResponse = $"Værelsestype \"{roomTypeToEdit.Name}\" er oprettet.";
+                exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToEdit.Name}\" er oprettet.", null, null);
             }
             else
             {
@@ -200,18 +227,22 @@ else
                 }
             }
 
+            await JS.InvokeVoidAsync("hideModal", "#createEditModal");
+
             roomTypeToEdit = null;
 
             StateHasChanged();
         }
         catch (ApiException ex)
         {
-            modalResponse = ex.Response;
+            modalException = ex;
         }
     }
 
     public async Task DeleteRoomType()
     {
+        modalException = null;
+
         if (roomTypeToDelete is null)
         {
             return;
@@ -221,13 +252,15 @@ else
         {
             await Api.DeleteRoomTypeAsync(roomTypeToDelete.Id);
 
+            await JS.InvokeVoidAsync("hideModal", "#deleteModal");
+
             roomTypes.Remove(roomTypeToDelete);
 
-            response = $"Værelsestype \"{roomTypeToDelete.Name}\" er slettet.";
+            exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToDelete.Name}\" er slettet.", null, null);
         }
         catch (ApiException ex)
         {
-            response = ex.Response;
+            modalException = ex;
         }
     }
 }
