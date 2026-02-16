@@ -41,10 +41,14 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             if (guest is null)
             {
-                throw new NonExistentException($"Guest with id {request.GuestId} doesn't exist ");
+                throw new NonExistentException($"Guest with id {request.GuestId} doesn't exist.");
             }
 
-            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, roomType.PricePerNight);
+            var discount = await _roomRepository.GetRoomDiscountAsync(roomType.Id, request.FromDate, request.ToDate, cancellationToken);
+
+            var calculatedDiscount = discount is not null ? discount.Percentage / 100 : 1;
+
+            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, roomType.PricePerNight * calculatedDiscount);
 
             guest.AddBooking(booking);
 

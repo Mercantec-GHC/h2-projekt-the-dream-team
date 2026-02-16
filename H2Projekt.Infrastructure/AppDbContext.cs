@@ -9,7 +9,7 @@ namespace H2Projekt.Infrastructure
         public DbSet<Guest> Guests => Set<Guest>();
         public DbSet<Room> Rooms => Set<Room>();
         public DbSet<RoomType> RoomTypes => Set<RoomType>();
-        public DbSet<RoomRate> RoomRates => Set<RoomRate>();
+        public DbSet<RoomDiscount> RoomDiscounts => Set<RoomDiscount>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -28,10 +28,6 @@ namespace H2Projekt.Infrastructure
                 .IsUnique();
 
             // Money precision
-            modelBuilder.Entity<RoomRate>()
-                .Property(rr => rr.PricePerNight)
-                .HasPrecision(10, 2);
-
             modelBuilder.Entity<RoomType>()
                 .Property(rt => rt.PricePerNight)
                 .HasPrecision(10, 2);

@@ -103,9 +103,9 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // var bookings = await Api.GetAllBookingsAsync();
+        var bookings = await Api.GetAllBookingsAsync();
 
-        // bookingsCount = bookings.Count;
+        bookingsCount = bookings.Count;
 
         var guests = await Api.GetAllGuestsAsync();
 
