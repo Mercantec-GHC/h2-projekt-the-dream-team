@@ -9,7 +9,6 @@ namespace H2Projekt.Application.Dto.Rooms
         public string Number { get; set; } = default!;
         public RoomType RoomType { get; set; } = default!;
         public RoomAvailabilityStatus Status { get; set; }
-        public ICollection<Booking> Bookings { get; set; } = default!;
 
         public RoomDto(Room room)
         {
@@ -17,7 +16,6 @@ namespace H2Projekt.Application.Dto.Rooms
             Number = room.Number;
             RoomType = room.RoomType;
             Status = room.Status;
-            Bookings = room.Bookings;
         }
     }
 }
