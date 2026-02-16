@@ -85,7 +85,7 @@ else
 
                 @if (roomTypeToEdit is not null)
                 {
-                    <RoomTypeForm Model="roomTypeToEdit" HideButton="true" />
+                    <RoomTypeForm Model="roomTypeToEdit" />
                 }
             </div>
 
@@ -223,7 +223,7 @@ else
 
             roomTypes.Remove(roomTypeToDelete);
 
-            response = $"Værelsestype {roomTypeToDelete.Name} er slettet.";
+            response = $"Værelsestype \"{roomTypeToDelete.Name}\" er slettet.";
         }
         catch (ApiException ex)
         {

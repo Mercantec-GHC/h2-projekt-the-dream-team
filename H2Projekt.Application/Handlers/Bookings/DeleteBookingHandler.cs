@@ -1,33 +1,34 @@
-﻿using H2Projekt.Application.Commands.Bookings;
-using H2Projekt.Application.Exceptions;
+﻿using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 
 namespace H2Projekt.Application.Handlers.Bookings
 {
     public class DeleteBookingHandler
     {
+        private readonly IBookingRepository _bookingRepository;
         private readonly IGuestRepository _guestRepository;
 
-        public DeleteBookingHandler(IGuestRepository guestRepository)
+        public DeleteBookingHandler(IBookingRepository bookingRepository, IGuestRepository guestRepository)
         {
+            _bookingRepository = bookingRepository;
             _guestRepository = guestRepository;
         }
 
-        public async Task HandleAsync(DeleteBookingCommand request, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(int id, CancellationToken cancellationToken = default)
         {
-            var guest = await _guestRepository.GetGuestByIdAsync(request.GuestId, cancellationToken);
+            var booking = await _bookingRepository.GetBookingByIdAsync(id, cancellationToken);
+
+            if (booking is null)
+            {
+                throw new NonExistentException($"Booking with id {id} doesn't exist.");
+            }
+
+            var guest = await _guestRepository.GetGuestByIdAsync(booking.GuestId, cancellationToken);
 
             if (guest is null)
             {
-                throw new NonExistentException($"Guest with id {request.GuestId} doesn't exist.");
+                throw new NonExistentException($"Guest with id {booking.GuestId} doesn't exist.");
             }
-
-            if (!guest.Bookings.Any(b => b.Id == request.BookingId))
-            {
-                throw new NonExistentException($"Booking with id {request.BookingId} doesn't exist for guest with id {request.GuestId}.");
-            }
-
-            var booking = guest.Bookings.First(b => b.Id == request.BookingId);
 
             guest.RemoveBooking(booking);
 

@@ -82,15 +82,11 @@ namespace H2Projekt.API.Controllers
         [HttpDelete()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteBooking([FromServices] DeleteBookingHandler handler, int guestId, int bookingId)
+        public async Task<ActionResult> DeleteBooking([FromServices] DeleteBookingHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(new DeleteBookingCommand()
-                {
-                    GuestId = guestId,
-                    BookingId = bookingId
-                });
+                await handler.HandleAsync(id);
 
                 return Ok();
             }

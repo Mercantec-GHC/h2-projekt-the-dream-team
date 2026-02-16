@@ -10,13 +10,8 @@ namespace H2Projekt.Application.Dto.Rooms
         public RoomTypeDto RoomType { get; set; } = default!;
         public RoomAvailabilityStatus Status { get; set; }
 
-        public RoomWithoutBookingsDto(Room? room)
+        public RoomWithoutBookingsDto(Room room)
         {
-            if (room is null)
-            {
-                return;
-            }
-
             Id = room.Id;
             Number = room.Number;
             RoomType = new RoomTypeDto(room.RoomType);

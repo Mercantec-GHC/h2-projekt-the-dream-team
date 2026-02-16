@@ -1,0 +1,199 @@
+﻿@page "/admin/manage-bookings"
+@rendermode InteractiveServer
+@inherits BasePage
+
+@inject ApiClient Api
+
+<PageTitle>Admin - Bookings</PageTitle>
+
+@if (!string.IsNullOrWhiteSpace(response))
+{
+    <div class="alert alert-success">@response</div>
+}
+
+<div class="d-flex gap-3 align-items-center mb-4">
+    <a href="/admin" class="btn btn-secondary">Tilbage</a>
+
+    <h3 class="mb-0">Bookings</h3>
+</div>
+
+@if (bookings is null)
+{
+    <p>Henter data...</p>
+}
+else if (bookings.Count == 0)
+{
+    <em>Ingen værelsestyper fundet.</em>
+}
+else
+{
+    <table id="dataTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th width="100">Id</th>
+                <th width="100">Gæst</th>
+                <th width="100">Værelsestype</th>
+                <th width="100">Fra dato</th>
+                <th width="100">Til dato</th>
+                <th width="100">Total pris</th>
+                <th width="100">Tildelt værelse</th>
+                <th width="1" data-dt-order="disable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var booking in bookings)
+            {
+                <tr>
+                    <td class="align-middle">@booking.Id</td>
+                    <td class="align-middle">@booking.Guest.FirstName @booking.Guest.LastName</td>
+                    <td class="align-middle">@booking.RoomType.Name</td>
+                    <td class="align-middle">@booking.FromDate.ToString("dd/MM/yyyy")</td>
+                    <td class="align-middle">@booking.ToDate.ToString("dd/MM/yyyy")</td>
+                    <td class="align-middle">@booking.PriceLocked.ToString("C")</td>
+                    <td class="align-middle">@(booking.Room?.Number ?? "")</td>
+                    <td class="align-middle">
+                        <div class="d-flex gap-2 w-100 justify-content-end">
+                            @if (booking.Room is null)
+                            {
+                                <button type="button" class="btn btn-secondary" @onclick="() => EditBooking(booking)" data-bs-toggle="modal" data-bs-target="#assignRoomModal">Tildel værelse</button>
+                            }
+
+                            <button class="btn btn-danger" @onclick="() => bookingToDelete = booking" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="modal fade" id="assignRoomModal" tabindex="-1" aria-labelledby="assignRoomModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="assignRoomModalLabel">Tildel værelse</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body my-3 p-0">
+                @if (!string.IsNullOrWhiteSpace(modalResponse))
+                {
+                    <div class="alert alert-success">@modalResponse</div>
+                }
+
+                @if (bookingToEdit is not null)
+                {
+                    <EditBookingForm Model="bookingToEdit" />
+                }
+            </div>
+
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="AssignRoom">Gem</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Booking</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="d-flex gap-3 mt-3">
+                <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteBooking">Slet</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private string? response;
+    private string? modalResponse;
+
+    private BookingDto? bookingToEdit;
+    private BookingDto? bookingToDelete;
+
+    private ICollection<BookingDto> bookings;
+
+    protected override async Task OnInitializedAsync()
+    {
+        bookings = await Api.GetAllBookingsAsync();
+    }
+
+    public void EditBooking(BookingDto booking)
+    {
+        modalResponse = null;
+
+        bookingToEdit = booking;
+    }
+
+    public async Task AssignRoom()
+    {
+        modalResponse = null;
+
+        if (bookingToEdit is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await Api.UpdateBookingAsync(new UpdateBookingCommand()
+            {
+                BookingId = bookingToEdit.Id,
+                RoomId = bookingToEdit.Room.Id,
+            });
+
+            var booking = bookings.FirstOrDefault(r => r.Id == bookingToEdit.Id);
+
+            if (booking is not null)
+            {
+                booking.Room = bookingToEdit.Room;
+            }
+
+            bookingToEdit = null;
+
+            StateHasChanged();
+        }
+        catch (ApiException ex)
+        {
+            modalResponse = ex.Response;
+        }
+    }
+
+    public async Task DeleteBooking()
+    {
+        if (bookingToDelete is null)
+        {
+            return;
+        }
+
+        try
+        {
+            await Api.DeleteBookingAsync(bookingToDelete.Id);
+
+            bookings.Remove(bookingToDelete);
+
+            response = $"Booking #{bookingToDelete.Id} er slettet.";
+        }
+        catch (ApiException ex)
+        {
+            response = ex.Response;
+        }
+    }
+}

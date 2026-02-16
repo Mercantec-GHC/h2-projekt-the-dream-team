@@ -254,19 +254,7 @@
         ],
         "parameters": [
           {
-            "name": "guestId",
-            "in": "query",
-            "schema": {
-              "pattern": "^-?(?:0|[1-9]\\d*)$",
-              "type": [
-                "integer",
-                "string"
-              ],
-              "format": "int32"
-            }
-          },
-          {
-            "name": "bookingId",
+            "name": "id",
             "in": "query",
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
@@ -1151,6 +1139,14 @@
       "BookingDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
           "guest": {
             "$ref": "#/components/schemas/GuestWithoutBookingsDto"
           },
@@ -1188,6 +1184,14 @@
       "BookingWithoutGuestDto": {
         "type": "object",
         "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
           "roomType": {
             "$ref": "#/components/schemas/RoomTypeDto"
           },
@@ -1414,48 +1418,10 @@
             "type": "string"
           },
           "roomType": {
-            "$ref": "#/components/schemas/RoomType"
+            "$ref": "#/components/schemas/RoomTypeDto"
           },
           "status": {
             "$ref": "#/components/schemas/RoomAvailabilityStatus"
-          }
-        }
-      },
-      "RoomType": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "description": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "maxOccupancy": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "pricePerNight": {
-            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
-            "type": [
-              "number",
-              "string"
-            ],
-            "format": "double"
-          },
-          "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
           }
         }
       },
@@ -1536,14 +1502,6 @@
       "UpdateBookingCommand": {
         "type": "object",
         "properties": {
-          "guestId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
           "bookingId": {
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
