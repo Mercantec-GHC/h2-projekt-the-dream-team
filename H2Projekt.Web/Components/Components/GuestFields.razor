@@ -1,0 +1,24 @@
+﻿@* Components/Forms/GuestFields.razor *@
+@using System.ComponentModel.DataAnnotations
+
+<div class="mb-3">
+    <label class="form-label">Fornavn</label>
+    <InputText class="form-control" @bind-Value="Model.FirstName" />
+    <ValidationMessage For="@(() => Model.FirstName)" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Efternavn</label>
+    <InputText class="form-control" @bind-Value="Model.LastName" />
+    <ValidationMessage For="@(() => Model.LastName)" />
+</div>
+
+<div class="mb-3">
+    <label class="form-label">Email</label>
+    <InputText class="form-control" @bind-Value="Model.Email" />
+    <ValidationMessage For="@(() => Model.Email)" />
+</div>
+
+@code {
+    [Parameter] public GuestDto Model { get; set; } = new();
+}

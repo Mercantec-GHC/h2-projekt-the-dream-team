@@ -51,7 +51,7 @@
                     <p><strong>Pris pr. nat:</strong> @selectedType.PricePerNight.ToString("C")</p>
 
                     <div class="d-flex gap-3 mt-4">
-                        <button class="btn btn-success w-50" @onclick="BookSelectedType">Book</button>
+                        <button class="btn btn-success w-50" @onclick="BookSelectedType">Book nu</button>
                         <button class="btn btn-secondary w-50" @onclick="() => selectedType = null">Luk</button>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
     {
         // Du bestemmer hvad der skal ske:
         // ➜ Redirect til booking flow, fx:
-        Navigation.NavigateTo($"/booking-room?roomTypeId={selectedType.Id}");
+        Navigation.NavigateTo($"/create-booking?roomTypeId={selectedType!.Id}");
 
         // Eller direkte booking, hvis du ønsker det.
     }
