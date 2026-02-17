@@ -4,7 +4,7 @@
     <table class="table table-bordered w-100 fs-7 m-0">
         <thead>
             <tr class="position-sticky top-0 z-1">
-                <th class="h-2rem min-w-10rem text-center">Room / Date</th>
+                <th></th>
 
                 @foreach (var d in Dates)
                 {
@@ -14,15 +14,20 @@
         </thead>
 
         <tbody>
-            @foreach (var group in GroupedRooms)
+            @foreach (var roomType in Rooms.Select(r => r.RoomType).DistinctBy(rt => rt.Id))
             {
+                if (!Rooms.Any(r => r.RoomType.Id == roomType.Id) || !Bookings.Any(b => b.RoomType.Id == roomType.Id))
+                {
+                    continue;
+                }
+
                 <tr>
-                    <td class="position-relative z-0 bg-primary-subtle border-end-0 p-0 text-center">@group.Key</td>
+                    <td class="position-relative z-0 bg-primary-subtle border-end-0 p-0 text-center">@roomType.Name</td>
 
                     <td class="position-relative z-0 bg-primary-subtle border-start-0" colspan="@(Dates.Count)"></td>
                 </tr>
 
-                @foreach (var room in group.Value)
+                @foreach (var room in Rooms.Where(r => r.RoomType.Id == roomType.Id))
                 {
                     <tr>
                         <td class="position-relative z-0 h-2rem min-w-10rem text-center">@room.Number</td>
@@ -31,17 +36,15 @@
                         {
                             var date = Dates[i];
 
-                            var key = CellKey(room.Id, date);
+                            var booking = GetActiveBookingForRoomOnDate(room, date);
 
-                            @if (BookingCells.TryGetValue(key, out var booking))
+                            @if (booking is not null)
                             {
-                                var auto = AutoPlaced[booking.Id];
-
                                 var span = booking.ToDate.ToDateOnly().DayNumber - date.DayNumber;
 
                                 <td colspan="@(span + 1)" class="position-relative z-0 h-2rem min-w-10rem text-center">
-                                    <div class="position-absolute d-flex justify-content-center align-items-center rounded-2 border border-primary inset-1 @(auto ? "border-dark" : "bg-primary")">
-                                        @booking.Guest.FirstName @booking.Guest.LastName
+                                    <div class="position-absolute d-flex justify-content-center align-items-center rounded-2 border border-primary inset-1 @(booking.Room is null ? "border-dark" : "bg-primary")">
+                                        @booking.Guest.FirstName @booking.Guest.LastName (#@booking.Id)
                                     </div>
                                 </td>
 
@@ -69,20 +72,15 @@
     [Parameter]
     public ICollection<BookingDto> Bookings { get; set; }
 
-    private Dictionary<string, List<RoomDto>> GroupedRooms = new();
+    private Dictionary<int, int> BookingsWithNoRoom = new();
 
     private List<DateOnly> Dates = new();
 
-    private Dictionary<string, BookingDto> BookingCells = new();
-
-    private Dictionary<int, bool> AutoPlaced = new();
-
     protected override void OnInitialized()
     {
-        GroupedRooms = Rooms.GroupBy(r => r.RoomType.Name).ToDictionary(g => g.Key, g => g.OrderBy(r => r.Number).ToList());
-
         BuildDates();
-        BuildCells();
+
+        AllocateRoomsToUnassignedBookings();
 
         StateHasChanged();
     }
@@ -100,75 +98,46 @@
         }
     }
 
-    private void BuildCells()
+    private void AllocateRoomsToUnassignedBookings()
     {
-        BookingCells.Clear();
-        AutoPlaced.Clear();
-
-        var busy = Rooms.ToDictionary(
-            r => r.Id,
-            _ => new HashSet<DateOnly>()
-        );
-
-        foreach (var booking in Bookings.OrderBy(b => b.FromDate.ToDateOnly()))
+        foreach (var booking in Bookings.Where(b => b.Room is null).OrderBy(b => b.Id))
         {
-            var days = EachDay(booking.FromDate.ToDateOnly(), booking.ToDate.ToDateOnly()).ToList();
-
-            if (booking.Room is not null)
+            if (BookingsWithNoRoom.ContainsKey(booking.Id))
             {
-                AutoPlaced[booking.Id] = false;
-
-                foreach (var day in days)
-                {
-                    busy[booking.Room.Id].Add(day);
-
-                    BookingCells[CellKey(booking.Room.Id, day)] = booking;
-                }
-
                 continue;
             }
 
-            var candidates = Rooms.Where(r => r.RoomType.Id == booking.RoomType.Id);
+            var candidateRooms = Rooms.Where(r => r.RoomType.Id == booking.RoomType.Id).ToList();
 
-            RoomDto? foundRoom = null;
-
-            foreach (var room in candidates)
+            foreach (var room in candidateRooms)
             {
-                if (days.All(day => !busy[room.Id].Contains(day)))
+                bool overlaps = HasOverlappingBookingForRoom(booking, room);
+
+                if (!overlaps)
                 {
-                    foundRoom = room;
+                    BookingsWithNoRoom[booking.Id] = room.Id;
 
                     break;
                 }
             }
-
-            AutoPlaced[booking.Id] = true;
-
-            if (foundRoom is null)
-            {
-                continue;
-            }
-
-            foreach (var day in days)
-            {
-                busy[foundRoom.Id].Add(day);
-
-                BookingCells[CellKey(foundRoom.Id, day)] = booking;
-            }
         }
     }
 
-    private IEnumerable<DateOnly> EachDay(DateOnly fromDate, DateOnly toDate)
+    private BookingDto? GetActiveBookingForRoomOnDate(RoomDto room, DateOnly date)
     {
-        var dates = new List<DateOnly>();
-
-        for (var d = fromDate; d <= toDate; d = d.AddDays(1))
-        {
-            dates.Add(d);
-        }
-
-        return dates;
+        return Bookings.FirstOrDefault(b =>
+            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id))
+            && b.FromDate.ToDateOnly() <= date && b.ToDate.ToDateOnly() > date
+        );
     }
 
-    private string CellKey(int roomId, DateOnly d) => $"{roomId}_{d:yyyy-MM-dd}";
+    private bool HasOverlappingBookingForRoom(BookingDto booking, RoomDto room)
+    {
+        return Bookings.Any(b =>
+            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id))
+            && b.Id != booking.Id
+            && b.FromDate.ToDateOnly() <= booking.ToDate.ToDateOnly()
+            && b.ToDate.ToDateOnly() >= booking.FromDate.ToDateOnly()
+        );
+    }
 }
