@@ -30,9 +30,11 @@
                 clearInterval(interval);
 
                 new DataTable(dataTable);
-
-                dataTable.removeAttribute("id");
             }, 50);
+        }
+
+        function hideModal(id) {
+            $(id).modal("hide");
         }
     </script>
 </body>

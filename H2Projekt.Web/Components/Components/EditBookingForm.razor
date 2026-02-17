@@ -1,0 +1,88 @@
+﻿@rendermode InteractiveServer
+
+@inject ApiClient Api
+
+@if (rooms is not null)
+{
+    <EditForm Enhance class="d-flex flex-column gap-3" Model="Model" OnValidSubmit="OnValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div>
+            <label class="form-label">Værelse</label>
+
+            <InputSelect @bind-Value:get="_roomId" @bind-Value:set="SetRoom" class="form-control">
+                @foreach (var room in rooms)
+                {
+                    @if (room.Id == _roomId)
+                    {
+                        <option value="@room.Id" selected>@room.Number (@room.RoomType.Name)</option>
+
+                        continue;
+                    }
+
+                    <option value="@room.Id">@room.Number (@room.RoomType.Name)</option>
+                }
+            </InputSelect>
+
+            <ValidationMessage For="@(() => Model.Room)" />
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    public BookingDto Model { get; set; } = new BookingDto();
+
+    [Parameter]
+    public EventCallback<EditContext> OnValidSubmit { get; set; }
+
+    private int _roomId;
+
+    private ICollection<RoomDto> rooms = [];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        var allRooms = await Api.GetAllRoomsAsync();
+
+        rooms = allRooms.Where(r => r.RoomType.Id == Model.RoomType.Id).ToList();
+
+        OnParametersSet();
+
+        StateHasChanged();
+    }
+
+    protected override void OnParametersSet()
+    {
+        _roomId = Model.Room?.Id ?? rooms.FirstOrDefault()?.Id ?? 1;
+
+        SetRoom(_roomId);
+    }
+
+    private void SetRoom(int roomId)
+    {
+        var room = rooms.FirstOrDefault(rt => rt.Id == roomId);
+
+        if (room is null)
+        {
+            return;
+        }
+
+        _roomId = roomId;
+
+        Model.Room = new RoomWithoutBookingsDto()
+        {
+            Id = room.Id,
+            Number = room.Number,
+            RoomType = room.RoomType,
+            Status = room.Status
+        };
+
+        StateHasChanged();
+    }
+}

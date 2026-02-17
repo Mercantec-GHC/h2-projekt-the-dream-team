@@ -24,5 +24,11 @@ namespace H2Projekt.Application.Interfaces
         Task DeleteRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default);
 
         #endregion
+
+        #region Room Discounts
+
+        Task<RoomDiscount?> GetRoomDiscountAsync(int roomTypeId, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken = default);
+
+        #endregion
     }
 }

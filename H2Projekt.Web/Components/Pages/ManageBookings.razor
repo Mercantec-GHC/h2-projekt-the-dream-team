@@ -1,10 +1,10 @@
-﻿@page "/admin/manage-guests"
+﻿@page "/admin/manage-bookings"
 @rendermode InteractiveServer
 @inherits BasePage
 
 @inject ApiClient Api
 
-<PageTitle>Admin - Gæster</PageTitle>
+<PageTitle>Admin - Bookings</PageTitle>
 
 @if (exception is not null)
 {
@@ -16,23 +16,19 @@
     </div>
 }
 
-<div class="d-flex gap-3 justify-content-between mb-4">
-    <div class="d-flex gap-3 align-items-center">
-        <a href="/admin" class="btn btn-secondary">Tilbage</a>
+<div class="d-flex gap-3 align-items-center mb-4">
+    <a href="/admin" class="btn btn-secondary">Tilbage</a>
 
-        <h3 class="mb-0">Gæster</h3>
-    </div>
-
-    <button type="button" class="btn btn-success" @onclick="() => PrepareGuestCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+    <h3 class="mb-0">Bookings</h3>
 </div>
 
-@if (guests is null)
+@if (bookings is null)
 {
     <p>Henter data...</p>
 }
-else if (guests.Count == 0)
+else if (bookings.Count == 0)
 {
-    <em>Ingen gæster fundet.</em>
+    <em>Ingen værelsestyper fundet.</em>
 }
 else
 {
@@ -40,25 +36,34 @@ else
         <thead>
             <tr>
                 <th width="100">Id</th>
-                <th width="100">Fornavn</th>
-                <th width="100">Efternavn</th>
-                <th width="100">Email</th>
+                <th width="100">Gæst</th>
+                <th width="100">Værelsestype</th>
+                <th width="100">Fra dato</th>
+                <th width="100">Til dato</th>
+                <th width="100">Total pris</th>
+                <th width="100">Tildelt værelse</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var guest in guests)
+            @foreach (var booking in bookings)
             {
                 <tr>
-                    <td class="align-middle">@guest.Id</td>
-                    <td class="align-middle">@guest.FirstName</td>
-                    <td class="align-middle">@guest.LastName</td>
-                    <td class="align-middle">@guest.Email</td>
+                    <td class="align-middle">@booking.Id</td>
+                    <td class="align-middle">@booking.Guest.FirstName @booking.Guest.LastName</td>
+                    <td class="align-middle">@booking.RoomType.Name</td>
+                    <td class="align-middle">@booking.FromDate.ToString("dd/MM/yyyy")</td>
+                    <td class="align-middle">@booking.ToDate.ToString("dd/MM/yyyy")</td>
+                    <td class="align-middle">@booking.PriceLocked.ToString("C")</td>
+                    <td class="align-middle">@(booking.Room?.Number ?? "")</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-secondary" @onclick="() => PrepareGuestCreationOrUpdate(guest)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            @if (booking.Room is null)
+                            {
+                                <button type="button" class="btn btn-secondary" @onclick="() => PrepareBookingUpdate(booking)" data-bs-toggle="modal" data-bs-target="#assignRoomModal">Tildel værelse</button>
+                            }
 
-                            <button class="btn btn-danger" @onclick="() => PrepareGuestDeletion(guest)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                            <button class="btn btn-danger" @onclick="() => PrepareBookingDeletion(booking)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
                         </div>
                     </td>
                 </tr>
@@ -67,11 +72,11 @@ else
     </table>
 }
 
-<div class="modal fade" id="createEditModal" tabindex="-1" aria-labelledby="createEditModalLabel" aria-hidden="true">
+<div class="modal fade" id="assignRoomModal" tabindex="-1" aria-labelledby="assignRoomModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-3">
             <div class="d-flex align-items-center justify-content-between">
-                <h5 class="fs-4 mb-0" id="createEditModalLabel">@(guestToEdit?.Id > 0 ? "Rediger" : "Tilføj") Gæst</h5>
+                <h5 class="fs-4 mb-0" id="assignRoomModalLabel">Tildel værelse</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
@@ -91,14 +96,14 @@ else
                     </div>
                 }
 
-                @if (guestToEdit is not null)
+                @if (bookingToEdit is not null)
                 {
-                    <GuestForm Model="guestToEdit" />
+                    <EditBookingForm Model="bookingToEdit" />
                 }
             </div>
 
             <div class="d-flex gap-3">
-                <button type="button" class="btn btn-primary w-50" @onclick="CreateOrSaveGuest">Gem</button>
+                <button type="button" class="btn btn-primary w-50" @onclick="AssignRoom">Gem</button>
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
             </div>
         </div>
@@ -109,7 +114,7 @@ else
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-3">
             <div class="d-flex align-items-center justify-content-between">
-                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Gæst</h5>
+                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Booking</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
                     <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
@@ -129,7 +134,7 @@ else
             }
 
             <div class="d-flex gap-3 mt-3">
-                <button type="button" class="btn btn-danger w-50" @onclick="DeleteGuest">Slet</button>
+                <button type="button" class="btn btn-danger w-50" @onclick="DeleteBooking">Slet</button>
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
             </div>
         </div>
@@ -140,91 +145,57 @@ else
     private ApiException? exception;
     private ApiException? modalException;
 
-    private GuestDto? guestToEdit;
-    private GuestDto? guestToDelete;
+    private BookingDto? bookingToEdit;
+    private BookingDto? bookingToDelete;
 
-    private ICollection<GuestDto> guests;
+    private ICollection<BookingDto> bookings;
 
     protected override async Task OnInitializedAsync()
     {
-        guests = await Api.GetAllGuestsAsync();
+        bookings = await Api.GetAllBookingsAsync();
     }
 
-    public void PrepareGuestCreationOrUpdate(GuestDto? guest = null)
+    public void PrepareBookingUpdate(BookingDto booking)
     {
         modalException = null;
 
-        if (guest is not null)
-        {
-            guestToEdit = guest;
-        }
-        else
-        {
-            guestToEdit = new GuestDto();
-        }
+        bookingToEdit = booking;
     }
 
-    public void PrepareGuestDeletion(GuestDto guest)
+    public void PrepareBookingDeletion(BookingDto booking)
     {
         modalException = null;
 
-        guestToDelete = guest;
+        bookingToDelete = booking;
     }
 
-    public async Task CreateOrSaveGuest()
+    public async Task AssignRoom()
     {
         modalException = null;
 
-        if (guestToEdit is null)
+        if (bookingToEdit is null)
         {
             return;
         }
 
         try
         {
-            if (guestToEdit.Id == 0)
+            await Api.UpdateBookingAsync(new UpdateBookingCommand()
             {
-                var guestId = await Api.CreateGuestAsync(new CreateGuestCommand()
-                {
-                    FirstName = guestToEdit.FirstName,
-                    LastName = guestToEdit.LastName,
-                    Email = guestToEdit.Email,
-                });
+                BookingId = bookingToEdit.Id,
+                RoomId = bookingToEdit.Room.Id,
+            });
 
-                guests.Add(new GuestDto()
-                {
-                    Id = guestId,
-                    FirstName = guestToEdit.FirstName,
-                    LastName = guestToEdit.LastName,
-                    Email = guestToEdit.Email,
-                });
+            var booking = bookings.FirstOrDefault(r => r.Id == bookingToEdit.Id);
 
-                exception = new ApiException(null, 200, $"Gæst \"{guestToEdit.FirstName}\" oprettet.", null, null);
-            }
-            else
+            if (booking is not null)
             {
-                await Api.UpdateGuestAsync(new UpdateGuestCommand()
-                {
-                    Id = guestToEdit.Id,
-                    FirstName = guestToEdit.FirstName,
-                    LastName = guestToEdit.LastName,
-                    Email = guestToEdit.Email,
-                });
-
-                var guest = guests.FirstOrDefault(r => r.Id == guestToEdit.Id);
-
-                if (guest is not null)
-                {
-                    guest.FirstName = guestToEdit.FirstName;
-                    guest.LastName = guestToEdit.LastName;
-                    guest.Email = guestToEdit.Email;
-                }
-
+                booking.Room = bookingToEdit.Room;
             }
 
-            await JS.InvokeVoidAsync("hideModal", "#createEditModal");
+            await JS.InvokeVoidAsync("hideModal", "#assignRoomModal");
 
-            guestToEdit = null;
+            bookingToEdit = null;
 
             StateHasChanged();
         }
@@ -234,24 +205,24 @@ else
         }
     }
 
-    public async Task DeleteGuest()
+    public async Task DeleteBooking()
     {
         modalException = null;
 
-        if (guestToDelete is null)
+        if (bookingToDelete is null)
         {
             return;
         }
 
         try
         {
-            await Api.DeleteGuestAsync(guestToDelete.Id);
+            await Api.DeleteBookingAsync(bookingToDelete.Id);
 
             await JS.InvokeVoidAsync("hideModal", "#deleteModal");
 
-            guests.Remove(guestToDelete);
+            bookings.Remove(bookingToDelete);
 
-            exception = new ApiException(null, 200, $"Gæst #{guestToDelete.Id} er slettet.", null, null);
+            exception = new ApiException(null, 200, $"Booking #{bookingToDelete.Id} er slettet.", null, null);
         }
         catch (ApiException ex)
         {

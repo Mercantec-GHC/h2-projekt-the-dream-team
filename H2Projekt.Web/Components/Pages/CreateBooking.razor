@@ -1,0 +1,200 @@
+﻿@page "/create-booking"
+@rendermode InteractiveServer
+@inherits BasePage
+@using System.ComponentModel.DataAnnotations
+@inject ApiClient Api
+@inject NavigationManager Navigation
+
+<button class="btn btn-secondary mb-3" @onclick="Back">← Tilbage</button>
+
+@if (loading)
+{
+    <p>Indlæser…</p>
+}
+else if (roomType is null)
+{
+    <div class="alert @messageCss">@message</div>
+}
+else
+{
+    @if (!string.IsNullOrWhiteSpace(message))
+    {
+        <div class="alert @messageCss">@message</div>
+    }
+
+    <h2 class="mb-2">Book @roomType.Name</h2>
+    <p class="text-muted mb-4">@roomType.Description</p>
+
+    <!-- ÉN samlet EditForm som validere alt -->
+    <EditForm Model="vm" OnValidSubmit="HandleValidSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="row g-4">
+            <!-- VENSTRE: Gæsteoplysninger -->
+            <div class="col-lg-6">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="mb-3">Dine oplysninger</h5>
+                    <GuestFields Model="vm.Guest" />
+                </div>
+            </div>
+
+            <!-- HØJRE: Datoer + submit -->
+            <div class="col-lg-6">
+                <div class="card p-3 shadow-sm">
+                    <h5 class="mb-3">Vælg datoer</h5>
+
+                    <div class="mb-3">
+                        <label class="form-label">Check-in</label>
+                        <InputDate class="form-control" @bind-Value="vm.CheckIn" />
+                        <ValidationMessage For="@(() => vm.CheckIn)" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Check-out</label>
+                        <InputDate class="form-control" @bind-Value="vm.CheckOut" />
+                        <ValidationMessage For="@(() => vm.CheckOut)" />
+                    </div>
+
+                    <button class="btn btn-success w-100 mt-2" type="submit" disabled="@posting">
+                        @if (posting)
+                        {
+                            <span class="spinner-border spinner-border-sm me-2"></span>
+                        }
+                        Bekræft booking
+                    </button>
+                </div>
+            </div>
+        </div>
+    </EditForm>
+}
+
+@code {
+    [Parameter]
+    [SupplyParameterFromQuery]
+    public int roomTypeId { get; set; }
+
+    private RoomTypeDto? roomType;
+    private string? message;
+    private string messageCss = "alert-success";
+    private bool loading = true;
+    private bool posting = false;
+
+    // Samlet viewmodel (gæst + datoer)
+    private CreateBookingViewModel vm = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        loading = true;
+        message = null;
+
+        try
+        {
+            if (roomTypeId <= 0)
+            {
+                message = "Ugyldig eller manglende værelsestype.";
+                messageCss = "alert-danger";
+                roomType = null;
+                return;
+            }
+
+            var types = await Api.GetAllRoomTypesAsync();
+            roomType = types.FirstOrDefault(t => t.Id == roomTypeId);
+
+            if (roomType is null)
+            {
+                message = $"Værelsestype med id {roomTypeId} blev ikke fundet.";
+                messageCss = "alert-danger";
+            }
+        }
+        catch (ApiException ex)
+        {
+            message = ex.Response;
+            messageCss = "alert-danger";
+            roomType = null;
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        if (roomType is null) return;
+
+        posting = true;
+        message = null;
+
+        try
+        {
+            // 1) Opret gæst
+            var guestId = await Api.CreateGuestAsync(new CreateGuestCommand
+            {
+                FirstName = vm.Guest.FirstName,
+                LastName = vm.Guest.LastName,
+                Email = vm.Guest.Email
+            });
+
+            // 2) Opret booking (brug DateOnly!)
+            var cmd = new CreateBookingCommand
+            {
+                GuestId = guestId,
+                RoomTypeId = roomType.Id,
+                FromDate = new DateTimeOffset(vm.CheckIn.Date),
+                ToDate = new DateTimeOffset(vm.CheckOut.Date)
+            };
+
+            await Api.CreateBookingAsync(cmd);
+
+            message = $"Tak, {vm.Guest.FirstName}! Din booking af {roomType.Name} er gennemført.";
+            messageCss = "alert-success";
+
+            // (Valgfrit) Navigation til kvittering
+            // Navigation.NavigateTo($"/booking-confirmation?roomTypeId={roomType.Id}&from={vm.CheckIn:yyyy-MM-dd}&to={vm.CheckOut:yyyy-MM-dd}");
+        }
+        catch (ApiException ex)
+        {
+            message = ex.Response;
+            messageCss = "alert-danger";
+        }
+        finally
+        {
+            posting = false;
+        }
+    }
+
+    public class CreateBookingViewModel
+    {
+        public GuestDto Guest { get; set; } = new();
+
+        [Required(ErrorMessage = "Vælg check-in.")]
+        public DateTime CheckIn { get; set; } = DateTime.Today;
+
+        [Required(ErrorMessage = "Vælg check-out.")]
+        [DateAfter(nameof(CheckIn), ErrorMessage = "Check-out skal være efter check-in."),
+        ]
+        public DateTime CheckOut { get; set; } = DateTime.Today.AddDays(1);
+    }
+
+    // Custom validering: CheckOut > CheckIn
+    public class DateAfterAttribute : ValidationAttribute
+    {
+        private readonly string _other;
+        public DateAfterAttribute(string other) => _other = other;
+
+        protected override ValidationResult? IsValid(object? value, ValidationContext context)
+        {
+            var current = value as DateTime? ?? default;
+            var prop = context.ObjectType.GetProperty(_other);
+            if (prop is null) return ValidationResult.Success;
+
+            var compareTo = (DateTime)(prop.GetValue(context.ObjectInstance) ?? default(DateTime));
+            return current > compareTo
+                ? ValidationResult.Success
+                : new ValidationResult(ErrorMessage ?? "Datoen skal være efter.");
+        }
+    }
+
+    private void Back() => Navigation.NavigateTo("/booking-room");
+}

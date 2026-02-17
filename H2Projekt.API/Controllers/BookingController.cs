@@ -40,6 +40,7 @@ namespace H2Projekt.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> CreateBooking([FromServices] CreateBookingHandler handler, [FromBody] CreateBookingCommand createBookingCommand)
         {
             try
@@ -54,13 +55,14 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> UpdateBooking([FromServices] UpdateBookingHandler handler, [FromBody] UpdateBookingCommand updateBookingCommand)
         {
             try
@@ -75,22 +77,18 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 
         [HttpDelete()]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteBooking([FromServices] DeleteBookingHandler handler, int guestId, int bookingId)
+        public async Task<ActionResult> DeleteBooking([FromServices] DeleteBookingHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(new DeleteBookingCommand()
-                {
-                    GuestId = guestId,
-                    BookingId = bookingId
-                });
+                await handler.HandleAsync(id);
 
                 return Ok();
             }

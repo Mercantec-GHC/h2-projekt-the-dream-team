@@ -3,6 +3,7 @@ using System;
 using H2Projekt.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace H2Projekt.Infrastructure.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260216081143_GuestMaxLength")]
+    partial class GuestMaxLength
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -116,7 +119,7 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("H2Projekt.Domain.RoomDiscount", b =>
+            modelBuilder.Entity("H2Projekt.Domain.RoomRate", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -124,15 +127,11 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<DateOnly>("FromDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("Percentage")
-                        .HasColumnType("integer");
+                    b.Property<decimal>("PricePerNight")
+                        .HasColumnType("numeric");
 
                     b.Property<int>("RoomTypeId")
                         .HasColumnType("integer");
@@ -144,7 +143,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("RoomDiscounts");
+                    b.ToTable("RoomRates");
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.RoomType", b =>
@@ -165,9 +164,9 @@ namespace H2Projekt.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<decimal>("PricePerNight")
+                    b.Property<int>("PricePerNight")
                         .HasPrecision(10, 2)
-                        .HasColumnType("numeric(10,2)");
+                        .HasColumnType("integer");
 
                     b.HasKey("Id");
 
@@ -214,7 +213,7 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.Navigation("RoomType");
                 });
 
-            modelBuilder.Entity("H2Projekt.Domain.RoomDiscount", b =>
+            modelBuilder.Entity("H2Projekt.Domain.RoomRate", b =>
                 {
                     b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
                         .WithMany()

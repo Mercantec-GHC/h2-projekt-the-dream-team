@@ -6,9 +6,14 @@
 
 <PageTitle>Admin - Værelser</PageTitle>
 
-@if (!string.IsNullOrWhiteSpace(response))
+@if (exception is not null)
 {
-    <div class="alert alert-success">@response</div>
+    <div class="d-flex flex-column gap-2 mb-4">
+        @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+        {
+            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+        }
+    </div>
 }
 
 <div class="d-flex gap-3 justify-content-between mb-4">
@@ -18,7 +23,7 @@
         <h3 class="mb-0">Værelser</h3>
     </div>
 
-    <button type="button" class="btn btn-success" @onclick="() => CreateOrEditRoom()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+    <button type="button" class="btn btn-success" @onclick="() => PrepareRoomCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
 </div>
 
 @if (rooms is null)
@@ -49,9 +54,9 @@ else
                     <td class="align-middle">@room.RoomType.Name</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-secondary" @onclick="() => CreateOrEditRoom(room)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            <button type="button" class="btn btn-secondary" @onclick="() => PrepareRoomCreationOrUpdate(room)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
 
-                            <button class="btn btn-danger" @onclick="() => roomToDelete = room" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                            <button class="btn btn-danger" @onclick="() => PrepareRoomDeletion(room)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
                         </div>
                     </td>
                 </tr>
@@ -74,19 +79,24 @@ else
             </div>
 
             <div class="modal-body my-3 p-0">
-                @if (!string.IsNullOrWhiteSpace(modalResponse))
+                @if (modalException is not null)
                 {
-                    <div class="alert alert-success">@modalResponse</div>
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                        {
+                            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                        }
+                    </div>
                 }
 
                 @if (roomToEdit is not null)
                 {
-                    <RoomForm Model="roomToEdit" HideButton="true" />
+                    <RoomForm Model="roomToEdit" />
                 }
             </div>
 
             <div class="d-flex gap-3">
-                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="CreateOrSaveRoom">Gem</button>
+                <button type="button" class="btn btn-primary w-50" @onclick="CreateOrSaveRoom">Gem</button>
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
             </div>
         </div>
@@ -106,8 +116,18 @@ else
                 </button>
             </div>
 
+            @if (modalException is not null)
+            {
+                <div class="modal-body mt-3 p-0 d-flex flex-column gap-2 mb-3">
+                    @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                    {
+                        <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                    }
+                </div>
+            }
+
             <div class="d-flex gap-3 mt-3">
-                <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteRoom">Slet</button>
+                <button type="button" class="btn btn-danger w-50" @onclick="DeleteRoom">Slet</button>
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
             </div>
         </div>
@@ -115,8 +135,8 @@ else
 </div>
 
 @code {
-    private string? response;
-    private string? modalResponse;
+    private ApiException? exception;
+    private ApiException? modalException;
 
     private RoomDto? roomToEdit;
     private RoomDto? roomToDelete;
@@ -130,9 +150,9 @@ else
         rooms = await Api.GetAllRoomsAsync();
     }
 
-    public void CreateOrEditRoom(RoomDto? room = null)
+    public void PrepareRoomCreationOrUpdate(RoomDto? room = null)
     {
-        modalResponse = null;
+        modalException = null;
 
         if (room is not null)
         {
@@ -144,9 +164,16 @@ else
         }
     }
 
+    public void PrepareRoomDeletion(RoomDto room)
+    {
+        modalException = null;
+
+        roomToDelete = room;
+    }
+
     public async Task CreateOrSaveRoom()
     {
-        modalResponse = null;
+        modalException = null;
 
         if (roomToEdit is null)
         {
@@ -172,7 +199,7 @@ else
                     Status = roomToEdit.Status,
                 });
 
-                modalResponse = $"Værelse #{roomToEdit.Number} er oprettet.";
+                modalException = new ApiException(null, 200, $"Værelse #{roomToEdit.Number} er oprettet.", null, null);
             }
             else
             {
@@ -193,18 +220,22 @@ else
                 }
             }
 
+            await JS.InvokeVoidAsync("hideModal", "#createEditModal");
+
             roomToEdit = null;
 
             StateHasChanged();
         }
         catch (ApiException ex)
         {
-            modalResponse = ex.Response;
+            modalException = ex;
         }
     }
 
     public async Task DeleteRoom()
     {
+        modalException = null;
+
         if (roomToDelete is null)
         {
             return;
@@ -214,13 +245,15 @@ else
         {
             await Api.DeleteRoomAsync(roomToDelete.Number);
 
+            await JS.InvokeVoidAsync("hideModal", "#deleteModal");
+
             rooms.Remove(roomToDelete);
 
-            response = $"Værelse #{roomToDelete.Number} er slettet.";
+            exception = new ApiException(null, 200, $"Værelse #{roomToDelete.Number} er slettet.", null, null);
         }
         catch (ApiException ex)
         {
-            response = ex.Response;
+            modalException = ex;
         }
     }
 }

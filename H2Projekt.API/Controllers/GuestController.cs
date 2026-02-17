@@ -40,6 +40,7 @@ namespace H2Projekt.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> CreateGuest([FromServices] CreateGuestHandler handler, [FromBody] CreateGuestCommand createGuestCommand)
         {
             try
@@ -54,13 +55,14 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult> UpdateGuest([FromServices] UpdateGuestHandler handler, [FromBody] UpdateGuestCommand updateGuestCommand)
         {
             try
@@ -75,7 +77,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (ValidationException ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
         }
 

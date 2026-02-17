@@ -89,6 +89,15 @@ namespace H2Projekt.Infrastructure.Repositories
             await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
-        #endregion 
+        #endregion
+
+        #region Room Discounts
+
+        public async Task<RoomDiscount?> GetRoomDiscountAsync(int roomTypeId, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.RoomDiscounts.SingleOrDefaultAsync(rd => rd.RoomTypeId == roomTypeId && rd.FromDate <= fromDate && rd.ToDate >= toDate, cancellationToken);
+        }
+
+        #endregion
     }
 }

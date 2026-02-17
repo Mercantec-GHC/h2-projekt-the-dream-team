@@ -1,11 +1,11 @@
 ﻿using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
 using Microsoft.EntityFrameworkCore;
+
 namespace H2Projekt.Infrastructure.Repositories
 {
     public class BookingRepository : BaseRepository, IBookingRepository
     {
-
         public BookingRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
         public async Task<List<Booking>> GetAllBookingsAsync(CancellationToken cancellationToken = default)

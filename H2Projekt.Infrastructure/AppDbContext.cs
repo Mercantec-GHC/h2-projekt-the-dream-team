@@ -9,7 +9,7 @@ namespace H2Projekt.Infrastructure
         public DbSet<Guest> Guests => Set<Guest>();
         public DbSet<Room> Rooms => Set<Room>();
         public DbSet<RoomType> RoomTypes => Set<RoomType>();
-        public DbSet<RoomRate> RoomRates => Set<RoomRate>();
+        public DbSet<RoomDiscount> RoomDiscounts => Set<RoomDiscount>();
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
@@ -24,13 +24,13 @@ namespace H2Projekt.Infrastructure
 
             // Room type names must be unique
             modelBuilder.Entity<RoomType>()
-                .HasIndex(r => r.Name)
+                .HasIndex(rt => rt.Name)
                 .IsUnique();
 
             // Money precision
-            modelBuilder.Entity<RoomRate>()
-                    .Property(r => r.PricePerNight)
-                    .HasPrecision(10, 2);
+            modelBuilder.Entity<RoomType>()
+                .Property(rt => rt.PricePerNight)
+                .HasPrecision(10, 2);
 
             modelBuilder.Entity<Booking>()
                 .Property(r => r.PriceLocked)
@@ -60,7 +60,7 @@ namespace H2Projekt.Infrastructure
             // On delete behavior for bookings when a room is deleted - restrict delete
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Room)
-                .WithMany()
+                .WithMany(r => r.Bookings)
                 .HasForeignKey(b => b.RoomId)
                 .OnDelete(DeleteBehavior.Restrict);
         }

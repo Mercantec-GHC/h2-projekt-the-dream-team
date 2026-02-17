@@ -9,12 +9,14 @@ namespace H2Projekt.Application.Handlers.Bookings
 {
     public class UpdateBookingHandler
     {
+        private readonly IBookingRepository _bookingRepository;
         private readonly IGuestRepository _guestRepository;
         private readonly IRoomRepository _roomRepository;
-        private readonly IValidator<Guest> _validator;
+        private readonly IValidator<Booking> _validator;
 
-        public UpdateBookingHandler(IGuestRepository guestRepository, IRoomRepository roomRepository, IValidator<Guest> validator)
+        public UpdateBookingHandler(IBookingRepository bookingRepository, IGuestRepository guestRepository, IRoomRepository roomRepository, IValidator<Booking> validator)
         {
+            _bookingRepository = bookingRepository;
             _guestRepository = guestRepository;
             _roomRepository = roomRepository;
             _validator = validator;
@@ -22,19 +24,19 @@ namespace H2Projekt.Application.Handlers.Bookings
 
         public async Task HandleAsync(UpdateBookingCommand request, CancellationToken cancellationToken = default)
         {
-            var guest = await _guestRepository.GetGuestByIdAsync(request.GuestId, cancellationToken);
+            var booking = await _bookingRepository.GetBookingByIdAsync(request.BookingId, cancellationToken);
+
+            if (booking is null)
+            {
+                throw new NonExistentException($"Booking with id {request.BookingId} doesn't exist.");
+            }
+
+            var guest = await _guestRepository.GetGuestByIdAsync(booking.GuestId, cancellationToken);
 
             if (guest is null)
             {
-                throw new NonExistentException($"Guest with id {request.GuestId} doesn't exist.");
+                throw new NonExistentException($"Guest with id {booking.GuestId} doesn't exist.");
             }
-
-            if (!guest.Bookings.Any(b => b.Id == request.BookingId))
-            {
-                throw new NonExistentException($"Booking with id {request.BookingId} doesn't exist for guest with id {request.GuestId}.");
-            }
-
-            var booking = guest.Bookings.First(b => b.Id == request.BookingId);
 
             var room = await _roomRepository.GetRoomByIdAsync(request.RoomId, cancellationToken);
 
@@ -47,14 +49,14 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             room.UpdateDetails(RoomAvailabilityStatus.Occupied);
 
-            var validationResult = await _validator.ValidateAsync(guest, cancellationToken);
+            var validationResult = await _validator.ValidateAsync(booking, cancellationToken);
 
             if (!validationResult.IsValid)
             {
                 throw new ValidationException(validationResult.Errors);
             }
 
-            await _guestRepository.SaveChangesAsync(cancellationToken);
+            await _bookingRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

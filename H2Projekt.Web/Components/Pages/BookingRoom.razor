@@ -1,0 +1,86 @@
+﻿@page "/booking-room"
+@rendermode InteractiveServer
+@inherits BasePage
+@inject ApiClient Api
+@inject NavigationManager Navigation
+
+<PageTitle>Værelsestyper</PageTitle>
+
+<div class="container my-4">
+
+    <h2 class="mb-4">Tilgængelige værelsestyper</h2>
+
+    @if (roomTypes is null)
+    {
+        <p>Henter værelsestyper...</p>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var type in roomTypes)
+            {
+                <div class="col">
+                    <div class="card shadow-sm h-100" @onclick="() => ShowDetails(type)" style="cursor: pointer">
+                        <div class="card-body">
+                            <h4 class="card-title">@type.Name</h4>
+                            <p class="text-muted">@type.Description</p>
+
+                            <p><strong>Maks personer:</strong> @type.MaxOccupancy</p>
+                            <p><strong>Pris pr. nat:</strong> @type.PricePerNight.ToString("C")</p>
+
+                            <button class="btn btn-primary w-100 mt-2">
+                                Se detaljer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+    @if (selectedType is not null)
+    {
+        <div class="modal fade show d-block" tabindex="-1" style="background: rgba(0,0,0,0.5);">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content p-3">
+
+                    <h3>@selectedType.Name</h3>
+
+                    <p>@selectedType.Description</p>
+                    <p><strong>Maks personer:</strong> @selectedType.MaxOccupancy</p>
+                    <p><strong>Pris pr. nat:</strong> @selectedType.PricePerNight.ToString("C")</p>
+
+                    <div class="d-flex gap-3 mt-4">
+                        <button class="btn btn-success w-50" @onclick="BookSelectedType">Book nu</button>
+                        <button class="btn btn-secondary w-50" @onclick="() => selectedType = null">Luk</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    private List<RoomTypeDto>? roomTypes;
+    private RoomTypeDto? selectedType;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomTypes = (await Api.GetAllRoomTypesAsync()).ToList();
+    }
+
+    private void ShowDetails(RoomTypeDto type)
+    {
+        selectedType = type;
+    }
+
+    private void BookSelectedType()
+    {
+        // Du bestemmer hvad der skal ske:
+        // ➜ Redirect til booking flow, fx:
+        Navigation.NavigateTo($"/create-booking?roomTypeId={selectedType!.Id}");
+
+        // Eller direkte booking, hvis du ønsker det.
+    }
+}

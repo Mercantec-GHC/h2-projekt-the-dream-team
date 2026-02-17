@@ -32,7 +32,7 @@ namespace H2Projekt.Application.Handlers.Rooms
 
             if (!validationResult.IsValid)
             {
-                throw new ValidationException(validationResult.ToString("\n"));
+                throw new ValidationException(validationResult.Errors);
             }
 
             await _roomRepository.AddRoomAsync(room, cancellationToken);
