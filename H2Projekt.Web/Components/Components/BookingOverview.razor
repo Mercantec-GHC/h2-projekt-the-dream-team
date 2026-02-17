@@ -1,0 +1,174 @@
+﻿@rendermode InteractiveServer
+
+<div class="overflow-auto max-w-diagram h-diagram">
+    <table class="table table-bordered w-100 fs-7 m-0">
+        <thead>
+            <tr class="position-sticky top-0 z-1">
+                <th class="h-2rem min-w-10rem text-center">Room / Date</th>
+
+                @foreach (var d in Dates)
+                {
+                    <th class="h-2rem min-w-10rem text-center">@d.ToString("dd/MM/yyyy")</th>
+                }
+            </tr>
+        </thead>
+
+        <tbody>
+            @foreach (var group in GroupedRooms)
+            {
+                <tr>
+                    <td class="position-relative z-0 bg-primary-subtle border-end-0 p-0 text-center">@group.Key</td>
+
+                    <td class="position-relative z-0 bg-primary-subtle border-start-0" colspan="@(Dates.Count)"></td>
+                </tr>
+
+                @foreach (var room in group.Value)
+                {
+                    <tr>
+                        <td class="position-relative z-0 h-2rem min-w-10rem text-center">@room.Number</td>
+
+                        @for (int i = 0; i < Dates.Count; i++)
+                        {
+                            var date = Dates[i];
+
+                            var key = CellKey(room.Id, date);
+
+                            @if (BookingCells.TryGetValue(key, out var booking))
+                            {
+                                var auto = AutoPlaced[booking.Id];
+
+                                var span = booking.ToDate.ToDateOnly().DayNumber - date.DayNumber;
+
+                                <td colspan="@(span + 1)" class="position-relative z-0 h-2rem min-w-10rem text-center">
+                                    <div class="position-absolute d-flex justify-content-center align-items-center rounded-2 border border-primary inset-1 @(auto ? "border-dark" : "bg-primary")">
+                                        @booking.Guest.FirstName @booking.Guest.LastName
+                                    </div>
+                                </td>
+
+                                if (span > 0)
+                                {
+                                    i += span;
+                                }
+                            }
+                            else
+                            {
+                                <td class="position-relative z-0 h-2rem min-w-10rem"></td>
+                            }
+                        }
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    [Parameter]
+    public ICollection<RoomDto> Rooms { get; set; }
+
+    [Parameter]
+    public ICollection<BookingDto> Bookings { get; set; }
+
+    private Dictionary<string, List<RoomDto>> GroupedRooms = new();
+
+    private List<DateOnly> Dates = new();
+
+    private Dictionary<string, BookingDto> BookingCells = new();
+
+    private Dictionary<int, bool> AutoPlaced = new();
+
+    protected override void OnInitialized()
+    {
+        GroupedRooms = Rooms.GroupBy(r => r.RoomType.Name).ToDictionary(g => g.Key, g => g.OrderBy(r => r.Number).ToList());
+
+        BuildDates();
+        BuildCells();
+
+        StateHasChanged();
+    }
+
+    private void BuildDates()
+    {
+        Dates.Clear();
+
+        var min = Bookings.Min(b => b.FromDate.ToDateOnly());
+        var max = Bookings.Max(b => b.ToDate.ToDateOnly());
+
+        for (var date = min; date <= max; date = date.AddDays(1))
+        {
+            Dates.Add(date);
+        }
+    }
+
+    private void BuildCells()
+    {
+        BookingCells.Clear();
+        AutoPlaced.Clear();
+
+        var busy = Rooms.ToDictionary(
+            r => r.Id,
+            _ => new HashSet<DateOnly>()
+        );
+
+        foreach (var booking in Bookings.OrderBy(b => b.FromDate.ToDateOnly()))
+        {
+            var days = EachDay(booking.FromDate.ToDateOnly(), booking.ToDate.ToDateOnly()).ToList();
+
+            if (booking.Room is not null)
+            {
+                AutoPlaced[booking.Id] = false;
+
+                foreach (var day in days)
+                {
+                    busy[booking.Room.Id].Add(day);
+
+                    BookingCells[CellKey(booking.Room.Id, day)] = booking;
+                }
+
+                continue;
+            }
+
+            var candidates = Rooms.Where(r => r.RoomType.Id == booking.RoomType.Id);
+
+            RoomDto? foundRoom = null;
+
+            foreach (var room in candidates)
+            {
+                if (days.All(day => !busy[room.Id].Contains(day)))
+                {
+                    foundRoom = room;
+
+                    break;
+                }
+            }
+
+            AutoPlaced[booking.Id] = true;
+
+            if (foundRoom is null)
+            {
+                continue;
+            }
+
+            foreach (var day in days)
+            {
+                busy[foundRoom.Id].Add(day);
+
+                BookingCells[CellKey(foundRoom.Id, day)] = booking;
+            }
+        }
+    }
+
+    private IEnumerable<DateOnly> EachDay(DateOnly fromDate, DateOnly toDate)
+    {
+        var dates = new List<DateOnly>();
+
+        for (var d = fromDate; d <= toDate; d = d.AddDays(1))
+        {
+            dates.Add(d);
+        }
+
+        return dates;
+    }
+
+    private string CellKey(int roomId, DateOnly d) => $"{roomId}_{d:yyyy-MM-dd}";
+}
