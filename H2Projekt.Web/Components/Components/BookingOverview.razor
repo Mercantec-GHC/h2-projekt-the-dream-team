@@ -1,6 +1,6 @@
 ﻿@rendermode InteractiveServer
 
-<div class="overflow-auto max-w-diagram h-diagram">
+<div class="overflow-auto max-w-diagram h-diagram rounded-2">
     <table class="table table-bordered w-100 fs-7 m-0">
         <thead>
             <tr class="position-sticky top-0 z-1">
@@ -13,7 +13,7 @@
             </tr>
         </thead>
 
-        <tbody>
+        <tbody class="position-sticky">
             @foreach (var roomType in Rooms.Select(r => r.RoomType).DistinctBy(rt => rt.Id))
             {
                 if (!Rooms.Any(r => r.RoomType.Id == roomType.Id) || !Bookings.Any(b => b.RoomType.Id == roomType.Id))
@@ -43,7 +43,7 @@
                                 var span = booking.ToDate.ToDateOnly().DayNumber - date.DayNumber;
 
                                 <td colspan="@(span + 1)" class="position-relative z-0 h-2rem min-w-10rem text-center">
-                                    <div class="position-absolute d-flex justify-content-center align-items-center rounded-2 border border-primary inset-1 @(booking.Room is null ? "border-dark" : "bg-primary")">
+                                    <div class="position-absolute d-flex justify-content-center align-items-center rounded-2 border border-dark inset-1 @(booking.Room is null ? "bg-dark-subtle" : "bg-primary text-white")">
                                         @booking.Guest.FirstName @booking.Guest.LastName (#@booking.Id)
                                     </div>
                                 </td>

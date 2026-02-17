@@ -144,7 +144,7 @@ h1:focus {
     border: none !important;
 }
 
-    .table-bordered tr.position-sticky {
+    .table-bordered .position-sticky {
         outline: 0.063rem solid var(--bs-border-color) !important;
     }
 
@@ -153,11 +153,15 @@ h1:focus {
     border: 0.063rem solid var(--bs-border-color) !important;
 }
 
+    .table-bordered th.border-start-0,
+    .table-bordered td.border-start-0,
     .table-bordered th:first-child,
     .table-bordered td:first-child {
         border-left: none !important;
     }
 
+    .table-bordered th.border-end-0,
+    .table-bordered td.border-end-0,
     .table-bordered th:last-child,
     .table-bordered td:last-child {
         border-right: none !important;
@@ -172,7 +176,6 @@ h1:focus {
 }
 
 /* DataTable */
-
 .dt-container {
     border: 0.063rem solid var(--bs-border-color-translucent);
     box-shadow: var(--bs-box-shadow-sm) !important;
