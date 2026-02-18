@@ -226,6 +226,8 @@ else
                     roomType.Description = roomTypeToEdit.Description;
                     roomType.MaxOccupancy = roomTypeToEdit.MaxOccupancy;
                     roomType.PricePerNight = roomTypeToEdit.PricePerNight;
+
+                    exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToEdit.Name}\" er opdateret.", null, null);
                 }
             }
 

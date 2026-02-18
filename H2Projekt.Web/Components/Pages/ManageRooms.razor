@@ -218,6 +218,8 @@ else
                     room.Number = roomToEdit.Number;
                     room.RoomType = roomToEdit.RoomType;
                     room.Status = roomToEdit.Status;
+
+                    exception = new ApiException(null, 200, $"Værelse #{roomToEdit.Number} er opdateret.", null, null);
                 }
             }
 

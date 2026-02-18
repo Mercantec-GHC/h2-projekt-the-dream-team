@@ -233,6 +233,8 @@ else
                     roomDiscount.FromDate = roomDiscountToEdit.FromDate;
                     roomDiscount.ToDate = roomDiscountToEdit.ToDate;
                     roomDiscount.PricePerNight = roomDiscountToEdit.PricePerNight;
+
+                    exception = new ApiException(null, 200, $"Værelsestilbud #{roomDiscount.Id} er opdateret.", null, null);
                 }
             }
 

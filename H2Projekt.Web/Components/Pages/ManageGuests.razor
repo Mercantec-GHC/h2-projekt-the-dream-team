@@ -219,6 +219,8 @@ else
                     guest.FirstName = guestToEdit.FirstName;
                     guest.LastName = guestToEdit.LastName;
                     guest.Email = guestToEdit.Email;
+
+                    exception = new ApiException(null, 200, $"Gæst \"{guestToEdit.FirstName}\" opdateret.", null, null);
                 }
             }
 

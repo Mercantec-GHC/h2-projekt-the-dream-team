@@ -201,6 +201,8 @@ else
             if (booking is not null)
             {
                 booking.Room = bookingToEdit.Room;
+
+                exception = new ApiException(null, 200, $"Værelse #{bookingToEdit.Room.Number} er tildelt booking #{bookingToEdit.Id}.", null, null);
             }
 
             await JS.InvokeVoidAsync("hideModal", "#assignRoomModal");
