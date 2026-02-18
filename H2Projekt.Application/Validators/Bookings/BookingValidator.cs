@@ -16,13 +16,13 @@ namespace H2Projekt.Application.Validators.Bookings
             RuleFor(b => b.FromDate)
                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Now))
                 .When(b => b.Id == 0)
-                .WithMessage("From date must be in the future.");
+                .WithMessage("From date must be today or in the future for new bookings.");
             RuleFor(b => b.FromDate)
-                .LessThan(b => b.ToDate)
-                .WithMessage("From date must be earlier than To date.");
+                .LessThanOrEqualTo(b => b.ToDate)
+                .WithMessage("From date must be earlier or equal to To date.");
             RuleFor(b => b.ToDate)
-                .GreaterThan(b => b.FromDate)
-                .WithMessage("To date must be later than the From date.");
+                .GreaterThanOrEqualTo(b => b.FromDate)
+                .WithMessage("To date must be later or equal to From date.");
             RuleFor(b => b.Room)
                 .Must((booking, room) => room is null || room.RoomTypeId == booking.RoomTypeId)
                 .WithMessage("Assigned room must be of the same type as the booking's room type.");
