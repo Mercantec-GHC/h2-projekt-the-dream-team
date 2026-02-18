@@ -127,7 +127,7 @@
     {
         return Bookings.FirstOrDefault(b =>
             (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id))
-            && b.FromDate.ToDateOnly() <= date && b.ToDate.ToDateOnly() > date
+            && b.FromDate.ToDateOnly() <= date && b.ToDate.ToDateOnly() >= date
         );
     }
 
