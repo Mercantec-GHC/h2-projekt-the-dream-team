@@ -498,7 +498,7 @@
         }
       }
     },
-    "/api/Guest/GetGuestIdByEmail": {
+    "/api/Guest/GetGuestIdByEmail/by-email": {
       "get": {
         "tags": [
           "Guest"

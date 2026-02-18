@@ -37,7 +37,7 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpGet]
+        [HttpGet("by-email")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<int>> GetGuestIdByEmail(
@@ -49,8 +49,10 @@ namespace H2Projekt.API.Controllers
 
             if (guest is null)
                 return NotFound();
+
             return Ok(guest.Id);
         }
+
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
