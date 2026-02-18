@@ -38,6 +38,7 @@ builder.Services.AddScoped<GetGuestByIdHandler>();
 builder.Services.AddScoped<CreateGuestHandler>();
 builder.Services.AddScoped<UpdateGuestHandler>();
 builder.Services.AddScoped<DeleteGuestHandler>();
+builder.Services.AddScoped<GetGuestByEmailHandler>();
 // - Rooms
 builder.Services.AddScoped<GetAllRoomsHandler>();
 builder.Services.AddScoped<GetRoomByNumberHandler>();

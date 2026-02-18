@@ -37,6 +37,21 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<int>> GetGuestIdByEmail(
+            [FromQuery] string email,
+            [FromServices] GetGuestByEmailHandler handler,
+            CancellationToken ct)
+        {
+            var guest = await handler.HandleAsync(email.Trim().ToLower(), ct);
+
+            if (guest is null)
+                return NotFound();
+            return Ok(guest.Id);
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
