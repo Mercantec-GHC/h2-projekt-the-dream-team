@@ -8,26 +8,26 @@ namespace H2Projekt.Application.Validators.Rooms
     {
         public GuestValidator()
         {
-            RuleFor(g => g.FirstName)
+            RuleFor(guest => guest.FirstName)
                 .NotEmpty()
                 .WithMessage("Fornavn er påkrævet.")
                 .MaximumLength(50)
                 .WithMessage("Fornavn må ikke overstige 50 tegn.");
-            RuleFor(g => g.LastName)
+            RuleFor(guest => guest.LastName)
                 .NotEmpty()
                 .WithMessage("Efternavn er påkrævet.")
                 .MaximumLength(50)
                 .WithMessage("Efternavn må ikke overstige 50 tegn.");
-            RuleFor(g => g.Email)
+            RuleFor(guest => guest.Email)
                 .NotEmpty()
                 .WithMessage("Email er påkrævet.")
                 .EmailAddress()
                 .WithMessage("Email skal være i et gyldigt format.")
                 .MaximumLength(100)
                 .WithMessage("Email må ikke overstige 100 tegn.");
-            RuleFor(g => g.Bookings)
+            RuleFor(guest => guest.Bookings)
                 .ForEach(booking => booking.SetValidator(new BookingValidator()))
-                .When(g => g.Bookings is not null && g.Bookings.Any());
+                .When(guest => guest.Bookings is not null && guest.Bookings.Any());
         }
     }
 }

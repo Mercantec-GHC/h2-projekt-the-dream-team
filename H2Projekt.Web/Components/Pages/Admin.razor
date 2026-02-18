@@ -14,14 +14,12 @@
     <div class="w-100">
         <div class="card h-100 shadow-sm">
             <div class="card-body text-center">
-                <i class="bi bi-calendar-check fs-1 text-primary mb-3"></i>
-
                 <h5 class="card-title text-muted">Bookings</h5>
 
                 <h2 class="display-4 fw-bold mb-0 mt-1">@(bookings?.Count ?? 0)</h2>
 
                 <a href="/admin/manage-bookings" class="btn btn-primary mt-3 w-100">
-                    Administrer Bookings
+                    Se Bookings
                 </a>
             </div>
         </div>
@@ -31,14 +29,12 @@
     <div class="w-100">
         <div class="card h-100 shadow-sm">
             <div class="card-body text-center">
-                <i class="bi bi-people fs-1 text-success mb-3"></i>
-
                 <h5 class="card-title text-muted">Gæster</h5>
 
                 <h2 class="display-4 fw-bold mb-0 mt-1">@guestsCount</h2>
 
                 <a href="/admin/manage-guests" class="btn btn-success mt-3 w-100">
-                    Administrer Gæster
+                    Se Gæster
                 </a>
             </div>
         </div>
@@ -48,14 +44,12 @@
     <div class="w-100">
         <div class="card h-100 shadow-sm">
             <div class="card-body text-center">
-                <i class="bi bi-door-open fs-1 text-info mb-3"></i>
-
                 <h5 class="card-title text-muted">Værelser</h5>
 
                 <h2 class="display-4 fw-bold mb-0 mt-1">@(rooms?.Count ?? 0)</h2>
 
                 <a href="/admin/manage-rooms" class="btn btn-info mt-3 w-100">
-                    Administrer Værelser
+                    Se Værelser
                 </a>
             </div>
         </div>
@@ -65,14 +59,27 @@
     <div class="w-100">
         <div class="card h-100 shadow-sm">
             <div class="card-body text-center">
-                <i class="bi bi-list-ul fs-1 text-warning mb-3"></i>
-
                 <h5 class="card-title text-muted">Værelsestyper</h5>
 
                 <h2 class="display-4 fw-bold mb-0 mt-1">@roomTypesCount</h2>
 
                 <a href="/admin/manage-room-types" class="btn btn-warning mt-3 w-100">
-                    Administrer Værelsestyper
+                    Se Værelsestyper
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Room Discounts Card -->
+    <div class="w-100">
+        <div class="card h-100 shadow-sm">
+            <div class="card-body text-center">
+                <h5 class="card-title text-muted">Værelsestilbud</h5>
+
+                <h2 class="display-4 fw-bold mb-0 mt-1">@roomDiscountsCount</h2>
+
+                <a href="/admin/manage-room-discounts" class="btn btn-danger mt-3 w-100">
+                    Se Værelsestilbud
                 </a>
             </div>
         </div>
@@ -105,6 +112,7 @@
     private int guestsCount = 0;
     private ICollection<RoomDto> rooms;
     private int roomTypesCount = 0;
+    private int roomDiscountsCount = 0;
 
     protected override async Task OnInitializedAsync()
     {
@@ -119,6 +127,10 @@
         var roomTypes = await Api.GetAllRoomTypesAsync();
 
         roomTypesCount = roomTypes.Count;
+
+        var roomDiscounts = await Api.GetAllRoomDiscountsAsync();
+
+        roomDiscountsCount = roomDiscounts.Count;
 
         StateHasChanged();
     }

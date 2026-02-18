@@ -1,0 +1,107 @@
+﻿@rendermode InteractiveServer
+
+@inject ApiClient Api
+
+<div class="d-flex flex-column gap-3">
+    <div>
+        <label class="form-label">Værelsestype</label>
+
+        <InputSelect @bind-Value:get="_roomTypeId" @bind-Value:set="SetRoomType" class="form-control">
+            <option value="">-- Vælg en værelsestype --</option>
+
+            @foreach (var type in roomTypes)
+            {
+                @if (type.Id.ToString() == _roomTypeId)
+                {
+                    <option value="@type.Id" selected>@type.Name</option>
+
+                    continue;
+                }
+
+                <option value="@type.Id">@type.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div>
+        <label class="form-label">Beskrivelse</label>
+
+        <InputTextArea class="form-control" @bind-Value="Model.Description" placeholder="Indtast beskrivelse" />
+    </div>
+
+    <div class="d-flex flex-wrap flex-lg-nowrap gap-3">
+        <div class="w-100">
+            <label class="form-label">Fra dato</label>
+
+            <InputDate class="form-control" @bind-Value="Model.FromDate" />
+        </div>
+
+        <div class="w-100">
+            <label class="form-label">Til dato</label>
+
+            <InputDate class="form-control" @bind-Value="Model.ToDate" />
+        </div>
+    </div>
+
+    <div>
+        <label class="form-label">Pris pr. nat</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RoomDiscountDto Model { get; set; } = new RoomDiscountDto();
+
+    private string _roomTypeId = string.Empty;
+
+    private ICollection<RoomTypeDto> roomTypes = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomTypes = await Api.GetAllRoomTypesAsync();
+
+        StateHasChanged();
+    }
+
+    private void SetRoomType(string roomTypeId)
+    {
+        if (string.IsNullOrEmpty(roomTypeId) || !int.TryParse(roomTypeId, out var parsedRoomTypeId))
+        {
+            Reset();
+
+            return;
+        }
+
+        var roomType = roomTypes.FirstOrDefault(rt => rt.Id == parsedRoomTypeId);
+
+        if (roomType is null)
+        {
+            Reset();
+
+            return;
+        }
+
+        _roomTypeId = roomTypeId;
+
+        Model.RoomType = new RoomTypeDto()
+        {
+            Id = roomType.Id,
+            Name = roomType.Name,
+            Description = roomType.Description,
+            MaxOccupancy = roomType.MaxOccupancy,
+        };
+
+        StateHasChanged();
+    }
+
+    private void Reset()
+    {
+        _roomTypeId = string.Empty;
+
+        Model.RoomType = null;
+
+        StateHasChanged();
+    }
+}

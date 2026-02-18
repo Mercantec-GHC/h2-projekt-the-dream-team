@@ -93,9 +93,33 @@ namespace H2Projekt.Infrastructure.Repositories
 
         #region Room Discounts
 
-        public async Task<RoomDiscount?> GetRoomDiscountAsync(int roomTypeId, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken = default)
+        public async Task<List<RoomDiscount>> GetAllRoomDiscountsAsync(CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.RoomDiscounts.SingleOrDefaultAsync(rd => rd.RoomTypeId == roomTypeId && rd.FromDate <= fromDate && rd.ToDate >= toDate, cancellationToken);
+            return await _appDbContext.RoomDiscounts.Include(rd => rd.RoomType).OrderBy(rd => rd.Id).ToListAsync(cancellationToken);
+        }
+
+        public async Task<RoomDiscount?> GetRoomDiscountByIdAsync(int id, CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.RoomDiscounts.Include(rd => rd.RoomType).SingleOrDefaultAsync(rd => rd.Id == id, cancellationToken);
+        }
+
+        public async Task<RoomDiscount?> GetRoomDiscountForPeriodAsync(int roomTypeId, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken = default)
+        {
+            return await _appDbContext.RoomDiscounts.Include(rd => rd.RoomType).SingleOrDefaultAsync(rd => rd.RoomTypeId == roomTypeId && rd.FromDate <= fromDate && rd.ToDate >= toDate, cancellationToken);
+        }
+
+        public async Task<int> AddRoomDiscountAsync(RoomDiscount roomDiscount, CancellationToken cancellationToken = default)
+        {
+            await _appDbContext.RoomDiscounts.AddAsync(roomDiscount);
+
+            return await _appDbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        public async Task DeleteRoomDiscountAsync(RoomDiscount roomDiscount, CancellationToken cancellationToken = default)
+        {
+            _appDbContext.RoomDiscounts.Remove(roomDiscount);
+
+            await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
         #endregion

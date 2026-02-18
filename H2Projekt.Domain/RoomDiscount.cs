@@ -10,8 +10,26 @@
         public DateOnly FromDate { get; private set; }
         public DateOnly ToDate { get; private set; }
 
-        public int Percentage { get; private set; }
+        public int PricePerNight { get; private set; }
 
         public RoomDiscount() { }
+
+        public RoomDiscount(int roomTypeId, string description, DateOnly fromDate, DateOnly toDate, int pricePerNight)
+        {
+            RoomTypeId = roomTypeId;
+            Description = description;
+            FromDate = fromDate;
+            ToDate = toDate;
+            PricePerNight = pricePerNight;
+        }
+
+        public void UpdateDetails(int roomTypeId, string description, DateOnly fromDate, DateOnly toDate, int pricePerNight)
+        {
+            RoomTypeId = roomTypeId;
+            Description = description;
+            FromDate = fromDate;
+            ToDate = toDate;
+            PricePerNight = pricePerNight;
+        }
     }
 }
