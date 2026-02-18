@@ -57,7 +57,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Guest", b =>
@@ -85,7 +85,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Guests");
+                    b.ToTable("Guests", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Room", b =>
@@ -113,7 +113,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("Rooms");
+                    b.ToTable("Rooms", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.RoomDiscount", b =>
@@ -144,7 +144,7 @@ namespace H2Projekt.Infrastructure.Migrations
 
                     b.HasIndex("RoomTypeId");
 
-                    b.ToTable("RoomDiscounts");
+                    b.ToTable("RoomDiscounts", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.RoomType", b =>
@@ -174,7 +174,7 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("RoomTypes");
+                    b.ToTable("RoomTypes", (string)null);
                 });
 
             modelBuilder.Entity("H2Projekt.Domain.Booking", b =>

@@ -9,23 +9,23 @@ namespace H2Projekt.Application.Validators.Bookings
         {
             RuleFor(b => b.GuestId)
                 .GreaterThan(0)
-                .WithMessage("Guest ID must be greater than 0.");
+                .WithMessage("Gæst ID'et skal være større end 0.");
             RuleFor(b => b.RoomTypeId)
                 .GreaterThan(0)
-                .WithMessage("Room type ID must be greater than 0.");
+                .WithMessage("Værelsestype ID'et skal være større end 0.");
             RuleFor(b => b.FromDate)
                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Now))
                 .When(b => b.Id == 0)
-                .WithMessage("From date must be in the future.");
+                .WithMessage("Fra dato skal være i dag eller i fremtiden for nye bookinger.");
             RuleFor(b => b.FromDate)
-                .LessThan(b => b.ToDate)
-                .WithMessage("From date must be earlier than To date.");
+                .LessThanOrEqualTo(b => b.ToDate)
+                .WithMessage("Fra dato skal være tidligere eller lig med Til dato.");
             RuleFor(b => b.ToDate)
-                .GreaterThan(b => b.FromDate)
-                .WithMessage("To date must be later than the From date.");
+                .GreaterThanOrEqualTo(b => b.FromDate)
+                .WithMessage("Til dato skal være senere eller lig med Fra dato.");
             RuleFor(b => b.Room)
                 .Must((booking, room) => room is null || room.RoomTypeId == booking.RoomTypeId)
-                .WithMessage("Assigned room must be of the same type as the booking's room type.");
+                .WithMessage("Tildelt værelse skal være af samme type som bookingens værelsestype.");
         }
     }
 }

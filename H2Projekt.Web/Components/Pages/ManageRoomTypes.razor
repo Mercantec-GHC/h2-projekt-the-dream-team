@@ -60,7 +60,7 @@ else
                         <div class="d-flex gap-2 w-100 justify-content-end">
                             <button type="button" class="btn btn-secondary" @onclick="() => PrepareRoomTypeCreationOrUpdate(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
 
-                            <button class="btn btn-danger" @onclick="() => roomTypeToDelete = roomType" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                            <button class="btn btn-danger" @onclick="() => PrepareRoomTypeDeletion(roomType)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
                         </div>
                     </td>
                 </tr>
@@ -95,7 +95,7 @@ else
 
                 @if (roomTypeToEdit is not null)
                 {
-                    <RoomTypeForm Model="roomTypeToEdit" />
+                    <RoomTypeFields Model="roomTypeToEdit" />
                 }
             </div>
 
@@ -143,7 +143,7 @@ else
     private ApiException? modalException;
 
     private RoomTypeDto? roomTypeToEdit;
-    private RoomTypeDto? roomTypeToDelete;
+    private int? roomTypeToDelete;
 
     private ICollection<RoomTypeDto> roomTypes;
 
@@ -156,13 +156,15 @@ else
     {
         modalException = null;
 
+        roomTypeToEdit = new RoomTypeDto();
+
         if (roomType is not null)
         {
-            roomTypeToEdit = roomType;
-        }
-        else
-        {
-            roomTypeToEdit = new RoomTypeDto();
+            roomTypeToEdit.Id = roomType.Id;
+            roomTypeToEdit.Name = roomType.Name;
+            roomTypeToEdit.Description = roomType.Description;
+            roomTypeToEdit.MaxOccupancy = roomType.MaxOccupancy;
+            roomTypeToEdit.PricePerNight = roomType.PricePerNight;
         }
     }
 
@@ -170,7 +172,7 @@ else
     {
         modalException = null;
 
-        roomTypeToDelete = roomType;
+        roomTypeToDelete = roomType.Id;
     }
 
     public async Task CreateOrSaveRoomType()
@@ -243,20 +245,20 @@ else
     {
         modalException = null;
 
-        if (roomTypeToDelete is null)
+        if (!roomTypeToDelete.HasValue || !roomTypes.Any(rt => rt.Id == roomTypeToDelete.Value))
         {
             return;
         }
 
         try
         {
-            await Api.DeleteRoomTypeAsync(roomTypeToDelete.Id);
+            await Api.DeleteRoomTypeAsync(roomTypeToDelete.Value);
 
             await JS.InvokeVoidAsync("hideModal", "#deleteModal");
 
-            roomTypes.Remove(roomTypeToDelete);
+            roomTypes.Remove(roomTypes.First(rt => rt.Id == roomTypeToDelete.Value));
 
-            exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToDelete.Name}\" er slettet.", null, null);
+            exception = new ApiException(null, 200, $"Værelsestype #{roomTypeToDelete.Value} er slettet.", null, null);
         }
         catch (ApiException ex)
         {

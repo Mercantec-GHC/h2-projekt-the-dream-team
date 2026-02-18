@@ -48,7 +48,7 @@
         }
       }
     },
-    "/api/Booking/GetBookingById": {
+    "/api/Booking/GetBookingById/{id}": {
       "get": {
         "tags": [
           "Booking"
@@ -56,7 +56,8 @@
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -287,7 +288,7 @@
         }
       }
     },
-    "/api/Booking/DeleteBooking": {
+    "/api/Booking/DeleteBooking/{id}": {
       "delete": {
         "tags": [
           "Booking"
@@ -295,7 +296,8 @@
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -432,7 +434,7 @@
         }
       }
     },
-    "/api/Guest/GetGuestById": {
+    "/api/Guest/GetGuestById/{id}": {
       "get": {
         "tags": [
           "Guest"
@@ -440,7 +442,8 @@
         "parameters": [
           {
             "name": "id",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "pattern": "^-?(?:0|[1-9]\\d*)$",
               "type": [
@@ -829,7 +832,7 @@
         }
       }
     },
-    "/api/Room/GetRoomByNumber": {
+    "/api/Room/GetRoomByNumber/{number}": {
       "get": {
         "tags": [
           "Room"
@@ -837,7 +840,8 @@
         "parameters": [
           {
             "name": "number",
-            "in": "query",
+            "in": "path",
+            "required": true,
             "schema": {
               "type": "string"
             }
@@ -1063,18 +1067,23 @@
         }
       }
     },
-    "/api/Room/DeleteRoom/{number}": {
+    "/api/Room/DeleteRoom/{id}": {
       "delete": {
         "tags": [
           "Room"
         ],
         "parameters": [
           {
-            "name": "number",
+            "name": "id",
             "in": "path",
             "required": true,
             "schema": {
-              "type": "string"
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
             }
           }
         ],

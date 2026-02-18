@@ -9,19 +9,25 @@ namespace H2Projekt.Application.Validators.Rooms
         public GuestValidator()
         {
             RuleFor(g => g.FirstName)
-                .NotEmpty().WithMessage("First name is required.")
-                .MaximumLength(50).WithMessage("First name cannot exceed 50 characters.");
+                .NotEmpty()
+                .WithMessage("Fornavn er påkrævet.")
+                .MaximumLength(50)
+                .WithMessage("Fornavn må ikke overstige 50 tegn.");
             RuleFor(g => g.LastName)
-                .NotEmpty().WithMessage("Last name is required.")
-                .MaximumLength(50).WithMessage("Last name cannot exceed 50 characters.");
+                .NotEmpty()
+                .WithMessage("Efternavn er påkrævet.")
+                .MaximumLength(50)
+                .WithMessage("Efternavn må ikke overstige 50 tegn.");
             RuleFor(g => g.Email)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Invalid email format.")
-                .MaximumLength(100).WithMessage("Email cannot exceed 100 characters.");
+                .NotEmpty()
+                .WithMessage("Email er påkrævet.")
+                .EmailAddress()
+                .WithMessage("Email skal være i et gyldigt format.")
+                .MaximumLength(100)
+                .WithMessage("Email må ikke overstige 100 tegn.");
             RuleFor(g => g.Bookings)
-                .NotNull()
-                .WithMessage("Bookings collection cannot be null.")
-                .ForEach(booking => booking.SetValidator(new BookingValidator()));
+                .ForEach(booking => booking.SetValidator(new BookingValidator()))
+                .When(g => g.Bookings is not null && g.Bookings.Any());
         }
     }
 }
