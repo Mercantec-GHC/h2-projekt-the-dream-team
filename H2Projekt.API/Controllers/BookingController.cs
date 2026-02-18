@@ -20,7 +20,7 @@ namespace H2Projekt.API.Controllers
             return Ok(bookings.Select(booking => new BookingDto(booking)));
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<BookingDto?>> GetBookingById([FromServices] GetBookingByIdHandler handler, int id)
@@ -81,7 +81,7 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpDelete()]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteBooking([FromServices] DeleteBookingHandler handler, int id)

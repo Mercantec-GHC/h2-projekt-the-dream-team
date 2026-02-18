@@ -93,7 +93,7 @@ else
 
                 @if (guestToEdit is not null)
                 {
-                    <GuestForm Model="guestToEdit" />
+                    <GuestFields Model="guestToEdit" />
                 }
             </div>
 
@@ -141,7 +141,7 @@ else
     private ApiException? modalException;
 
     private GuestDto? guestToEdit;
-    private GuestDto? guestToDelete;
+    private int? guestToDelete;
 
     private ICollection<GuestDto> guests;
 
@@ -154,13 +154,14 @@ else
     {
         modalException = null;
 
+        guestToEdit = new GuestDto();
+
         if (guest is not null)
         {
-            guestToEdit = guest;
-        }
-        else
-        {
-            guestToEdit = new GuestDto();
+            guestToEdit.Id = guest.Id;
+            guestToEdit.FirstName = guest.FirstName;
+            guestToEdit.LastName = guest.LastName;
+            guestToEdit.Email = guest.Email;
         }
     }
 
@@ -168,7 +169,7 @@ else
     {
         modalException = null;
 
-        guestToDelete = guest;
+        guestToDelete = guest.Id;
     }
 
     public async Task CreateOrSaveGuest()
@@ -219,7 +220,6 @@ else
                     guest.LastName = guestToEdit.LastName;
                     guest.Email = guestToEdit.Email;
                 }
-
             }
 
             await JS.InvokeVoidAsync("hideModal", "#createEditModal");
@@ -238,20 +238,20 @@ else
     {
         modalException = null;
 
-        if (guestToDelete is null)
+        if (!guestToDelete.HasValue || !guests.Any(g => g.Id == guestToDelete.Value))
         {
             return;
         }
 
         try
         {
-            await Api.DeleteGuestAsync(guestToDelete.Id);
+            await Api.DeleteGuestAsync(guestToDelete.Value);
 
             await JS.InvokeVoidAsync("hideModal", "#deleteModal");
 
-            guests.Remove(guestToDelete);
+            guests.Remove(guests.First(g => g.Id == guestToDelete.Value));
 
-            exception = new ApiException(null, 200, $"Gæst #{guestToDelete.Id} er slettet.", null, null);
+            exception = new ApiException(null, 200, $"Gæst #{guestToDelete.Value} er slettet.", null, null);
         }
         catch (ApiException ex)
         {

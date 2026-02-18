@@ -20,7 +20,7 @@ namespace H2Projekt.API.Controllers
             return Ok(guests.Select(guest => new GuestDto(guest)));
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GuestDto?>> GetGuestById([FromServices] GetGuestByIdHandler handler, int id)

@@ -22,7 +22,7 @@ namespace H2Projekt.API.Controllers
             return Ok(rooms.Select(room => new RoomDto(room)));
         }
 
-        [HttpGet]
+        [HttpGet("{number}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoomDto?>> GetRoomByNumber([FromServices] GetRoomByNumberHandler handler, string number)
@@ -83,14 +83,14 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpDelete("{number}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteRoom([FromServices] DeleteRoomHandler handler, string number)
+        public async Task<ActionResult> DeleteRoom([FromServices] DeleteRoomHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(number);
+                await handler.HandleAsync(id);
 
                 return Ok();
             }

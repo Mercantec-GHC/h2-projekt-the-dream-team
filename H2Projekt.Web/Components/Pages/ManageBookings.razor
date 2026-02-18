@@ -98,7 +98,7 @@ else
 
                 @if (bookingToEdit is not null)
                 {
-                    <EditBookingForm Model="bookingToEdit" />
+                    <EditBookingFields Model="bookingToEdit" Rooms="rooms" Bookings="bookings" />
                 }
             </div>
 
@@ -146,27 +146,37 @@ else
     private ApiException? modalException;
 
     private BookingDto? bookingToEdit;
-    private BookingDto? bookingToDelete;
+    private int? bookingToDelete;
 
     private ICollection<BookingDto> bookings;
+    private ICollection<RoomDto> rooms;
 
     protected override async Task OnInitializedAsync()
     {
         bookings = await Api.GetAllBookingsAsync();
+        rooms = await Api.GetAllRoomsAsync();
     }
 
     public void PrepareBookingUpdate(BookingDto booking)
     {
         modalException = null;
 
-        bookingToEdit = booking;
+        bookingToEdit = new BookingDto()
+        {
+            Id = booking.Id,
+            Guest = booking.Guest,
+            RoomType = booking.RoomType,
+            FromDate = booking.FromDate,
+            ToDate = booking.ToDate,
+            Room = booking.Room,
+        };
     }
 
     public void PrepareBookingDeletion(BookingDto booking)
     {
         modalException = null;
 
-        bookingToDelete = booking;
+        bookingToDelete = booking.Id;
     }
 
     public async Task AssignRoom()
@@ -209,20 +219,20 @@ else
     {
         modalException = null;
 
-        if (bookingToDelete is null)
+        if (!bookingToDelete.HasValue || !bookings.Any(b => b.Id == bookingToDelete.Value))
         {
             return;
         }
 
         try
         {
-            await Api.DeleteBookingAsync(bookingToDelete.Id);
+            await Api.DeleteBookingAsync(bookingToDelete.Value);
 
             await JS.InvokeVoidAsync("hideModal", "#deleteModal");
 
-            bookings.Remove(bookingToDelete);
+            bookings.Remove(bookings.First(b => b.Id == bookingToDelete.Value));
 
-            exception = new ApiException(null, 200, $"Booking #{bookingToDelete.Id} er slettet.", null, null);
+            exception = new ApiException(null, 200, $"Booking #{bookingToDelete.Value} er slettet.", null, null);
         }
         catch (ApiException ex)
         {

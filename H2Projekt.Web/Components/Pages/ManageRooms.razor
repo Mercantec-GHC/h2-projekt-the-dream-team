@@ -91,7 +91,7 @@ else
 
                 @if (roomToEdit is not null)
                 {
-                    <RoomForm Model="roomToEdit" />
+                    <RoomFields Model="roomToEdit" />
                 }
             </div>
 
@@ -139,7 +139,7 @@ else
     private ApiException? modalException;
 
     private RoomDto? roomToEdit;
-    private RoomDto? roomToDelete;
+    private int? roomToDelete;
 
     private ICollection<RoomTypeDto> roomTypes;
     private ICollection<RoomDto> rooms;
@@ -154,13 +154,14 @@ else
     {
         modalException = null;
 
+        roomToEdit = new RoomDto();
+
         if (room is not null)
         {
-            roomToEdit = room;
-        }
-        else
-        {
-            roomToEdit = new RoomDto();
+            roomToEdit.Id = room.Id;
+            roomToEdit.Number = room.Number;
+            roomToEdit.RoomType = room.RoomType;
+            roomToEdit.Status = room.Status;
         }
     }
 
@@ -168,7 +169,7 @@ else
     {
         modalException = null;
 
-        roomToDelete = room;
+        roomToDelete = room.Id;
     }
 
     public async Task CreateOrSaveRoom()
@@ -187,7 +188,7 @@ else
                 var roomId = await Api.CreateRoomAsync(new CreateRoomCommand()
                 {
                     Number = roomToEdit.Number,
-                    RoomTypeId = roomToEdit.RoomType.Id,
+                    RoomTypeId = roomToEdit.RoomType?.Id ?? 0,
                     Status = roomToEdit.Status,
                 });
 
@@ -206,7 +207,7 @@ else
                 await Api.UpdateRoomAsync(new UpdateRoomCommand()
                 {
                     Number = roomToEdit.Number,
-                    RoomTypeId = roomToEdit.RoomType.Id,
+                    RoomTypeId = roomToEdit.RoomType?.Id ?? 0,
                     Status = roomToEdit.Status,
                 });
 
@@ -236,20 +237,20 @@ else
     {
         modalException = null;
 
-        if (roomToDelete is null)
+        if (!roomToDelete.HasValue || !rooms.Any(r => r.Id == roomToDelete.Value))
         {
             return;
         }
 
         try
         {
-            await Api.DeleteRoomAsync(roomToDelete.Number);
+            await Api.DeleteRoomAsync(roomToDelete.Value);
 
             await JS.InvokeVoidAsync("hideModal", "#deleteModal");
 
-            rooms.Remove(roomToDelete);
+            rooms.Remove(rooms.First(r => r.Id == roomToDelete.Value));
 
-            exception = new ApiException(null, 200, $"Værelse #{roomToDelete.Number} er slettet.", null, null);
+            exception = new ApiException(null, 200, $"Værelse #{roomToDelete.Value} er slettet.", null, null);
         }
         catch (ApiException ex)
         {

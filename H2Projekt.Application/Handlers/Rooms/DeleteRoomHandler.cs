@@ -12,13 +12,13 @@ namespace H2Projekt.Application.Handlers.Rooms
             _roomRepository = roomRepository;
         }
 
-        public async Task HandleAsync(string number, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(int id, CancellationToken cancellationToken = default)
         {
-            var room = await _roomRepository.GetRoomByNumberAsync(number, cancellationToken);
+            var room = await _roomRepository.GetRoomByIdAsync(id, cancellationToken);
 
             if (room is null)
             {
-                throw new NonExistentException($"Room with number {number} doesn't exist.");
+                throw new NonExistentException($"Room with id {id} doesn't exist.");
             }
 
             await _roomRepository.DeleteRoomAsync(room, cancellationToken);
