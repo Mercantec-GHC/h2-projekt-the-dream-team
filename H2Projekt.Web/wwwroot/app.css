@@ -122,6 +122,10 @@ h1:focus {
     min-height: 2.5rem !important;
 }
 
+.min-h-screen {
+    min-height: calc(100dvh - 6.5rem) !important;
+}
+
 .fs-7 {
     font-size: 0.875rem;
     line-height: 1.25rem;
@@ -144,9 +148,9 @@ h1:focus {
     border: none !important;
 }
 
-    .table-bordered .position-sticky {
-        outline: 0.063rem solid var(--bs-border-color) !important;
-    }
+.table-bordered .position-sticky {
+    outline: 0.063rem solid var(--bs-border-color) !important;
+}
 
 .table-bordered th,
 .table-bordered td {
@@ -194,4 +198,17 @@ h1:focus {
 
     .dt-container:first-child {
         display: none;
+    }
+
+/* Bootstrap */
+
+.form-switch-lg {
+    padding-left: 3rem;
+    min-height: 1.5rem;
+}
+
+    .form-switch-lg .form-check-input {
+        margin-left: -3rem;
+        height: 1.25rem;
+        width: 2.5rem;
     }

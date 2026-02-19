@@ -1,7 +1,5 @@
 ﻿@rendermode InteractiveServer
 
-@inject ApiClient Api
-
 <div class="d-flex flex-column gap-3">
     <div>
         <label class="form-label">Værelsesnummer</label>
@@ -12,76 +10,11 @@
     <div>
         <label class="form-label">Værelsestype</label>
 
-        <InputSelect @bind-Value:get="_roomTypeId" @bind-Value:set="SetRoomType" class="form-control">
-            <option value="">-- Vælg en værelsestype --</option>
-
-            @foreach (var type in roomTypes)
-            {
-                @if (type.Id.ToString() == _roomTypeId)
-                {
-                    <option value="@type.Id" selected>@type.Name</option>
-
-                    continue;
-                }
-
-                <option value="@type.Id">@type.Name</option>
-            }
-        </InputSelect>
+        <RoomTypeDropdown OnRoomTypeChanged="(value) => Model.RoomType = value" />
     </div>
 </div>
 
 @code {
     [Parameter]
     public RoomDto Model { get; set; } = new RoomDto();
-
-    private string _roomTypeId = string.Empty;
-
-    private ICollection<RoomTypeDto> roomTypes = [];
-
-    protected override async Task OnInitializedAsync()
-    {
-        roomTypes = await Api.GetAllRoomTypesAsync();
-
-        StateHasChanged();
-    }
-
-    private void SetRoomType(string roomTypeId)
-    {
-        if (string.IsNullOrEmpty(roomTypeId) || !int.TryParse(roomTypeId, out var parsedRoomTypeId))
-        {
-            Reset();
-
-            return;
-        }
-
-        var roomType = roomTypes.FirstOrDefault(rt => rt.Id == parsedRoomTypeId);
-
-        if (roomType is null)
-        {
-            Reset();
-
-            return;
-        }
-
-        _roomTypeId = roomTypeId;
-
-        Model.RoomType = new RoomTypeDto()
-        {
-            Id = roomType.Id,
-            Name = roomType.Name,
-            Description = roomType.Description,
-            MaxOccupancy = roomType.MaxOccupancy,
-        };
-
-        StateHasChanged();
-    }
-
-    private void Reset()
-    {
-        _roomTypeId = string.Empty;
-
-        Model.RoomType = null;
-
-        StateHasChanged();
-    }
 }
