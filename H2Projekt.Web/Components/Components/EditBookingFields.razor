@@ -6,7 +6,7 @@
     <InputSelect @bind-Value:get="_roomId" @bind-Value:set="SetRoom" class="form-control">
         <option value="">-- Vælg et værelse --</option>
 
-        @foreach (var room in Rooms.Where(room => !Bookings.Any(booking => booking.Room is not null && booking.Room.Id == room.Id)))
+        @foreach (var room in Rooms.Where(room => room.RoomType.Id == Model.RoomType.Id && !HasOverlappingBookingForRoom(Model, room)))
         {
             @if (room.Id.ToString() == _roomId)
             {
@@ -70,5 +70,15 @@
         Model.Room = null;
 
         StateHasChanged();
+    }
+
+    private bool HasOverlappingBookingForRoom(BookingDto booking, RoomDto room)
+    {
+        return Bookings.Any(b =>
+            (b.Room is not null && b.Room.Id == room.Id)
+            && b.Id != booking.Id
+            && b.FromDate.ToDateOnly() <= booking.ToDate.ToDateOnly()
+            && b.ToDate.ToDateOnly() >= booking.FromDate.ToDateOnly()
+        );
     }
 }
