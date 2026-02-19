@@ -132,7 +132,8 @@ else
 
             try
             {
-                guestId = await Api.GetGuestIdByEmailAsync(vm.Guest.Email);
+                var guest = await Api.GetGuestByEmailAsync(vm.Guest.Email);
+                guestId = guest.Id;
             }
             catch (ApiException ex) when (ex.StatusCode == 404)
             {

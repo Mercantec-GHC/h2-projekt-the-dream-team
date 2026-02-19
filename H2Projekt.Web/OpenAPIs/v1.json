@@ -498,7 +498,7 @@
         }
       }
     },
-    "/api/Guest/GetGuestIdByEmail/by-email": {
+    "/api/Guest/GetGuestByEmail": {
       "get": {
         "tags": [
           "Guest"
@@ -518,32 +518,17 @@
             "content": {
               "text/plain": {
                 "schema": {
-                  "pattern": "^-?(?:0|[1-9]\\d*)$",
-                  "type": [
-                    "integer",
-                    "string"
-                  ],
-                  "format": "int32"
+                  "$ref": "#/components/schemas/GuestDto"
                 }
               },
               "application/json": {
                 "schema": {
-                  "pattern": "^-?(?:0|[1-9]\\d*)$",
-                  "type": [
-                    "integer",
-                    "string"
-                  ],
-                  "format": "int32"
+                  "$ref": "#/components/schemas/GuestDto"
                 }
               },
               "text/json": {
                 "schema": {
-                  "pattern": "^-?(?:0|[1-9]\\d*)$",
-                  "type": [
-                    "integer",
-                    "string"
-                  ],
-                  "format": "int32"
+                  "$ref": "#/components/schemas/GuestDto"
                 }
               }
             }

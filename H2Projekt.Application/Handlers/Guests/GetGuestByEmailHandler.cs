@@ -1,4 +1,5 @@
-﻿using H2Projekt.Application.Interfaces;
+﻿using H2Projekt.Application.Exceptions;
+using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers.Guests
@@ -12,9 +13,14 @@ namespace H2Projekt.Application.Handlers.Guests
             _guestRepository = guestRepository;
         }
 
-        public Task<Guest?> HandleAsync(string email, CancellationToken ct = default)
+        public async Task<Guest> HandleAsync(string email, CancellationToken cancellationToken = default)
         {
-            return _guestRepository.GetGuestByEmailAsync(email.Trim().ToLower(), ct);
+            // Await resultet FØR null-check
+            var guest = await _guestRepository.GetGuestByEmailAsync(email, cancellationToken);
+            if (guest is null)
+                throw new NonExistentException($"Guest with Email {email} doesn't exist.");
+
+            return guest;
         }
     }
 }
