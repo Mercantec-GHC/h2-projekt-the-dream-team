@@ -15,7 +15,6 @@ namespace H2Projekt.Application.Handlers.Guests
 
         public async Task<Guest> HandleAsync(string email, CancellationToken cancellationToken = default)
         {
-            // Await resultet FØR null-check
             var guest = await _guestRepository.GetGuestByEmailAsync(email, cancellationToken);
             if (guest is null)
                 throw new NonExistentException($"Guest with Email {email} doesn't exist.");
