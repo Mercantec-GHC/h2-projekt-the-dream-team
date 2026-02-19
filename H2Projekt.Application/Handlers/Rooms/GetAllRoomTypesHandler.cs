@@ -1,5 +1,5 @@
-﻿using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
+﻿using H2Projekt.Application.Dto.Rooms;
+using H2Projekt.Application.Interfaces;
 
 namespace H2Projekt.Application.Handlers.Rooms
 {
@@ -12,11 +12,11 @@ namespace H2Projekt.Application.Handlers.Rooms
             _roomRepository = roomRepository;
         }
 
-        public async Task<List<RoomType>> HandleAsync(CancellationToken cancellationToken = default)
+        public async Task<List<RoomTypeDto>> HandleAsync(CancellationToken cancellationToken = default)
         {
             var roomTypes = await _roomRepository.GetAllRoomTypesAsync(cancellationToken);
 
-            return roomTypes;
+            return roomTypes.Select(roomType => new RoomTypeDto(roomType)).ToList();
         }
     }
 }

@@ -19,7 +19,7 @@ namespace H2Projekt.API.Controllers
         {
             var rooms = await handler.HandleAsync();
 
-            return Ok(rooms.Select(room => new RoomDto(room)));
+            return Ok(rooms);
         }
 
         [HttpGet("{number}")]
@@ -31,7 +31,7 @@ namespace H2Projekt.API.Controllers
             {
                 var room = await handler.HandleAsync(number);
 
-                return Ok(new RoomDto(room));
+                return Ok(room);
             }
             catch (NonExistentException ex)
             {
@@ -110,7 +110,7 @@ namespace H2Projekt.API.Controllers
         {
             var roomTypes = await handler.HandleAsync();
 
-            return Ok(roomTypes.Select(roomType => new RoomTypeDto(roomType)));
+            return Ok(roomTypes);
         }
 
         [HttpPost]
@@ -184,7 +184,7 @@ namespace H2Projekt.API.Controllers
         {
             var roomDiscounts = await handler.HandleAsync();
 
-            return Ok(roomDiscounts.Select(roomDiscount => new RoomDiscountDto(roomDiscount)));
+            return Ok(roomDiscounts);
         }
 
         [HttpPost]

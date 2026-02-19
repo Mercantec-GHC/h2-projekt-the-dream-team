@@ -2,7 +2,7 @@
 using H2Projekt.Application.Validators.Bookings;
 using H2Projekt.Domain;
 
-namespace H2Projekt.Application.Validators.Rooms
+namespace H2Projekt.Application.Validators.Guests
 {
     public class GuestValidator : AbstractValidator<Guest>
     {

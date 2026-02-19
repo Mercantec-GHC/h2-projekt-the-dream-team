@@ -1,6 +1,6 @@
-﻿using H2Projekt.Application.Exceptions;
+﻿using H2Projekt.Application.Dto.Guests;
+using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers.Guests
 {
@@ -13,7 +13,7 @@ namespace H2Projekt.Application.Handlers.Guests
             _guestRepository = guestRepository;
         }
 
-        public async Task<Guest> HandleAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<GuestDto> HandleAsync(int id, CancellationToken cancellationToken = default)
         {
             var guest = await _guestRepository.GetGuestByIdAsync(id, cancellationToken);
 
@@ -22,7 +22,7 @@ namespace H2Projekt.Application.Handlers.Guests
                 throw new NonExistentException($"Guest with id {id} doesn't exist.");
             }
 
-            return guest;
+            return new GuestDto(guest);
         }
     }
 }

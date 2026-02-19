@@ -17,7 +17,7 @@ namespace H2Projekt.API.Controllers
         {
             var guests = await handler.HandleAsync();
 
-            return Ok(guests.Select(guest => new GuestDto(guest)));
+            return Ok(guests);
         }
 
         [HttpGet("{id}")]
@@ -29,7 +29,7 @@ namespace H2Projekt.API.Controllers
             {
                 var guest = await handler.HandleAsync(id);
 
-                return Ok(new GuestDto(guest));
+                return Ok(guest);
             }
             catch (NonExistentException ex)
             {
@@ -46,14 +46,13 @@ namespace H2Projekt.API.Controllers
             {
                 var guest = await handler.HandleAsync(email);
 
-                return Ok(new GuestDto(guest));
+                return Ok(guest);
             }
             catch (NonExistentException ex)
             {
                 return NotFound(ex.Message);
             }
         }
-
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]

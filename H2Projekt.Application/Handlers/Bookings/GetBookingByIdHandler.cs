@@ -1,7 +1,6 @@
 ﻿using H2Projekt.Application.Dto.Bookings;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers.Bookings
 {
@@ -14,7 +13,7 @@ namespace H2Projekt.Application.Handlers.Bookings
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<Booking> HandleAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<BookingDto> HandleAsync(int id, CancellationToken cancellationToken = default)
         {
             var booking = await _bookingRepository.GetBookingByIdAsync(id, cancellationToken);
 
@@ -23,7 +22,7 @@ namespace H2Projekt.Application.Handlers.Bookings
                 throw new NonExistentException($"Booking with id {id} doesn't exist.");
             }
 
-            return booking;
+            return new BookingDto(booking);
         }
     }
 }

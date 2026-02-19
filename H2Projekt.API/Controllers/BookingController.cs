@@ -17,7 +17,7 @@ namespace H2Projekt.API.Controllers
         {
             var bookings = await handler.HandleAsync();
 
-            return Ok(bookings.Select(booking => new BookingDto(booking)));
+            return Ok(bookings);
         }
 
         [HttpGet("{id}")]
@@ -29,7 +29,7 @@ namespace H2Projekt.API.Controllers
             {
                 var booking = await handler.HandleAsync(id);
 
-                return Ok(new BookingDto(booking));
+                return Ok(booking);
             }
             catch (NonExistentException ex)
             {

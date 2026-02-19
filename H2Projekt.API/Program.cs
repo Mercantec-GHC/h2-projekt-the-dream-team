@@ -4,6 +4,7 @@ using H2Projekt.Application.Handlers.Guests;
 using H2Projekt.Application.Handlers.Rooms;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Application.Validators.Bookings;
+using H2Projekt.Application.Validators.Guests;
 using H2Projekt.Application.Validators.Rooms;
 using H2Projekt.Domain;
 using H2Projekt.Infrastructure;
