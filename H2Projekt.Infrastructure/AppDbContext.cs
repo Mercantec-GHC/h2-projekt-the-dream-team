@@ -17,12 +17,11 @@ namespace H2Projekt.Infrastructure
         {
             base.OnModelCreating(modelBuilder);
 
-            // Room numbers must be unique
+            // Unique constraints
             modelBuilder.Entity<Room>()
                 .HasIndex(r => r.Number)
                 .IsUnique();
 
-            // Room type names must be unique
             modelBuilder.Entity<RoomType>()
                 .HasIndex(rt => rt.Name)
                 .IsUnique();
@@ -32,11 +31,22 @@ namespace H2Projekt.Infrastructure
                 .Property(rt => rt.PricePerNight)
                 .HasPrecision(10, 2);
 
-            modelBuilder.Entity<Booking>()
-                .Property(r => r.PriceLocked)
+            modelBuilder.Entity<RoomDiscount>()
+                .Property(rd => rd.PricePerNight)
                 .HasPrecision(10, 2);
 
-            // Guest
+            modelBuilder.Entity<Booking>()
+                .Property(b => b.PriceLocked)
+                .HasPrecision(10, 2);
+
+            // Max length and required fields
+            modelBuilder.Entity<RoomDiscount>(rd =>
+            {
+                rd.Property(rd => rd.Description)
+                    .HasMaxLength(200)
+                    .IsRequired();
+            });
+
             modelBuilder.Entity<Guest>(g =>
             {
                 g.Property(g => g.FirstName)

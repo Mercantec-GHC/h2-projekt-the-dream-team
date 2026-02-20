@@ -9,16 +9,16 @@ namespace H2Projekt.Application.Validators.Rooms
         {
             RuleFor(roomType => roomType.Name)
                 .NotEmpty()
-                .WithMessage("Room type name is required.");
+                .WithMessage("Navn er påkrævet.");
             RuleFor(roomType => roomType.Description)
                 .NotEmpty()
-                .WithMessage("Room type description is required.");
+                .WithMessage("Beskrivelse er påkrævet.");
             RuleFor(roomType => roomType.MaxOccupancy)
                 .GreaterThan(0)
-                .WithMessage("Max occupancy must be greater than 0.");
+                .WithMessage("Maksimal belægning skal være større end 0.");
             RuleFor(roomType => roomType.PricePerNight)
                 .GreaterThan(0)
-                .WithMessage("Price per night must be greater than 0.");
+                .WithMessage("Pris per nat skal være større end 0.");
         }
     }
 }

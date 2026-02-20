@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.JSInterop;
 
-namespace H2Projekt.Web
+namespace H2Projekt.Web.Components
 {
     public class BasePage : ComponentBase, IDisposable
     {

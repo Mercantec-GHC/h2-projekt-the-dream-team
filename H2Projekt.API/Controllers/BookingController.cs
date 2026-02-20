@@ -17,10 +17,10 @@ namespace H2Projekt.API.Controllers
         {
             var bookings = await handler.HandleAsync();
 
-            return Ok(bookings.Select(booking => new BookingDto(booking)));
+            return Ok(bookings);
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<BookingDto?>> GetBookingById([FromServices] GetBookingByIdHandler handler, int id)
@@ -29,7 +29,7 @@ namespace H2Projekt.API.Controllers
             {
                 var booking = await handler.HandleAsync(id);
 
-                return Ok(new BookingDto(booking));
+                return Ok(booking);
             }
             catch (NonExistentException ex)
             {
@@ -81,7 +81,7 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpDelete()]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteBooking([FromServices] DeleteBookingHandler handler, int id)

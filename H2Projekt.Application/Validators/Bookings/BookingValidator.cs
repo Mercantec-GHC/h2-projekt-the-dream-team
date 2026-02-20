@@ -7,25 +7,25 @@ namespace H2Projekt.Application.Validators.Bookings
     {
         public BookingValidator()
         {
-            RuleFor(b => b.GuestId)
+            RuleFor(booking => booking.GuestId)
                 .GreaterThan(0)
-                .WithMessage("Guest ID must be greater than 0.");
-            RuleFor(b => b.RoomTypeId)
+                .WithMessage("Gæst ID'et skal være større end 0.");
+            RuleFor(booking => booking.RoomTypeId)
                 .GreaterThan(0)
-                .WithMessage("Room type ID must be greater than 0.");
-            RuleFor(b => b.FromDate)
+                .WithMessage("Værelsestype ID'et skal være større end 0.");
+            RuleFor(booking => booking.FromDate)
                 .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Now))
-                .When(b => b.Id == 0)
-                .WithMessage("From date must be in the future.");
-            RuleFor(b => b.FromDate)
-                .LessThan(b => b.ToDate)
-                .WithMessage("From date must be earlier than To date.");
-            RuleFor(b => b.ToDate)
-                .GreaterThan(b => b.FromDate)
-                .WithMessage("To date must be later than the From date.");
-            RuleFor(b => b.Room)
+                .When(booking => booking.Id == 0)
+                .WithMessage("Fra dato skal være i dag eller i fremtiden for nye bookinger.");
+            RuleFor(booking => booking.FromDate)
+                .LessThanOrEqualTo(booking => booking.ToDate)
+                .WithMessage("Fra dato skal være tidligere eller lig med Til dato.");
+            RuleFor(booking => booking.ToDate)
+                .GreaterThanOrEqualTo(booking => booking.FromDate)
+                .WithMessage("Til dato skal være senere eller lig med Fra dato.");
+            RuleFor(booking => booking.Room)
                 .Must((booking, room) => room is null || room.RoomTypeId == booking.RoomTypeId)
-                .WithMessage("Assigned room must be of the same type as the booking's room type.");
+                .WithMessage("Tildelt værelse skal være af samme type som bookingens værelsestype.");
         }
     }
 }

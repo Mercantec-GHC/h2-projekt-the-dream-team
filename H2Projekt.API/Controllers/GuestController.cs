@@ -17,10 +17,10 @@ namespace H2Projekt.API.Controllers
         {
             var guests = await handler.HandleAsync();
 
-            return Ok(guests.Select(guest => new GuestDto(guest)));
+            return Ok(guests);
         }
 
-        [HttpGet]
+        [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<GuestDto?>> GetGuestById([FromServices] GetGuestByIdHandler handler, int id)
@@ -29,7 +29,24 @@ namespace H2Projekt.API.Controllers
             {
                 var guest = await handler.HandleAsync(id);
 
-                return Ok(new GuestDto(guest));
+                return Ok(guest);
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<GuestDto>> GetGuestByEmail([FromServices] GetGuestByEmailHandler handler, string email)
+        {
+            try
+            {
+                var guest = await handler.HandleAsync(email);
+
+                return Ok(guest);
             }
             catch (NonExistentException ex)
             {

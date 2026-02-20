@@ -4,13 +4,23 @@
 
 <PageTitle>Home</PageTitle>
 
-@if (GuestService.SelectedGuest is not null)
-{
-    <h1>Hello, @GuestService.SelectedGuest.FirstName!</h1>
-}
-else
-{
-    <h1>Hello, world!</h1>
-}
+<div class="d-flex justify-content-center align-items-center min-h-screen">
+    <div class="d-flex flex-column gap-5 align-items-center">
+        @if (GuestService.SelectedGuest is not null)
+        {
+            <h1>Velkommen, @GuestService.SelectedGuest.FirstName!</h1>
+        }
+        else
+        {
+            <h1>Velkommen!</h1>
+        }
 
-Welcome to your new app.
+        <div class="card p-2">
+            <SearchFilter />
+        </div>
+    </div>
+</div>
+
+@code {
+
+}

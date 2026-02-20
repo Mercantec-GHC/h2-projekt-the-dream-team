@@ -1,0 +1,40 @@
+﻿@rendermode InteractiveServer
+
+<div class="d-flex flex-column gap-3">
+    <div>
+        <label class="form-label">Værelsestype</label>
+
+        <RoomTypeDropdown OnRoomTypeChanged="(value) => Model.RoomType = value" />
+    </div>
+
+    <div>
+        <label class="form-label">Beskrivelse</label>
+
+        <InputTextArea class="form-control" @bind-Value="Model.Description" placeholder="Indtast beskrivelse" />
+    </div>
+
+    <div class="d-flex flex-wrap flex-lg-nowrap gap-3">
+        <div class="w-100">
+            <label class="form-label">Fra dato</label>
+
+            <InputDate class="form-control" @bind-Value="Model.FromDate" />
+        </div>
+
+        <div class="w-100">
+            <label class="form-label">Til dato</label>
+
+            <InputDate class="form-control" @bind-Value="Model.ToDate" />
+        </div>
+    </div>
+
+    <div>
+        <label class="form-label">Pris pr. nat</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RoomDiscountDto Model { get; set; } = new RoomDiscountDto();
+}

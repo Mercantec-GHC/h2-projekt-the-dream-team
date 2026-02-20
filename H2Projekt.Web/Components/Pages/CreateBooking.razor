@@ -5,7 +5,7 @@
 @inject ApiClient Api
 @inject NavigationManager Navigation
 
-<button class="btn btn-secondary mb-3" @onclick="Back">← Tilbage</button>
+<button class="btn btn-secondary mb-3" @onclick="Back">Tilbage</button>
 
 @if (loading)
 {
@@ -128,15 +128,26 @@ else
 
         try
         {
-            // 1) Opret gæst
-            var guestId = await Api.CreateGuestAsync(new CreateGuestCommand
-            {
-                FirstName = vm.Guest.FirstName,
-                LastName = vm.Guest.LastName,
-                Email = vm.Guest.Email
-            });
+            int guestId;
 
-            // 2) Opret booking (brug DateOnly!)
+            try
+            {
+                var guest = await Api.GetGuestByEmailAsync(vm.Guest.Email);
+                guestId = guest.Id;
+            }
+            catch (ApiException ex) when (ex.StatusCode == 404)
+            {
+
+                guestId = await Api.CreateGuestAsync(new CreateGuestCommand
+                {
+                    FirstName = vm.Guest.FirstName,
+                    LastName = vm.Guest.LastName,
+                    Email = vm.Guest.Email
+                });
+            }
+
+
+
             var cmd = new CreateBookingCommand
             {
                 GuestId = guestId,
@@ -149,9 +160,6 @@ else
 
             message = $"Tak, {vm.Guest.FirstName}! Din booking af {roomType.Name} er gennemført.";
             messageCss = "alert-success";
-
-            // (Valgfrit) Navigation til kvittering
-            // Navigation.NavigateTo($"/booking-confirmation?roomTypeId={roomType.Id}&from={vm.CheckIn:yyyy-MM-dd}&to={vm.CheckOut:yyyy-MM-dd}");
         }
         catch (ApiException ex)
         {
@@ -164,36 +172,14 @@ else
         }
     }
 
+
     public class CreateBookingViewModel
     {
         public GuestDto Guest { get; set; } = new();
 
-        [Required(ErrorMessage = "Vælg check-in.")]
         public DateTime CheckIn { get; set; } = DateTime.Today;
 
-        [Required(ErrorMessage = "Vælg check-out.")]
-        [DateAfter(nameof(CheckIn), ErrorMessage = "Check-out skal være efter check-in."),
-        ]
         public DateTime CheckOut { get; set; } = DateTime.Today.AddDays(1);
-    }
-
-    // Custom validering: CheckOut > CheckIn
-    public class DateAfterAttribute : ValidationAttribute
-    {
-        private readonly string _other;
-        public DateAfterAttribute(string other) => _other = other;
-
-        protected override ValidationResult? IsValid(object? value, ValidationContext context)
-        {
-            var current = value as DateTime? ?? default;
-            var prop = context.ObjectType.GetProperty(_other);
-            if (prop is null) return ValidationResult.Success;
-
-            var compareTo = (DateTime)(prop.GetValue(context.ObjectInstance) ?? default(DateTime));
-            return current > compareTo
-                ? ValidationResult.Success
-                : new ValidationResult(ErrorMessage ?? "Datoen skal være efter.");
-        }
     }
 
     private void Back() => Navigation.NavigateTo("/booking-room");

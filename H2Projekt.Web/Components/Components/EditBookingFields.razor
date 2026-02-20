@@ -1,0 +1,84 @@
+﻿@rendermode InteractiveServer
+
+<div>
+    <label class="form-label">Værelse</label>
+
+    <InputSelect @bind-Value:get="_roomId" @bind-Value:set="SetRoom" class="form-control">
+        <option value="">-- Vælg et værelse --</option>
+
+        @foreach (var room in Rooms.Where(room => room.RoomType.Id == Model.RoomType.Id && !HasOverlappingBookingForRoom(Model, room)))
+        {
+            @if (room.Id.ToString() == _roomId)
+            {
+                <option value="@room.Id" selected>@room.Number (@room.RoomType.Name)</option>
+
+                continue;
+            }
+
+            <option value="@room.Id">@room.Number (@room.RoomType.Name)</option>
+        }
+    </InputSelect>
+</div>
+
+@code {
+    [Parameter]
+    public BookingDto Model { get; set; } = new BookingDto();
+
+    [Parameter]
+    public ICollection<RoomDto> Rooms { get; set; } = [];
+
+    [Parameter]
+    public ICollection<BookingDto> Bookings { get; set; } = [];
+
+    private string _roomId = string.Empty;
+
+    private void SetRoom(string roomId)
+    {
+        if (string.IsNullOrEmpty(roomId) || !int.TryParse(roomId, out var parsedRoomId))
+        {
+            Reset();
+
+            return;
+        }
+
+        var room = Rooms.FirstOrDefault(rt => rt.Id == parsedRoomId);
+
+        if (room is null)
+        {
+            Reset();
+
+            return;
+        }
+
+        _roomId = roomId;
+
+        Model.Room = new RoomWithoutBookingsDto()
+        {
+            Id = room.Id,
+            Number = room.Number,
+            RoomType = room.RoomType,
+            Status = room.Status
+        };
+
+        StateHasChanged();
+    }
+
+    private void Reset()
+    {
+        _roomId = string.Empty;
+
+        Model.Room = null;
+
+        StateHasChanged();
+    }
+
+    private bool HasOverlappingBookingForRoom(BookingDto booking, RoomDto room)
+    {
+        return Bookings.Any(b =>
+            (b.Room is not null && b.Room.Id == room.Id)
+            && b.Id != booking.Id
+            && b.FromDate.ToDateOnly() <= booking.ToDate.ToDateOnly()
+            && b.ToDate.ToDateOnly() >= booking.FromDate.ToDateOnly()
+        );
+    }
+}

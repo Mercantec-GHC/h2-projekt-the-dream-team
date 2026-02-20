@@ -4,22 +4,22 @@ using H2Projekt.Application.Interfaces;
 
 namespace H2Projekt.Application.Handlers.Guests
 {
-    public class GetGuestByIdHandler
+    public class GetGuestByEmailHandler
     {
         private readonly IGuestRepository _guestRepository;
 
-        public GetGuestByIdHandler(IGuestRepository guestRepository)
+        public GetGuestByEmailHandler(IGuestRepository guestRepository)
         {
             _guestRepository = guestRepository;
         }
 
-        public async Task<GuestDto> HandleAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<GuestDto> HandleAsync(string email, CancellationToken cancellationToken = default)
         {
-            var guest = await _guestRepository.GetGuestByIdAsync(id, cancellationToken);
+            var guest = await _guestRepository.GetGuestByEmailAsync(email, cancellationToken);
 
             if (guest is null)
             {
-                throw new NonExistentException($"Guest with id {id} doesn't exist.");
+                throw new NonExistentException($"Guest with Email {email} doesn't exist.");
             }
 
             return new GuestDto(guest);

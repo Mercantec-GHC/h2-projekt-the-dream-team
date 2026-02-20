@@ -1,6 +1,6 @@
-﻿using H2Projekt.Application.Exceptions;
+﻿using H2Projekt.Application.Dto.Rooms;
+using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers.Rooms
 {
@@ -13,7 +13,7 @@ namespace H2Projekt.Application.Handlers.Rooms
             _roomRepository = roomRepository;
         }
 
-        public async Task<Room> HandleAsync(string number, CancellationToken cancellationToken = default)
+        public async Task<RoomDto> HandleAsync(string number, CancellationToken cancellationToken = default)
         {
             var room = await _roomRepository.GetRoomByNumberAsync(number, cancellationToken);
 
@@ -22,7 +22,7 @@ namespace H2Projekt.Application.Handlers.Rooms
                 throw new NonExistentException($"Room with number {number} doesn't exist.");
             }
 
-            return room;
+            return new RoomDto(room);
         }
     }
 }

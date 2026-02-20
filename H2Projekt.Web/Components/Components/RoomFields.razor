@@ -1,0 +1,20 @@
+﻿@rendermode InteractiveServer
+
+<div class="d-flex flex-column gap-3">
+    <div>
+        <label class="form-label">Værelsesnummer</label>
+
+        <InputText class="form-control" @bind-Value="Model.Number" placeholder="Indtast værelsesnummer" />
+    </div>
+
+    <div>
+        <label class="form-label">Værelsestype</label>
+
+        <RoomTypeDropdown OnRoomTypeChanged="(value) => Model.RoomType = value" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RoomDto Model { get; set; } = new RoomDto();
+}

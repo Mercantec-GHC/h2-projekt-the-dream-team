@@ -19,10 +19,10 @@ namespace H2Projekt.API.Controllers
         {
             var rooms = await handler.HandleAsync();
 
-            return Ok(rooms.Select(room => new RoomDto(room)));
+            return Ok(rooms);
         }
 
-        [HttpGet]
+        [HttpGet("{number}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<RoomDto?>> GetRoomByNumber([FromServices] GetRoomByNumberHandler handler, string number)
@@ -31,7 +31,7 @@ namespace H2Projekt.API.Controllers
             {
                 var room = await handler.HandleAsync(number);
 
-                return Ok(new RoomDto(room));
+                return Ok(room);
             }
             catch (NonExistentException ex)
             {
@@ -83,14 +83,14 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpDelete("{number}")]
+        [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteRoom([FromServices] DeleteRoomHandler handler, string number)
+        public async Task<ActionResult> DeleteRoom([FromServices] DeleteRoomHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(number);
+                await handler.HandleAsync(id);
 
                 return Ok();
             }
@@ -110,7 +110,7 @@ namespace H2Projekt.API.Controllers
         {
             var roomTypes = await handler.HandleAsync();
 
-            return Ok(roomTypes.Select(roomType => new RoomTypeDto(roomType)));
+            return Ok(roomTypes);
         }
 
         [HttpPost]
@@ -161,6 +161,80 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult> DeleteRoomType([FromServices] DeleteRoomTypeHandler handler, int id)
+        {
+            try
+            {
+                await handler.HandleAsync(id);
+
+                return Ok();
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+        }
+
+        #endregion
+
+        #region Room Discounts
+
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<RoomDiscountDto>>> GetAllRoomDiscounts([FromServices] GetAllRoomDiscountsHandler handler)
+        {
+            var roomDiscounts = await handler.HandleAsync();
+
+            return Ok(roomDiscounts);
+        }
+
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<int>> CreateRoomDiscount([FromServices] CreateRoomDiscountHandler handler, [FromBody] CreateRoomDiscountCommand createRoomDiscountCommand)
+        {
+            try
+            {
+                var roomId = await handler.HandleAsync(createRoomDiscountCommand);
+
+                return Ok(roomId);
+            }
+            catch (DuplicateException ex)
+            {
+                return Conflict(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+        }
+
+        [HttpPut]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> UpdateRoomDiscount([FromServices] UpdateRoomDiscountHandler handler, [FromBody] UpdateRoomDiscountCommand updateRoomDiscountCommand)
+        {
+            try
+            {
+                await handler.HandleAsync(updateRoomDiscountCommand);
+
+                return Ok();
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult> DeleteRoomDiscount([FromServices] DeleteRoomDiscountHandler handler, int id)
         {
             try
             {

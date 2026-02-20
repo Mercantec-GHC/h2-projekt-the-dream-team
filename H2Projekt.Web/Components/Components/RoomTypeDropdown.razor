@@ -1,0 +1,75 @@
+﻿@rendermode InteractiveServer
+
+@inject ApiClient Api
+
+<InputSelect @bind-Value:get="_roomTypeId" @bind-Value:set="SetRoomType" class="form-control">
+    <option value="">-- Vælg en værelsestype --</option>
+
+    @foreach (var type in roomTypes)
+    {
+        @if (type.Id.ToString() == _roomTypeId)
+        {
+            <option value="@type.Id" selected>@type.Name</option>
+
+            continue;
+        }
+
+        <option value="@type.Id">@type.Name</option>
+    }
+</InputSelect>
+
+@code {
+    [Parameter]
+    public EventCallback<RoomTypeDto?> OnRoomTypeChanged { get; set; }
+
+    private string _roomTypeId = string.Empty;
+
+    private ICollection<RoomTypeDto> roomTypes = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomTypes = await Api.GetAllRoomTypesAsync();
+
+        StateHasChanged();
+    }
+
+    private async Task SetRoomType(string roomTypeId)
+    {
+        if (string.IsNullOrEmpty(roomTypeId) || !int.TryParse(roomTypeId, out var parsedRoomTypeId))
+        {
+            await Reset();
+
+            return;
+        }
+
+        var roomType = roomTypes.FirstOrDefault(rt => rt.Id == parsedRoomTypeId);
+
+        if (roomType is null)
+        {
+            await Reset();
+
+            return;
+        }
+
+        _roomTypeId = roomTypeId;
+
+        await OnRoomTypeChanged.InvokeAsync(new RoomTypeDto()
+        {
+            Id = roomType.Id,
+            Name = roomType.Name,
+            Description = roomType.Description,
+            MaxOccupancy = roomType.MaxOccupancy,
+        });
+
+        StateHasChanged();
+    }
+
+    private async Task Reset()
+    {
+        _roomTypeId = string.Empty;
+
+        await OnRoomTypeChanged.InvokeAsync(null);
+
+        StateHasChanged();
+    }
+}

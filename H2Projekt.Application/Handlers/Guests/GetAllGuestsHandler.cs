@@ -1,5 +1,5 @@
-﻿using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
+﻿using H2Projekt.Application.Dto.Guests;
+using H2Projekt.Application.Interfaces;
 
 namespace H2Projekt.Application.Handlers.Guests
 {
@@ -12,11 +12,11 @@ namespace H2Projekt.Application.Handlers.Guests
             _guestRepository = guestRepository;
         }
 
-        public async Task<List<Guest>> HandleAsync(CancellationToken cancellationToken = default)
+        public async Task<List<GuestDto>> HandleAsync(CancellationToken cancellationToken = default)
         {
             var guests = await _guestRepository.GetAllGuestsAsync(cancellationToken);
 
-            return guests;
+            return guests.Select(guest => new GuestDto(guest)).ToList();
         }
     }
 }

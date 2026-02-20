@@ -1,0 +1,277 @@
+﻿@page "/admin/manage-room-discounts"
+@rendermode InteractiveServer
+@inherits BasePage
+
+@inject ApiClient Api
+
+<PageTitle>Admin - Værelsestilbud</PageTitle>
+
+@if (exception is not null)
+{
+    <div class="d-flex flex-column gap-2 mb-4">
+        @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+        {
+            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+        }
+    </div>
+}
+
+<div class="d-flex gap-3 justify-content-between mb-4">
+    <div class="d-flex gap-3 align-items-center">
+        <a href="/admin" class="btn btn-secondary">Tilbage</a>
+
+        <h3 class="mb-0">Værelsestilbud</h3>
+    </div>
+
+    <button type="button" class="btn btn-success" @onclick="() => PrepareRoomDiscountCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+</div>
+
+@if (roomDiscounts is null)
+{
+    <p>Henter data...</p>
+}
+else if (roomDiscounts.Count == 0)
+{
+    <em>Ingen værelsestyper fundet.</em>
+}
+else
+{
+    <table id="dataTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th width="100">Id</th>
+                <th width="100">Værelsestype</th>
+                <th width="100">Beskrivelse</th>
+                <th width="100">Fra dato</th>
+                <th width="100">Til dato</th>
+                <th width="100">Pris pr. nat</th>
+                <th width="1" data-dt-order="disable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var roomDiscount in roomDiscounts)
+            {
+                <tr>
+                    <td class="align-middle">@roomDiscount.Id</td>
+                    <td class="align-middle">@roomDiscount.RoomType?.Name</td>
+                    <td class="align-middle">@roomDiscount.Description</td>
+                    <td class="align-middle">@roomDiscount.FromDate.ToString("dd/MM/yyyy")</td>
+                    <td class="align-middle">@roomDiscount.ToDate.ToString("dd/MM/yyyy")</td>
+                    <td class="align-middle">@roomDiscount.PricePerNight.ToString("C")</td>
+                    <td class="align-middle">
+                        <div class="d-flex gap-2 w-100 justify-content-end">
+                            <button type="button" class="btn btn-secondary" @onclick="() => PrepareRoomDiscountCreationOrUpdate(roomDiscount)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+
+                            <button class="btn btn-danger" @onclick="() => PrepareRoomDiscountDeletion(roomDiscount)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="modal fade" id="createEditModal" tabindex="-1" aria-labelledby="createEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="createEditModalLabel">@(roomDiscountToEdit?.Id > 0 ? "Rediger" : "Tilføj") Værelsestilbud</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body my-3 p-0">
+                @if (modalException is not null)
+                {
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                        {
+                            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                        }
+                    </div>
+                }
+
+                @if (roomDiscountToEdit is not null)
+                {
+                    <RoomDiscountFields Model="roomDiscountToEdit" />
+                }
+            </div>
+
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="CreateOrSaveRoomDiscount">Gem</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Værelsestilbud</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            @if (modalException is not null)
+            {
+                <div class="modal-body mt-3 p-0 d-flex flex-column gap-2 mb-3">
+                    @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                    {
+                        <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                    }
+                </div>
+            }
+
+            <div class="d-flex gap-3 mt-3">
+                <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteRoomDiscount">Slet</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ApiException? exception;
+    private ApiException? modalException;
+
+    private RoomDiscountDto? roomDiscountToEdit;
+    private int? roomDiscountToDelete;
+
+    private ICollection<RoomDiscountDto> roomDiscounts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomDiscounts = await Api.GetAllRoomDiscountsAsync();
+    }
+
+    public void PrepareRoomDiscountCreationOrUpdate(RoomDiscountDto? roomDiscount = null)
+    {
+        modalException = null;
+
+        roomDiscountToEdit = new RoomDiscountDto();
+
+        if (roomDiscount is not null)
+        {
+            roomDiscountToEdit.Id = roomDiscount.Id;
+            roomDiscountToEdit.RoomType = roomDiscount.RoomType;
+            roomDiscountToEdit.Description = roomDiscount.Description;
+            roomDiscountToEdit.FromDate = roomDiscount.FromDate;
+            roomDiscountToEdit.ToDate = roomDiscount.ToDate;
+            roomDiscountToEdit.PricePerNight = roomDiscount.PricePerNight;
+        }
+    }
+
+    public void PrepareRoomDiscountDeletion(RoomDiscountDto roomDiscount)
+    {
+        modalException = null;
+
+        roomDiscountToDelete = roomDiscount.Id;
+    }
+
+    public async Task CreateOrSaveRoomDiscount()
+    {
+        modalException = null;
+
+        if (roomDiscountToEdit is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (roomDiscountToEdit.Id == 0)
+            {
+                var roomDiscountId = await Api.CreateRoomDiscountAsync(new CreateRoomDiscountCommand()
+                {
+                    RoomTypeId = roomDiscountToEdit.RoomType?.Id ?? 0,
+                    Description = roomDiscountToEdit.Description,
+                    FromDate = roomDiscountToEdit.FromDate,
+                    ToDate = roomDiscountToEdit.ToDate,
+                    PricePerNight = roomDiscountToEdit.PricePerNight,
+                });
+
+                roomDiscounts.Add(new RoomDiscountDto()
+                {
+                    Id = roomDiscountId,
+                    RoomType = roomDiscountToEdit.RoomType,
+                    Description = roomDiscountToEdit.Description,
+                    FromDate = roomDiscountToEdit.FromDate,
+                    ToDate = roomDiscountToEdit.ToDate,
+                    PricePerNight = roomDiscountToEdit.PricePerNight,
+                });
+
+                exception = new ApiException(null, 200, $"Værelsestilbud #{roomDiscountId} er oprettet.", null, null);
+            }
+            else
+            {
+                await Api.UpdateRoomDiscountAsync(new UpdateRoomDiscountCommand()
+                {
+                    Id = roomDiscountToEdit.Id,
+                    RoomTypeId = roomDiscountToEdit.RoomType?.Id ?? 0,
+                    Description = roomDiscountToEdit.Description,
+                    FromDate = roomDiscountToEdit.FromDate,
+                    ToDate = roomDiscountToEdit.ToDate,
+                    PricePerNight = roomDiscountToEdit.PricePerNight,
+                });
+
+                var roomDiscount = roomDiscounts.FirstOrDefault(r => r.Id == roomDiscountToEdit.Id);
+
+                if (roomDiscount is not null)
+                {
+                    roomDiscount.RoomType = roomDiscountToEdit.RoomType;
+                    roomDiscount.Description = roomDiscountToEdit.Description;
+                    roomDiscount.FromDate = roomDiscountToEdit.FromDate;
+                    roomDiscount.ToDate = roomDiscountToEdit.ToDate;
+                    roomDiscount.PricePerNight = roomDiscountToEdit.PricePerNight;
+
+                    exception = new ApiException(null, 200, $"Værelsestilbud #{roomDiscount.Id} er opdateret.", null, null);
+                }
+            }
+
+            await JS.InvokeVoidAsync("hideModal", "#createEditModal");
+
+            roomDiscountToEdit = null;
+
+            StateHasChanged();
+        }
+        catch (ApiException ex)
+        {
+            modalException = ex;
+        }
+    }
+
+    public async Task DeleteRoomDiscount()
+    {
+        modalException = null;
+
+        if (!roomDiscountToDelete.HasValue || !roomDiscounts.Any(rt => rt.Id == roomDiscountToDelete.Value))
+        {
+            return;
+        }
+
+        try
+        {
+            await Api.DeleteRoomDiscountAsync(roomDiscountToDelete.Value);
+
+            await JS.InvokeVoidAsync("hideModal", "#deleteModal");
+
+            roomDiscounts.Remove(roomDiscounts.First(rt => rt.Id == roomDiscountToDelete.Value));
+
+            exception = new ApiException(null, 200, $"Værelsestilbud #{roomDiscountToDelete.Value} er slettet.", null, null);
+        }
+        catch (ApiException ex)
+        {
+            modalException = ex;
+        }
+    }
+}

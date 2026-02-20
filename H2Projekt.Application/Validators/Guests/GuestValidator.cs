@@ -2,26 +2,32 @@
 using H2Projekt.Application.Validators.Bookings;
 using H2Projekt.Domain;
 
-namespace H2Projekt.Application.Validators.Rooms
+namespace H2Projekt.Application.Validators.Guests
 {
     public class GuestValidator : AbstractValidator<Guest>
     {
         public GuestValidator()
         {
-            RuleFor(g => g.FirstName)
-                .NotEmpty().WithMessage("First name is required.")
-                .MaximumLength(50).WithMessage("First name cannot exceed 50 characters.");
-            RuleFor(g => g.LastName)
-                .NotEmpty().WithMessage("Last name is required.")
-                .MaximumLength(50).WithMessage("Last name cannot exceed 50 characters.");
-            RuleFor(g => g.Email)
-                .NotEmpty().WithMessage("Email is required.")
-                .EmailAddress().WithMessage("Invalid email format.")
-                .MaximumLength(100).WithMessage("Email cannot exceed 100 characters.");
-            RuleFor(g => g.Bookings)
-                .NotNull()
-                .WithMessage("Bookings collection cannot be null.")
-                .ForEach(booking => booking.SetValidator(new BookingValidator()));
+            RuleFor(guest => guest.FirstName)
+                .NotEmpty()
+                .WithMessage("Fornavn er påkrævet.")
+                .MaximumLength(50)
+                .WithMessage("Fornavn må ikke overstige 50 tegn.");
+            RuleFor(guest => guest.LastName)
+                .NotEmpty()
+                .WithMessage("Efternavn er påkrævet.")
+                .MaximumLength(50)
+                .WithMessage("Efternavn må ikke overstige 50 tegn.");
+            RuleFor(guest => guest.Email)
+                .NotEmpty()
+                .WithMessage("Email er påkrævet.")
+                .EmailAddress()
+                .WithMessage("Email skal være i et gyldigt format.")
+                .MaximumLength(100)
+                .WithMessage("Email må ikke overstige 100 tegn.");
+            RuleFor(guest => guest.Bookings)
+                .ForEach(booking => booking.SetValidator(new BookingValidator()))
+                .When(guest => guest.Bookings is not null && guest.Bookings.Any());
         }
     }
 }
