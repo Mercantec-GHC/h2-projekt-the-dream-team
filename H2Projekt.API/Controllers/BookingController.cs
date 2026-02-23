@@ -59,17 +59,17 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> UpdateBooking([FromServices] UpdateBookingHandler handler, [FromBody] UpdateBookingCommand updateBookingCommand)
+        public async Task<ActionResult<int>> AssignRoomToBooking([FromServices] AssignRoomToBookingHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(updateBookingCommand);
+                var roomId = await handler.HandleAsync(id);
 
-                return Ok();
+                return Ok(roomId);
             }
             catch (NonExistentException ex)
             {

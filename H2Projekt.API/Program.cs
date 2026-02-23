@@ -31,7 +31,7 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configu
 builder.Services.AddScoped<GetAllBookingsHandler>();
 builder.Services.AddScoped<GetBookingByIdHandler>();
 builder.Services.AddScoped<CreateBookingHandler>();
-builder.Services.AddScoped<UpdateBookingHandler>();
+builder.Services.AddScoped<AssignRoomToBookingHandler>();
 builder.Services.AddScoped<DeleteBookingHandler>();
 // - Guests
 builder.Services.AddScoped<GetAllGuestsHandler>();
