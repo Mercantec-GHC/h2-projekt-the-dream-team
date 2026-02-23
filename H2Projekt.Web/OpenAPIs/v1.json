@@ -1948,7 +1948,11 @@
         }
       },
       "RoomAvailabilityStatus": {
-        "type": "integer"
+        "enum": [
+          "Available",
+          "Occupied",
+          "Maintenance"
+        ]
       },
       "RoomDiscountDto": {
         "type": "object",

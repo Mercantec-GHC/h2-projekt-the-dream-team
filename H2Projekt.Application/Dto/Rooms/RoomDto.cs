@@ -1,5 +1,6 @@
 ﻿using H2Projekt.Domain;
 using H2Projekt.Domain.Enums;
+using System.Text.Json.Serialization;
 
 namespace H2Projekt.Application.Dto.Rooms
 {
@@ -8,6 +9,7 @@ namespace H2Projekt.Application.Dto.Rooms
         public int Id { get; set; }
         public string Number { get; set; } = default!;
         public RoomTypeDto RoomType { get; set; } = default!;
+        [JsonConverter(typeof(JsonStringEnumConverter))]
         public RoomAvailabilityStatus Status { get; set; }
 
         public RoomDto(Room room)

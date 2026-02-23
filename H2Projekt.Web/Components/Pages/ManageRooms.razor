@@ -42,6 +42,7 @@ else
                 <th width="100">Id</th>
                 <th width="100">Nummer</th>
                 <th width="100">Type</th>
+                <th width="100">Status</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
         </thead>
@@ -52,6 +53,7 @@ else
                     <td class="align-middle">@room.Id</td>
                     <td class="align-middle">@room.Number</td>
                     <td class="align-middle">@room.RoomType.Name</td>
+                    <td class="align-middle">@room.Status</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
                             <button type="button" class="btn btn-secondary" @onclick="() => PrepareRoomCreationOrUpdate(room)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
