@@ -14,7 +14,6 @@ namespace H2Projekt.Infrastructure.Repositories
         public async Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default)
         {
             return await _appDbContext.Rooms
-                .Where(r => r.Status != RoomAvailabilityStatus.Maintenance)
                 .Include(r => r.RoomType)
                 .Include(r => r.Bookings)
                     .ThenInclude(b => b.RoomType)
