@@ -12,6 +12,9 @@ namespace H2Projekt.Application.Dto.Bookings
         public DateOnly FromDate { get; set; }
         public DateOnly ToDate { get; set; }
         public decimal PriceLocked { get; set; }
+        public int NumberOfAdults { get; set; }
+        public int NumberOfChildren { get; set; }
+        public bool TravelingWithPets { get; set; }
         public RoomWithoutBookingsDto? Room { get; set; }
 
         public BookingDto(Booking booking)
@@ -22,6 +25,9 @@ namespace H2Projekt.Application.Dto.Bookings
             FromDate = booking.FromDate;
             ToDate = booking.ToDate;
             PriceLocked = booking.PriceLocked;
+            NumberOfAdults = booking.NumberOfAdults;
+            NumberOfChildren = booking.NumberOfChildren;
+            TravelingWithPets = booking.TravelingWithPets;
 
             if (booking.Room is not null)
             {

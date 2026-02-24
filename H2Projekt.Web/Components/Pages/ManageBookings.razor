@@ -41,6 +41,9 @@ else
                 <th width="100">Fra dato</th>
                 <th width="100">Til dato</th>
                 <th width="100">Total pris</th>
+                <th width="100">Antal voksne</th>
+                <th width="100">Antal børn</th>
+                <th width="100">Kæledyr</th>
                 <th width="100">Tildelt værelse</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
@@ -55,6 +58,9 @@ else
                     <td class="align-middle">@booking.FromDate.ToString("dd/MM/yyyy")</td>
                     <td class="align-middle">@booking.ToDate.ToString("dd/MM/yyyy")</td>
                     <td class="align-middle">@booking.PriceLocked.ToString("C")</td>
+                    <td class="align-middle">@booking.NumberOfAdults</td>
+                    <td class="align-middle">@booking.NumberOfChildren</td>
+                    <td class="align-middle">@((booking.TravelingWithPets ? "Ja" : "Nej"))</td>
                     <td class="align-middle">@(booking.Room?.Number ?? "")</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">

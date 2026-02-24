@@ -1684,6 +1684,25 @@
             ],
             "format": "double"
           },
+          "numberOfAdults": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "numberOfChildren": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "travelingWithPets": {
+            "type": "boolean"
+          },
           "room": {
             "oneOf": [
               {
@@ -1764,6 +1783,25 @@
           "toDate": {
             "type": "string",
             "format": "date"
+          },
+          "numberOfAdults": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "numberOfChildren": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "travelingWithPets": {
+            "type": "boolean"
           }
         }
       },
