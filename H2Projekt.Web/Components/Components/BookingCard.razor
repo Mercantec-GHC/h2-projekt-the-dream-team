@@ -1,0 +1,27 @@
+﻿<div class="card d-flex flex-column p-3 @(isUnavailable ? "opacity-50 grayscale" : "")">
+    <h5 class="fw-bold">@roomType.Name</h5>
+
+    <p class="text-body-secondary">@roomType.Description</p>
+
+    <small class="mb-3 mt-auto text-body-secondary">Pris: @roomType.PricePerNight.ToString("C") pr. nat</small>
+
+    @if (isUnavailable)
+    {
+        <button class="btn btn-primary" disabled>Ikke tilgængelig</button>
+    }
+    else
+    {
+        <button class="btn btn-primary" @onclick="() => OnBook.InvokeAsync(roomType)">Book nu</button>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public RoomTypeDto roomType { get; set; }
+
+    [Parameter]
+    public bool isUnavailable { get; set; } = false;
+
+    [Parameter]
+    public EventCallback<RoomTypeDto> OnBook { get; set; }
+}

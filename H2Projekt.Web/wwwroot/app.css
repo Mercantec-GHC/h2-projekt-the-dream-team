@@ -57,6 +57,9 @@ h1:focus {
 
 /* Ekstra */
 
+.grayscale {
+    filter: grayscale(100%);
+}
 
 .w-fit {
     width: fit-content !important;

@@ -10,25 +10,26 @@
 
         public DateOnly FromDate { get; private set; }
         public DateOnly ToDate { get; private set; }
-        public decimal PriceLocked { get; private set; }
         public int NumberOfAdults { get; private set; }
         public int NumberOfChildren { get; private set; }
         public bool TravelingWithPets { get; private set; }
+        public decimal PriceLocked { get; private set; }
+
         public int? RoomId { get; private set; }
         public Room? Room { get; private set; }
 
         public Booking() { }
 
-        public Booking(int guestId, int roomTypeId, DateOnly fromDate, DateOnly toDate, decimal priceLocked, int numberOfAdults, int numberOfChildren, bool travelingWithPets)
+        public Booking(int guestId, int roomTypeId, DateOnly fromDate, DateOnly toDate, int numberOfAdults, int numberOfChildren, bool travelingWithPets, decimal priceLocked)
         {
             GuestId = guestId;
             RoomTypeId = roomTypeId;
             FromDate = fromDate;
             ToDate = toDate;
-            PriceLocked = priceLocked;
             NumberOfAdults = numberOfAdults;
             NumberOfChildren = numberOfChildren;
             TravelingWithPets = travelingWithPets;
+            PriceLocked = priceLocked;
         }
 
         public void AssignRoom(Room room)

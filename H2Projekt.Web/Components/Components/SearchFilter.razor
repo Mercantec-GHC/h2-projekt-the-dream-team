@@ -1,5 +1,7 @@
 ﻿@rendermode InteractiveServer
 
+@inject ApiClient Api
+
 <div class="d-flex flex-wrap justify-content-center gap-2 w-fit">
     <div class="w-fit">
         <InputDate class="form-control" @bind-Value="fromDate" />
@@ -53,16 +55,20 @@
     </div>
 
     <div>
-        <button class="btn btn-primary" @onclick="Search">Søg</button>
+        <button class="btn btn-primary" @onclick="Search">
+            <span class="bi bi-search"></span>
+            Søg
+        </button>
     </div>
 </div>
 
 @code {
-    private RoomTypeDto? roomType = null;
+    [Parameter]
+    public EventCallback<AvailableRoomTypesForStayDto> AvailableRoomTypesForStayChanged { get; set; }
 
-    private DateTime? fromDate = null;
+    private DateTime fromDate = DateTime.Today;
 
-    private DateTime? toDate = null;
+    private DateTime toDate = DateTime.Today.AddDays(1);
 
     private int numberOfAdults = 2;
 
@@ -70,7 +76,22 @@
 
     private bool travelingWithPets = false;
 
-    private void Search()
+    private async Task Search()
     {
+        try
+        {
+            var lists = await Api.GetAvailableRoomTypesForStayAsync(fromDate, toDate, numberOfAdults, numberOfChildren, travelingWithPets);
+
+            if (lists is null)
+            {
+                return;
+            }
+
+            await AvailableRoomTypesForStayChanged.InvokeAsync(lists);
+        }
+        catch (ApiException ex)
+        {
+
+        }
     }
 }
