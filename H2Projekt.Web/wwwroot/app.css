@@ -94,7 +94,7 @@ h1:focus {
 }
 
 .max-w-diagram {
-    max-width: calc(100vw - 19.25rem);
+    max-width: calc(100vw - 15.375rem);
 }
 
 .h-fit {

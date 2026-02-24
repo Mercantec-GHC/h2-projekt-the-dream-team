@@ -58,9 +58,9 @@ else
                     <td class="align-middle">@roomType.PricePerNight.ToString("C")</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-secondary" @onclick="() => PrepareRoomTypeCreationOrUpdate(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareRoomTypeCreationOrUpdate(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
 
-                            <button class="btn btn-danger" @onclick="() => PrepareRoomTypeDeletion(roomType)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => PrepareRoomTypeDeletion(roomType)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
                         </div>
                     </td>
                 </tr>
