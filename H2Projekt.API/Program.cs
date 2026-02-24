@@ -54,6 +54,7 @@ builder.Services.AddScoped<UpdateRoomHandler>();
 builder.Services.AddScoped<DeleteRoomHandler>();
 // - Room types
 builder.Services.AddScoped<GetAllRoomTypesHandler>();
+builder.Services.AddScoped<GetAvailableRoomTypesForStayHandler>();
 builder.Services.AddScoped<CreateRoomTypeHandler>();
 builder.Services.AddScoped<UpdateRoomTypeHandler>();
 builder.Services.AddScoped<DeleteRoomTypeHandler>();

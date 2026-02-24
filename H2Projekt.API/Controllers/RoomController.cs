@@ -113,6 +113,22 @@ namespace H2Projekt.API.Controllers
             return Ok(roomTypes);
         }
 
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<AvailableRoomTypesForStayDto>> GetAvailableRoomTypesForStay([FromServices] GetAvailableRoomTypesForStayHandler handler, [FromQuery] GetAvailableRoomTypesForStayCommand getAvailableRoomTypesForStayCommand)
+        {
+            try
+            {
+                var availableRoomTypesForStay = await handler.HandleAsync(getAvailableRoomTypesForStayCommand);
+
+                return Ok(availableRoomTypesForStay);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]

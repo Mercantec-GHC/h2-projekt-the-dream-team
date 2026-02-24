@@ -5,7 +5,7 @@
         public string Name { get; private set; } = default!;
         public string? Description { get; private set; }
         public int MaxOccupancy { get; private set; }
-        public decimal PricePerNight { get; private set; }
+        public decimal PricePerNight { get; private set; } 
 
         public RoomType() { }
 

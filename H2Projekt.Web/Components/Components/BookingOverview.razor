@@ -126,18 +126,19 @@
     private BookingDto? GetActiveBookingForRoomOnDate(RoomDto room, DateOnly date)
     {
         return Bookings.FirstOrDefault(b =>
-            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id))
-            && b.FromDate.ToDateOnly() <= date && b.ToDate.ToDateOnly() >= date
+            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) && 
+            b.FromDate.ToDateOnly() <= date && 
+            b.ToDate.ToDateOnly() >= date
         );
     }
 
     private bool HasOverlappingBookingForRoom(BookingDto booking, RoomDto room)
     {
         return Bookings.Any(b =>
-            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id))
-            && b.Id != booking.Id
-            && b.FromDate.ToDateOnly() <= booking.ToDate.ToDateOnly()
-            && b.ToDate.ToDateOnly() >= booking.FromDate.ToDateOnly()
+            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) && 
+            b.Id != booking.Id && 
+            b.FromDate.ToDateOnly() <= booking.ToDate.ToDateOnly() && 
+            b.ToDate.ToDateOnly() >= booking.FromDate.ToDateOnly()
         );
     }
 }
