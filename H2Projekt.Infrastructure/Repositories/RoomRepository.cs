@@ -1,6 +1,5 @@
 ﻿using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
-using H2Projekt.Domain.Enums;
 using Microsoft.EntityFrameworkCore;
 
 namespace H2Projekt.Infrastructure.Repositories
@@ -15,7 +14,7 @@ namespace H2Projekt.Infrastructure.Repositories
         {
             return await _appDbContext.Rooms
                 .Include(r => r.RoomType)
-                .Include(r => r.Bookings)
+                .Include(r => r.Booking)
                     .ThenInclude(b => b.RoomType)
                 .OrderBy(r => r.Id)
                 .ToListAsync(cancellationToken);
@@ -26,7 +25,7 @@ namespace H2Projekt.Infrastructure.Repositories
             return await _appDbContext.Rooms
                 .Where(r => r.RoomTypeId == roomTypeId)
                 .Include(r => r.RoomType)
-                .Include(r => r.Bookings)
+                .Include(r => r.Booking)
                     .ThenInclude(b => b.RoomType)
                 .OrderBy(r => r.Id)
                 .ToListAsync(cancellationToken);
@@ -36,7 +35,7 @@ namespace H2Projekt.Infrastructure.Repositories
         {
             return await _appDbContext.Rooms
                 .Include(r => r.RoomType)
-                .Include(r => r.Bookings)
+                .Include(r => r.Booking)
                     .ThenInclude(b => b.RoomType)
                 .SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
@@ -44,10 +43,10 @@ namespace H2Projekt.Infrastructure.Repositories
         public async Task<Room?> GetRoomByNumberAsync(string number, CancellationToken cancellationToken = default)
         {
             return await _appDbContext.Rooms
-                .Include(r => r.RoomType)
-                .Include(r => r.Bookings)
-                    .ThenInclude(b => b.RoomType)
-                .SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
+            .Include(r => r.RoomType)
+            .Include(r => r.Booking)
+                .ThenInclude(b => b.RoomType)
+            .SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
         }
 
         public async Task<bool> RoomExistsAsync(string number, CancellationToken cancellationToken = default)

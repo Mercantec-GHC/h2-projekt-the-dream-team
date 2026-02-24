@@ -67,12 +67,33 @@ namespace H2Projekt.Infrastructure
                 .HasForeignKey(b => b.GuestId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            // On delete behavior for bookings when a room type is deleted - restrict delete
+            modelBuilder.Entity<Booking>()
+                .HasOne(b => b.RoomType)
+                .WithMany(rt => rt.Bookings)
+                .HasForeignKey(b => b.RoomTypeId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // On delete behavior for bookings when a room is deleted - restrict delete
             modelBuilder.Entity<Booking>()
                 .HasOne(b => b.Room)
-                .WithMany(r => r.Bookings)
-                .HasForeignKey(b => b.RoomId)
+                .WithOne(r => r.Booking)
+                .HasForeignKey<Booking>(b => b.RoomId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            // On delete behavior for rooms when a room type is deleted - cascade delete
+            modelBuilder.Entity<Room>()
+                .HasOne(r => r.RoomType)
+                .WithMany(rt => rt.Rooms)
+                .HasForeignKey(r => r.RoomTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // On delete behavior for room discounts when a room type is deleted - cascade delete
+            modelBuilder.Entity<RoomDiscount>()
+                .HasOne(rd => rd.RoomType)
+                .WithMany(rt => rt.RoomDiscounts)
+                .HasForeignKey(rd => rd.RoomTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

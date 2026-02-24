@@ -8,6 +8,15 @@
         public bool PetsAllowed { get; private set; }
         public decimal PricePerNight { get; private set; }
 
+        private readonly List<Booking> bookings = new List<Booking>();
+        public IReadOnlyCollection<Booking> Bookings => bookings.AsReadOnly();
+
+        private readonly List<Room> rooms = new List<Room>();
+        public IReadOnlyCollection<Room> Rooms => rooms.AsReadOnly();
+
+        private readonly List<RoomDiscount> roomDiscounts = new List<RoomDiscount>();
+        public IReadOnlyCollection<RoomDiscount> RoomDiscounts => roomDiscounts.AsReadOnly();
+
         public RoomType() { }
 
         public RoomType(string name, string? description, int maxOccupancy, bool petsAllowed, decimal pricePerNight)

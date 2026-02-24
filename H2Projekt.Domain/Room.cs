@@ -10,7 +10,7 @@ namespace H2Projekt.Domain
         public RoomType RoomType { get; private set; } = default!;
 
         public RoomAvailabilityStatus Status { get; private set; }
-        public ICollection<Booking> Bookings { get; private set; } = new List<Booking>();
+        public Booking Booking { get; private set; }
 
         public Room() { }
 
