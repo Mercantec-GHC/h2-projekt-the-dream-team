@@ -48,7 +48,7 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             var pricePerNight = discount is not null ? discount.PricePerNight : roomType.PricePerNight;
 
-            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, pricePerNight);
+            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, pricePerNight, request.NumberOfAdults, request.NumberOfChildren, request.TravelingWithPets);
 
             guest.AddBooking(booking);
 
