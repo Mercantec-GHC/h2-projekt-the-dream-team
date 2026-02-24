@@ -138,6 +138,16 @@ else
 
             var room = rooms.First(r => r.Id == roomId);
 
+            var bookingToUpdate = bookings.First(b => b.Id == booking.Id);
+
+            bookingToUpdate.Room = new RoomWithoutBookingsDto()
+            {
+                Id = room.Id,
+                Number = room.Number,
+                RoomType = room.RoomType,
+                Status = room.Status
+            };
+
             exception = new ApiException(null, 200, $"Værelse #{room.Number} er tildelt booking #{booking.Id}.", null, null);
 
             StateHasChanged();
