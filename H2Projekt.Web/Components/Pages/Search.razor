@@ -2,7 +2,19 @@
 @rendermode InteractiveServer
 @inherits BasePage
 
+@inject ApiClient Api
+
 <PageTitle>Search</PageTitle>
+
+@if (exception is not null)
+{
+    <div class="d-flex flex-column gap-2 mb-5">
+        @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+        {
+            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+        }
+    </div>
+}
 
 <div class="d-flex justify-content-center align-items-center min-h-screen">
     <div class="d-flex flex-column gap-5 align-items-center">
@@ -16,7 +28,12 @@
         }
 
         <div class="card p-2">
-            <SearchFilter AvailableRoomTypesForStayChanged="(value) => availableRoomTypesForStay = value" />
+            <SearchFilter @bind-FromDate="fromDate"
+                          @bind-ToDate="toDate"
+                          @bind-NumberOfAdults="numberOfAdults"
+                          @bind-NumberOfChildren="numberOfChildren"
+                          @bind-TravelingWithPets="travelingWithPets"
+                          AvailableRoomTypesForStayChanged="(value) => availableRoomTypesForStay = value" />
         </div>
 
         @if (availableRoomTypesForStay is not null)
@@ -29,7 +46,7 @@
                     <div class="d-grid gap-3 w-fit" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                         @foreach (var roomType in availableRoomTypesForStay.SuitableRoomTypes)
                         {
-                            <BookingCard roomType="roomType" OnBook="OnBook" />
+                            <BookingCard RoomType="roomType" OnBook="PrepareBookingCreation" />
                         }
                     </div>
 
@@ -41,7 +58,7 @@
                     {
                         var isUnavailable = availableRoomTypesForStay.UnavailableRoomTypes.Any(unavailableRoomType => unavailableRoomType.Id == roomType.Id);
 
-                        <BookingCard roomType="roomType" isUnavailable="isUnavailable" OnBook="OnBook" />
+                        <BookingCard RoomType="roomType" IsUnavailable="isUnavailable" OnBook="PrepareBookingCreation" />
                     }
                 </div>
             </div>
@@ -49,21 +66,128 @@
     </div>
 </div>
 
+<div class="modal modal-lg fade" id="createBookingModal" tabindex="-1" aria-labelledby="createBookingModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="createBookingModalLabel">Book Værelse</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
+                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="modal-body my-3 p-0">
+                @if (modalException is not null)
+                {
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                        {
+                            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                        }
+                    </div>
+                }
+
+                @if (roomType is not null)
+                {
+                    <CreateBooking @bind-Guest="guest" RoomType="roomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
+                }
+            </div>
+
+            <div class="d-flex gap-3">
+                <button type="button" class="btn btn-success w-50" @onclick="BookRoom">Book Værelse</button>
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+            </div>
+        </div>
+    </div>
+</div>
 @code {
-    private AvailableRoomTypesForStayDto? availableRoomTypesForStay = null;
+    private ApiException? exception;
+    private ApiException? modalException;
 
-    private RoomTypeDto? roomTypeToBook = null;
+    private AvailableRoomTypesForStayDto? availableRoomTypesForStay;
 
-    private async Task OnBook(RoomTypeDto roomType)
+    private GuestDto guest = new GuestDto();
+
+    private RoomTypeDto? roomType;
+
+    private DateTime fromDate = DateTime.Today;
+
+    private DateTime toDate = DateTime.Today.AddDays(1);
+
+    private DateTime finalFromDate = DateTime.Today;
+
+    private DateTime finalToDate = DateTime.Today.AddDays(1);
+
+    private int numberOfAdults = 1;
+
+    private int numberOfChildren = 0;
+
+    private bool travelingWithPets = false;
+
+    private async Task PrepareBookingCreation(RoomTypeDto value)
     {
-        roomTypeToBook = new RoomTypeDto()
+        guest = new GuestDto();
+
+        roomType = new RoomTypeDto()
         {
-            Id = roomType.Id,
-            Name = roomType.Name,
-            Description = roomType.Description,
-            MaxOccupancy = roomType.MaxOccupancy,
-            // PetsAllowed = roomType.PetsAllowed,
-            PricePerNight = roomType.PricePerNight
+            Id = value.Id,
+            Name = value.Name,
+            Description = value.Description,
+            MaxOccupancy = value.MaxOccupancy,
+            PetsAllowed = value.PetsAllowed,
+            PricePerNight = value.PricePerNight
         };
+
+        finalFromDate = fromDate;
+        finalToDate = toDate;
+    }
+
+    private async Task BookRoom()
+    {
+        modalException = null;
+
+        if (roomType is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (guest.Id == 0)
+            {
+                guest.Id = await Api.CreateGuestAsync(new CreateGuestCommand()
+                {
+                    FirstName = guest.FirstName,
+                    LastName = guest.LastName,
+                    Email = guest.Email
+                });
+            }
+
+            var bookingId = await Api.CreateBookingAsync(new CreateBookingCommand()
+            {
+                GuestId = guest.Id,
+                RoomTypeId = roomType.Id,
+                FromDate = new DateTimeOffset(finalFromDate),
+                ToDate = new DateTimeOffset(finalToDate),
+                NumberOfAdults = numberOfAdults,
+                NumberOfChildren = numberOfChildren,
+                TravelingWithPets = travelingWithPets
+            });
+
+            await JS.InvokeVoidAsync("hideModal", "#createBookingModal");
+
+            guest = new GuestDto();
+
+            exception = new ApiException(null, 200, $"Værelsestype booket fra {fromDate:dd/MM/yyyy} til {toDate:dd/MM/yyyy} for {numberOfAdults + numberOfChildren} gæster! Din booking reference er #{bookingId}.", null, null);
+
+            StateHasChanged();
+        }
+        catch (ApiException ex)
+        {
+            modalException = ex;
+        }
     }
 }

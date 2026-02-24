@@ -2,12 +2,12 @@
 
 @inject ApiClient Api
 
-<InputSelect @bind-Value:get="_roomTypeId" @bind-Value:set="(value) => SetRoomType(value)" class="form-control">
+<InputSelect @bind-Value:get="roomTypeId" @bind-Value:set="(value) => SetRoomType(value)" class="form-control">
     <option value="">-- Vælg en værelsestype --</option>
 
     @foreach (var type in roomTypes)
     {
-        @if (type.Id.ToString() == _roomTypeId)
+        @if (type.Id.ToString() == roomTypeId)
         {
             <option value="@type.Id" selected>@type.Name</option>
 
@@ -25,7 +25,7 @@
     [Parameter]
     public EventCallback<RoomTypeDto?> OnRoomTypeChanged { get; set; }
 
-    private string _roomTypeId = string.Empty;
+    private string roomTypeId = string.Empty;
 
     private ICollection<RoomTypeDto> roomTypes = Array.Empty<RoomTypeDto>();
 
@@ -68,7 +68,7 @@
             return;
         }
 
-        _roomTypeId = roomTypeId;
+        this.roomTypeId = roomTypeId;
 
         if (invoke)
         {
@@ -86,7 +86,7 @@
 
     private async Task Reset()
     {
-        _roomTypeId = string.Empty;
+        roomTypeId = string.Empty;
 
         await OnRoomTypeChanged.InvokeAsync(null);
 

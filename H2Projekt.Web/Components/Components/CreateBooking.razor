@@ -1,0 +1,92 @@
+﻿@rendermode InteractiveServer
+
+@inject ApiClient Api
+@inject IJSRuntime JS
+
+<div class="d-flex gap-3">
+    <div class="card p-3 d-flex flex-column gap-3 w-100">
+        <h5 class="mb-0">Dine oplysninger</h5>
+
+        <GuestFields Model="Guest" EmailChanged="FindAndSetGuest" />
+    </div>
+
+    <div class="card p-3 d-flex flex-column gap-3 w-100">
+        <h5 class="mb-0">Vælg datoer</h5>
+
+        <div>
+            <label class="form-label">Fra dato</label>
+
+            <InputDate class="form-control" @bind-Value:get="FromDate" @bind-Value:set="SetFromDate" /> 
+        </div>
+
+        <div>
+            <label class="form-label">Til dato</label>
+
+            <InputDate class="form-control" @bind-Value:get="ToDate" @bind-Value:set="SetToDate" />
+        </div>
+
+        <div class="mt-auto">
+            Total price: <span class="fw-bold">@totalPrice.ToString("C")</span>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public GuestDto Guest { get; set; } 
+
+    [Parameter]
+    public EventCallback<GuestDto> GuestChanged { get; set; }
+
+    [Parameter]
+    public RoomTypeDto? RoomType { get; set; }
+
+    [Parameter]
+    public DateTime FromDate { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> ToDateChanged { get; set; }
+
+    [Parameter]
+    public DateTime ToDate { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> FromDateChanged { get; set; }
+
+    private decimal totalPrice => RoomType is not null ? (decimal)(RoomType.PricePerNight * ((ToDate - FromDate).Days < 0 ? 0 : (ToDate - FromDate).Days)) : 0M;
+
+    private ICollection<GuestDto> guests = new List<GuestDto>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        guests = await Api.GetAllGuestsAsync();
+    }
+
+    private async Task FindAndSetGuest(string email)
+    {
+        var foundGuest = guests.FirstOrDefault(g => g.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+        if (foundGuest is null)
+        {
+            return;
+        }
+
+        Guest = foundGuest;
+
+        await GuestChanged.InvokeAsync(foundGuest);
+    }
+
+    private async Task SetFromDate(DateTime value)
+    {
+        FromDate = value;
+
+        await FromDateChanged.InvokeAsync(value);
+    }
+
+    private async Task SetToDate(DateTime value)
+    {
+        ToDate = value;
+
+        await ToDateChanged.InvokeAsync(value);
+    }
+}

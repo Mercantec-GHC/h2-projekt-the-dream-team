@@ -54,10 +54,10 @@ else
             </div>
 
             <div class="modal-body my-3 p-0">
-                <InputSelect @bind-Value:get="_selectedGuestId" @bind-Value:set="SetSelectedGuest" class="form-control">
+                <InputSelect @bind-Value:get="selectedGuestId" @bind-Value:set="SetSelectedGuest" class="form-control">
                     @foreach (var guest in guests)
                     {
-                        @if (guest.Id == _selectedGuestId)
+                        @if (guest.Id == selectedGuestId)
                         {
                             <option value="@guest.Id" selected>@guest.FirstName @guest.LastName (@guest.Email)</option>
 
@@ -80,7 +80,7 @@ else
 @code {
     private ICollection<GuestDto> guests = Array.Empty<GuestDto>();
 
-    private int _selectedGuestId;
+    private int selectedGuestId;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -93,19 +93,19 @@ else
 
         var selectedGuest = await GuestService.GetGuestFromLocalStorage();
 
-        _selectedGuestId = selectedGuest?.Id ?? guests.FirstOrDefault()?.Id ?? 0;
+        selectedGuestId = selectedGuest?.Id ?? guests.FirstOrDefault()?.Id ?? 0;
 
         StateHasChanged();
     }
 
     private void SetSelectedGuest(int id)
     {
-        _selectedGuestId = id;
+        selectedGuestId = id;
     }
 
     private async Task SaveSelectedGuest()
     {
-        await GuestService.SelectGuest(guests.FirstOrDefault(guest => guest.Id == _selectedGuestId));
+        await GuestService.SelectGuest(guests.FirstOrDefault(guest => guest.Id == selectedGuestId));
 
         StateHasChanged();
     }

@@ -6,7 +6,7 @@
             <tr>
                 <th></th>
 
-                @foreach (var d in Dates)
+                @foreach (var d in dates)
                 {
                     <th class="h-2rem min-w-10rem text-center">@d.ToString("dd/MM/yyyy")</th>
                 }
@@ -24,7 +24,7 @@
                 <tr>
                     <td class="position-relative z-0 bg-primary-subtle border-end-0 p-0 text-center">@roomType.Name</td>
 
-                    <td class="position-relative z-0 bg-primary-subtle border-start-0" colspan="@(Dates.Count)"></td>
+                    <td class="position-relative z-0 bg-primary-subtle border-start-0" colspan="@(dates.Count)"></td>
                 </tr>
 
                 @foreach (var room in Rooms.Where(r => r.RoomType.Id == roomType.Id))
@@ -32,9 +32,9 @@
                     <tr>
                         <td class="position-relative z-0 h-2rem min-w-10rem text-center">@room.Number</td>
 
-                        @for (int i = 0; i < Dates.Count; i++)
+                        @for (int i = 0; i < dates.Count; i++)
                         {
-                            var date = Dates[i];
+                            var date = dates[i];
 
                             var booking = GetActiveBookingForRoomOnDate(room, date);
 
@@ -72,9 +72,9 @@
     [Parameter]
     public ICollection<BookingDto> Bookings { get; set; }
 
-    private Dictionary<int, int> BookingsWithNoRoom = new();
+    private Dictionary<int, int> bookingsWithNoRoom = new();
 
-    private List<DateOnly> Dates = new();
+    private List<DateOnly> dates = new();
 
     protected override void OnInitialized()
     {
@@ -87,14 +87,14 @@
 
     private void BuildDates()
     {
-        Dates.Clear();
+        dates.Clear();
 
         var min = Bookings.Min(b => b.FromDate.ToDateOnly());
         var max = Bookings.Max(b => b.ToDate.ToDateOnly());
 
         for (var date = min; date <= max; date = date.AddDays(1))
         {
-            Dates.Add(date);
+            dates.Add(date);
         }
     }
 
@@ -102,7 +102,7 @@
     {
         foreach (var booking in Bookings.Where(b => b.Room is null).OrderBy(b => b.Id))
         {
-            if (BookingsWithNoRoom.ContainsKey(booking.Id))
+            if (bookingsWithNoRoom.ContainsKey(booking.Id))
             {
                 continue;
             }
@@ -115,7 +115,7 @@
 
                 if (!overlaps)
                 {
-                    BookingsWithNoRoom[booking.Id] = room.Id;
+                    bookingsWithNoRoom[booking.Id] = room.Id;
 
                     break;
                 }
@@ -126,7 +126,7 @@
     private BookingDto? GetActiveBookingForRoomOnDate(RoomDto room, DateOnly date)
     {
         return Bookings.FirstOrDefault(b =>
-            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) && 
+            (b.Room?.Id == room.Id || (b.Room is null && bookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) && 
             b.FromDate.ToDateOnly() <= date && 
             b.ToDate.ToDateOnly() >= date
         );
@@ -135,7 +135,7 @@
     private bool HasOverlappingBookingForRoom(BookingDto booking, RoomDto room)
     {
         return Bookings.Any(b =>
-            (b.Room?.Id == room.Id || (b.Room is null && BookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) && 
+            (b.Room?.Id == room.Id || (b.Room is null && bookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) && 
             b.Id != booking.Id && 
             b.FromDate.ToDateOnly() <= booking.ToDate.ToDateOnly() && 
             b.ToDate.ToDateOnly() >= booking.FromDate.ToDateOnly()

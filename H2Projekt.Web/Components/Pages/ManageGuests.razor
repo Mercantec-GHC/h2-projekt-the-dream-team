@@ -93,7 +93,7 @@ else
 
                 @if (guestToEdit is not null)
                 {
-                    <GuestFields Model="guestToEdit" />
+                    <GuestFields @bind-Value="guestToEdit" />
                 }
             </div>
 

@@ -49,9 +49,9 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(bookingId);
             }
-            catch (DuplicateException ex)
+            catch (NonExistentException ex)
             {
-                return Conflict(ex.Message);
+                return NotFound(ex.Message);
             }
             catch (ValidationException ex)
             {
