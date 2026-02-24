@@ -1988,6 +1988,9 @@
             ],
             "format": "int32"
           },
+          "petsAllowed": {
+            "type": "boolean"
+          },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
@@ -2178,6 +2181,9 @@
             ],
             "format": "int32"
           },
+          "petsAllowed": {
+            "type": "boolean"
+          },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
@@ -2329,6 +2335,9 @@
               "string"
             ],
             "format": "int32"
+          },
+          "petsAllowed": {
+            "type": "boolean"
           },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",

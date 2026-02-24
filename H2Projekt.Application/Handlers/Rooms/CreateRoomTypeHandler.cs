@@ -26,7 +26,7 @@ namespace H2Projekt.Application.Handlers.Rooms
                 throw new DuplicateException($"Room type with name {request.Name} already exists.");
             }
 
-            var roomType = new RoomType(request.Name, request.Description, request.MaxOccupancy, request.PricePerNight);
+            var roomType = new RoomType(request.Name, request.Description, request.MaxOccupancy, request.PetsAllowed, request.PricePerNight);
 
             var validationResult = await _validator.ValidateAsync(roomType);
 

@@ -24,6 +24,12 @@
 
         <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
     </div>
+
+    <div>
+        <label class="form-label">Kæledyr tilladt</label>
+
+        <PetsAllowedDropdown PetsAllowed="Model.PetsAllowed" OnRoomTypeChanged="(value) => Model.PetsAllowed = value" />
+    </div>
 </div>
 
 @code {

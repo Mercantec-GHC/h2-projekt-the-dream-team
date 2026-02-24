@@ -43,6 +43,7 @@ else
                 <th width="100">Navn</th>
                 <th width="100">Beskrivelse</th>
                 <th width="100">Maks personer</th>
+                <th width="100">Kæledyr tilladt</th>
                 <th width="100">Pris pr. nat</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
@@ -55,6 +56,7 @@ else
                     <td class="align-middle">@roomType.Name</td>
                     <td class="align-middle">@roomType.Description</td>
                     <td class="align-middle">@roomType.MaxOccupancy</td>
+                    <td class="align-middle">@((roomType.PetsAllowed ? "Ja" : "Nej"))</td>
                     <td class="align-middle">@roomType.PricePerNight.ToString("C")</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
@@ -164,6 +166,7 @@ else
             roomTypeToEdit.Name = roomType.Name;
             roomTypeToEdit.Description = roomType.Description;
             roomTypeToEdit.MaxOccupancy = roomType.MaxOccupancy;
+            roomTypeToEdit.PetsAllowed = roomType.PetsAllowed;
             roomTypeToEdit.PricePerNight = roomType.PricePerNight;
         }
     }
@@ -193,6 +196,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
                     PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
@@ -202,6 +206,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
                     PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
@@ -215,6 +220,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
                     PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
@@ -225,6 +231,7 @@ else
                     roomType.Name = roomTypeToEdit.Name;
                     roomType.Description = roomTypeToEdit.Description;
                     roomType.MaxOccupancy = roomTypeToEdit.MaxOccupancy;
+                    roomType.PetsAllowed = roomTypeToEdit.PetsAllowed;
                     roomType.PricePerNight = roomTypeToEdit.PricePerNight;
 
                     exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToEdit.Name}\" er opdateret.", null, null);
