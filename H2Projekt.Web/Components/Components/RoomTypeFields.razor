@@ -20,18 +20,18 @@
     </div>
 
     <div>
-        <label class="form-label">Pris pr. nat</label>
-
-        <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
-    </div>
-
-    <div>
         <label class="form-label">Kæledyr tilladt</label>
 
         <InputSelect @bind-Value="Model.PetsAllowed" class="form-select">
             <option value="true">Ja</option>
             <option value="false">Nej</option>
         </InputSelect>
+    </div>
+
+    <div>
+        <label class="form-label">Pris pr. nat</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
     </div>
 </div>
 
