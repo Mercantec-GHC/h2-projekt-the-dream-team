@@ -143,7 +143,7 @@
 
     private async Task PrepareBookingCreation(RoomTypeDto value)
     {
-        guest = new GuestDto();
+        guest = GuestService.SelectedGuest ?? new GuestDto();
 
         roomType = new RoomTypeDto()
         {
