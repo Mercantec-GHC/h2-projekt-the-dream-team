@@ -27,9 +27,11 @@ namespace H2Projekt.Application.Handlers.Bookings
                 throw new NonExistentException($"Room type with id {request.RoomTypeId} doesn't exist.");
             }
 
-            var isRoomTypeAvailable = await _bookingRepository.IsRoomTypeAvailableAsync(roomType, request.FromDate, request.ToDate, cancellationToken);
+            var rooms = await _roomRepository.GetAllRoomsByRoomTypeAsync(roomType.Id, cancellationToken);
 
-            if (!isRoomTypeAvailable)
+            var bookings = await _bookingRepository.GetAllBookingsForRoomTypeAsync(roomType.Id, cancellationToken);
+
+            if (!rooms.Any() || bookings.Count(booking => booking.FromDate <= request.ToDate && booking.ToDate >= request.FromDate) >= rooms.Count)
             {
                 throw new NonExistentException("There are no available rooms of the selected type for the given dates.");
             }
@@ -43,9 +45,7 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             var discount = await _roomRepository.GetRoomDiscountForPeriodAsync(roomType.Id, request.FromDate, request.ToDate, cancellationToken);
 
-            var pricePerNight = discount is not null ? discount.PricePerNight : roomType.PricePerNight;
-
-            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, request.NumberOfAdults, request.NumberOfChildren, request.TravelingWithPets, pricePerNight);
+            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, request.NumberOfAdults, request.NumberOfChildren, request.TravelingWithPets, discount?.PricePerNight ?? roomType.PricePerNight);
 
             guest.AddBooking(booking);
 
