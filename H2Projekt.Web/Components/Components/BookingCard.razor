@@ -6,9 +6,20 @@
 
         <ul class="p-0 mb-3 mt-auto fs-7">
             <li class="mb-1 text-body-secondary d-flex">
-                <span class="w-100">Pris:</span>
+                <span class="w-100">Pris pr. nat:</span>
 
-                <span class="text-nowrap text-body fw-bold">@RoomType.PricePerNight.ToString("C") pr. nat</span>
+                <div class="d-flex text-nowrap text-body fw-bold">
+                    @if (RoomDiscount is not null && RoomDiscount.PricePerNight > 0)
+                    {
+                        <span class="text-danger">@RoomDiscount.PricePerNight.ToString("C")&nbsp;</span>
+
+                        <span class="text-decoration-line-through opacity-50">@RoomType.PricePerNight.ToString("C")</span>
+                    }
+                    else
+                    {
+                        <span>@RoomType.PricePerNight.ToString("C")</span>
+                    }
+                </div>
             </li>
 
             <li class="text-body-secondary d-flex">
@@ -38,6 +49,9 @@
 @code {
     [Parameter]
     public RoomTypeDto RoomType { get; set; }
+
+    [Parameter]
+    public RoomDiscountDto? RoomDiscount { get; set; }
 
     [Parameter]
     public bool IsUnavailable { get; set; } = false;

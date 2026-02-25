@@ -4,7 +4,7 @@
 
 @inject ApiClient Api
 
-<PageTitle>Search</PageTitle>
+<PageTitle>Søg</PageTitle>
 
 @if (exception is not null)
 {
@@ -46,7 +46,7 @@
                     <div class="d-grid gap-3 w-fit" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                         @foreach (var roomType in availableRoomTypesForStay.SuitableRoomTypes)
                         {
-                            <BookingCard RoomType="roomType" OnBook="PrepareBookingCreation" />
+                            <BookingCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" OnBook="PrepareBookingCreation" />
                         }
                     </div>
 
@@ -58,7 +58,7 @@
                     {
                         var isUnavailable = availableRoomTypesForStay.UnavailableRoomTypes.Any(unavailableRoomType => unavailableRoomType.Id == roomType.Id);
 
-                        <BookingCard RoomType="roomType" IsUnavailable="isUnavailable" OnBook="PrepareBookingCreation" />
+                        <BookingCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" IsUnavailable="isUnavailable" OnBook="PrepareBookingCreation" />
                     }
                 </div>
             </div>
@@ -92,7 +92,9 @@
 
                 @if (roomType is not null)
                 {
-                    <CreateBooking @bind-Guest="guest" RoomType="roomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
+                    var roomDiscountsForRoomType = roomDiscounts.Where(roomDiscount => roomDiscount.RoomType.Id == roomType.Id).ToList();
+
+                    <CreateBooking @bind-Guest="guest" RoomType="roomType" RoomDiscounts="roomDiscountsForRoomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
                 }
             </div>
 
@@ -126,6 +128,18 @@
     private int numberOfChildren = 0;
 
     private bool travelingWithPets = false;
+
+    private ICollection<RoomDiscountDto> roomDiscounts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        roomDiscounts = await Api.GetAllRoomDiscountsAsync();
+    }
+
+    private RoomDiscountDto? GetDiscount(RoomTypeDto roomType)
+    {
+        return roomDiscounts.FirstOrDefault(discount => discount.RoomType.Id == roomType.Id && discount.FromDate <= toDate && discount.ToDate >= fromDate);
+    }
 
     private async Task PrepareBookingCreation(RoomTypeDto value)
     {

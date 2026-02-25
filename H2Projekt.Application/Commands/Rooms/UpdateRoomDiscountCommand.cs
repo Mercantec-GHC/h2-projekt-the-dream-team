@@ -7,6 +7,6 @@
         public string Description { get; set; }
         public DateOnly FromDate { get; set; }
         public DateOnly ToDate { get; set; }
-        public int PricePerNight { get; set; }
+        public decimal PricePerNight { get; set; }
     }
 }

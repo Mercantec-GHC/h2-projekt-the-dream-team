@@ -13,11 +13,11 @@ namespace H2Projekt.Domain
         public DateOnly FromDate { get; private set; }
         public DateOnly ToDate { get; private set; }
 
-        public int PricePerNight { get; private set; }
+        public decimal PricePerNight { get; private set; }
 
         public RoomDiscount() { }
 
-        public RoomDiscount(int roomTypeId, string description, DateOnly fromDate, DateOnly toDate, int pricePerNight)
+        public RoomDiscount(int roomTypeId, string description, DateOnly fromDate, DateOnly toDate, decimal pricePerNight)
         {
             RoomTypeId = roomTypeId;
             Description = description;
@@ -28,7 +28,7 @@ namespace H2Projekt.Domain
             ThrowIfInvalid();
         }
 
-        public void UpdateDetails(int roomTypeId, string description, DateOnly fromDate, DateOnly toDate, int pricePerNight)
+        public void UpdateDetails(int roomTypeId, string description, DateOnly fromDate, DateOnly toDate, decimal pricePerNight)
         {
             RoomTypeId = roomTypeId;
             Description = description;

@@ -16,7 +16,7 @@
         <div>
             <label class="form-label">Fra dato</label>
 
-            <InputDate class="form-control" @bind-Value:get="FromDate" @bind-Value:set="SetFromDate" /> 
+            <InputDate class="form-control" @bind-Value:get="FromDate" @bind-Value:set="SetFromDate" />
         </div>
 
         <div>
@@ -26,20 +26,41 @@
         </div>
 
         <div class="mt-auto">
-            Total price: <span class="fw-bold">@totalPrice.ToString("C")</span>
+            <span>Total pris pr. nat:</span>
+
+            <div class="d-flex text-nowrap w-bold">
+                @{
+                    var originalTotal = CalculateOriginalTotal();
+                    var discountedTotal = CalculateDiscountedTotal();
+
+                    @if (discountedTotal > 0 && originalTotal != discountedTotal)
+                    {
+                        <span class="text-danger">@discountedTotal.ToString("C")&nbsp;</span>
+
+                        <span class="text-decoration-line-through opacity-50">@originalTotal.ToString("C")</span>
+                    }
+                    else
+                    {
+                        <span>@originalTotal.ToString("C")</span>
+                    }
+                }
+            </div>
         </div>
     </div>
 </div>
 
 @code {
     [Parameter]
-    public GuestDto Guest { get; set; } 
+    public GuestDto Guest { get; set; }
 
     [Parameter]
     public EventCallback<GuestDto> GuestChanged { get; set; }
 
     [Parameter]
     public RoomTypeDto? RoomType { get; set; }
+
+    [Parameter]
+    public List<RoomDiscountDto> RoomDiscounts { get; set; }
 
     [Parameter]
     public DateTime FromDate { get; set; }
@@ -52,8 +73,6 @@
 
     [Parameter]
     public EventCallback<DateTime> FromDateChanged { get; set; }
-
-    private decimal totalPrice => RoomType is not null ? (decimal)(RoomType.PricePerNight * ((ToDate - FromDate).Days < 0 ? 0 : (ToDate - FromDate).Days)) : 0M;
 
     private ICollection<GuestDto> guests = new List<GuestDto>();
 
@@ -88,5 +107,36 @@
         ToDate = value;
 
         await ToDateChanged.InvokeAsync(value);
+    }
+
+    private decimal CalculateOriginalTotal()
+    {
+        if (RoomType is null)
+        {
+            return 0M;
+        }
+
+        var nights = (ToDate - FromDate).Days;
+
+        return Math.Max(0M, (decimal)RoomType.PricePerNight * nights);
+    }
+
+    private decimal CalculateDiscountedTotal()
+    {
+        if (RoomType is null || !RoomDiscounts.Any())
+        {
+            return 0M;
+        }
+
+        decimal total = 0M;
+
+        for (var date = FromDate.ToDateOnly(); date < ToDate.ToDateOnly(); date = date.AddDays(1))
+        {
+            var discount = RoomDiscounts.FirstOrDefault(d => date >= d.FromDate.ToDateOnly() && date < d.ToDate.ToDateOnly());
+
+            total += (decimal)(discount?.PricePerNight ?? RoomType.PricePerNight);
+        }
+
+        return Math.Max(0M, total);
     }
 }

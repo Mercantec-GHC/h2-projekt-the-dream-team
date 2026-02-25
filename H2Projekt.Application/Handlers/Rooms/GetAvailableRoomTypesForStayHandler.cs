@@ -80,7 +80,8 @@ namespace H2Projekt.Application.Handlers.Rooms
                 SuitableRoomTypes = suitableRoomTypes
                     .Select(suitableRoomType => new RoomTypeDto(suitableRoomType)
                     {
-                        PricePerNight = initialBestSuitableRoomTypes.Max(roomType => roomType.PricePerNight),
+                        // Set the PricePerNight to the maximum price per night of the initial best suitable room types to ensure that the price is not lower than the price of the best suitable room types based on the number of guests, even if there are no available rooms for the best suitable room types based on the number of guests
+                        PricePerNight = initialBestSuitableRoomTypes.FirstOrDefault(roomType => roomType.Id == suitableRoomType.Id)?.PricePerNight ?? initialBestSuitableRoomTypes.Max(roomType => roomType.PricePerNight),
                     })
                     .ToList(),
                 OtherRoomTypes = roomTypes
