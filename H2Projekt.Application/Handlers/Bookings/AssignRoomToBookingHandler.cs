@@ -1,7 +1,6 @@
 ﻿using FluentValidation;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
 using H2Projekt.Domain.Enums;
 
 namespace H2Projekt.Application.Handlers.Bookings
@@ -11,14 +10,12 @@ namespace H2Projekt.Application.Handlers.Bookings
         private readonly IBookingRepository _bookingRepository;
         private readonly IGuestRepository _guestRepository;
         private readonly IRoomRepository _roomRepository;
-        private readonly IValidator<Booking> _validator;
 
-        public AssignRoomToBookingHandler(IBookingRepository bookingRepository, IGuestRepository guestRepository, IRoomRepository roomRepository, IValidator<Booking> validator)
+        public AssignRoomToBookingHandler(IBookingRepository bookingRepository, IGuestRepository guestRepository, IRoomRepository roomRepository)
         {
             _bookingRepository = bookingRepository;
             _guestRepository = guestRepository;
             _roomRepository = roomRepository;
-            _validator = validator;
         }
 
         public async Task<int> HandleAsync(int id, CancellationToken cancellationToken = default)
@@ -57,14 +54,7 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             booking.AssignRoom(room);
 
-            room.UpdateDetails(RoomAvailabilityStatus.Occupied);
-
-            var validationResult = await _validator.ValidateAsync(booking, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            room.UpdateStatus(RoomAvailabilityStatus.Occupied);
 
             await _bookingRepository.SaveChangesAsync(cancellationToken);
 

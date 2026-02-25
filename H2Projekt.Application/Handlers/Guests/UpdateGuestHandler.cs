@@ -1,20 +1,16 @@
-﻿using FluentValidation;
-using H2Projekt.Application.Commands.Guests;
+﻿using H2Projekt.Application.Commands.Guests;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers.Guests
 {
     public class UpdateGuestHandler
     {
         private readonly IGuestRepository _guestRepository;
-        private readonly IValidator<Guest> _validator;
 
-        public UpdateGuestHandler(IGuestRepository guestRepository, IValidator<Guest> validator)
+        public UpdateGuestHandler(IGuestRepository guestRepository)
         {
             _guestRepository = guestRepository;
-            _validator = validator;
         }
 
         public async Task HandleAsync(UpdateGuestCommand request, CancellationToken cancellationToken = default)
@@ -27,13 +23,6 @@ namespace H2Projekt.Application.Handlers.Guests
             }
 
             existingGuest.UpdateDetails(request.FirstName, request.LastName, request.Email);
-
-            var validationResult = await _validator.ValidateAsync(existingGuest);
-
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
 
             await _guestRepository.SaveChangesAsync(cancellationToken);
         }

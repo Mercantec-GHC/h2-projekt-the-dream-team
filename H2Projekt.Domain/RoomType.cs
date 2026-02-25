@@ -1,4 +1,7 @@
-﻿namespace H2Projekt.Domain
+﻿using FluentValidation;
+using H2Projekt.Domain.Validators.Rooms;
+
+namespace H2Projekt.Domain
 {
     public class RoomType : EntityBase
     {
@@ -26,6 +29,8 @@
             MaxOccupancy = maxOccupancy;
             PetsAllowed = petsAllowed;
             PricePerNight = pricePerNight;
+
+            ThrowIfInvalid();
         }
 
         public void UpdateDetails(string name, string? description, int maxOccupancy, bool petsAllowed, decimal pricePerNight)
@@ -35,6 +40,22 @@
             MaxOccupancy = maxOccupancy;
             PetsAllowed = petsAllowed;
             PricePerNight = pricePerNight;
+
+            ThrowIfInvalid();
+        }
+
+        private void ThrowIfInvalid()
+        {
+            var validator = new RoomTypeValidator();
+
+            var result = validator.Validate(this);
+
+            if (result.IsValid)
+            {
+                return;
+            }
+
+            throw new ValidationException(result.Errors);
         }
     }
 }

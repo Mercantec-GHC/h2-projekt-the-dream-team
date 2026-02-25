@@ -1,4 +1,7 @@
-﻿namespace H2Projekt.Domain
+﻿using FluentValidation;
+using H2Projekt.Domain.Validators.Rooms;
+
+namespace H2Projekt.Domain
 {
     public class RoomDiscount : EntityBase
     {
@@ -21,6 +24,8 @@
             FromDate = fromDate;
             ToDate = toDate;
             PricePerNight = pricePerNight;
+
+            ThrowIfInvalid();
         }
 
         public void UpdateDetails(int roomTypeId, string description, DateOnly fromDate, DateOnly toDate, int pricePerNight)
@@ -30,6 +35,22 @@
             FromDate = fromDate;
             ToDate = toDate;
             PricePerNight = pricePerNight;
+
+            ThrowIfInvalid();
+        }
+
+        private void ThrowIfInvalid()
+        {
+            var validator = new RoomDiscountValidator();
+
+            var result = validator.Validate(this);
+
+            if (result.IsValid)
+            {
+                return;
+            }
+
+            throw new ValidationException(result.Errors);
         }
     }
 }

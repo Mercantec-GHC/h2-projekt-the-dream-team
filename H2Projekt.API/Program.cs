@@ -1,12 +1,7 @@
-using FluentValidation;
 using H2Projekt.Application.Handlers.Bookings;
 using H2Projekt.Application.Handlers.Guests;
 using H2Projekt.Application.Handlers.Rooms;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
-using H2Projekt.Domain.Validators.Bookings;
-using H2Projekt.Domain.Validators.Guests;
-using H2Projekt.Domain.Validators.Rooms;
 using H2Projekt.Infrastructure;
 using H2Projekt.Infrastructure.Repositories;
 using H2Projekt.ServiceDefaults;
@@ -63,13 +58,6 @@ builder.Services.AddScoped<GetAllRoomDiscountsHandler>();
 builder.Services.AddScoped<CreateRoomDiscountHandler>();
 builder.Services.AddScoped<UpdateRoomDiscountHandler>();
 builder.Services.AddScoped<DeleteRoomDiscountHandler>();
-
-// Validators
-builder.Services.AddScoped<IValidator<Booking>, BookingValidator>();
-builder.Services.AddScoped<IValidator<Guest>, GuestValidator>();
-builder.Services.AddScoped<IValidator<Room>, RoomValidator>();
-builder.Services.AddScoped<IValidator<RoomType>, RoomTypeValidator>();
-builder.Services.AddScoped<IValidator<RoomDiscount>, RoomDiscountValidator>();
 
 // Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();

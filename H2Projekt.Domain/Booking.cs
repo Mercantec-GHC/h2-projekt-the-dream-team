@@ -1,4 +1,7 @@
-﻿namespace H2Projekt.Domain
+﻿using FluentValidation;
+using H2Projekt.Domain.Validators.Bookings;
+
+namespace H2Projekt.Domain
 {
     public class Booking : EntityBase
     {
@@ -30,12 +33,30 @@
             NumberOfChildren = numberOfChildren;
             TravelingWithPets = travelingWithPets;
             PriceLocked = priceLocked;
+
+            ThrowIfInvalid();
         }
 
         public void AssignRoom(Room room)
         {
             RoomId = room.Id;
             Room = room;
+
+            ThrowIfInvalid();
+        }
+
+        private void ThrowIfInvalid()
+        {
+            var validator = new BookingValidator();
+
+            var result = validator.Validate(this);
+
+            if (result.IsValid)
+            {
+                return;
+            }
+
+            throw new ValidationException(result.Errors);
         }
     }
 }
