@@ -15,14 +15,21 @@ namespace H2Projekt.Application.Handlers.Rooms
 
         public async Task HandleAsync(UpdateRoomDiscountCommand request, CancellationToken cancellationToken = default)
         {
-            var existingRoomDiscount = await _roomRepository.GetRoomDiscountByIdAsync(request.Id, cancellationToken);
+            var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
 
-            if (existingRoomDiscount is null)
+            if (roomType is null)
             {
-                throw new NonExistentException($"Room discount with id {request.Id} doesn't exist.");
+                throw new NonExistentException($"Room type with ID {request.RoomTypeId} doesn't exist.");
             }
 
-            existingRoomDiscount.UpdateDetails(request.RoomTypeId, request.Description, request.FromDate, request.ToDate, request.PricePerNight);
+            var roomDiscount = roomType.RoomDiscounts.FirstOrDefault(room => room.Id == request.Id);
+
+            if (roomDiscount is null)
+            {
+                throw new NonExistentException($"Room discount with ID {request.Id} doesn't exist.");
+            }
+
+            roomDiscount.UpdateDetails(request.RoomTypeId, request.Description, request.FromDate, request.ToDate, request.PricePerNight);
 
             await _roomRepository.SaveChangesAsync(cancellationToken);
         }

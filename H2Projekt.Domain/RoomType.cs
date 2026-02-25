@@ -44,6 +44,34 @@ namespace H2Projekt.Domain
             ThrowIfInvalid();
         }
 
+        public void AddRoom(Room room)
+        {
+            rooms.Add(room);
+
+            ThrowIfInvalid();
+        }
+
+        public void RemoveRoom(Room room)
+        {
+            rooms.Remove(room);
+
+            ThrowIfInvalid();
+        }
+
+        public void AddRoomDiscount(RoomDiscount roomDiscount)
+        {
+            roomDiscounts.Add(roomDiscount);
+
+            ThrowIfInvalid();
+        }
+
+        public void RemoveRoomDiscount(RoomDiscount roomDiscount)
+        {
+            roomDiscounts.Remove(roomDiscount);
+
+            ThrowIfInvalid();
+        }
+
         private void ThrowIfInvalid()
         {
             var validator = new RoomTypeValidator();

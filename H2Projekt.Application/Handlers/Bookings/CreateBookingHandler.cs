@@ -27,11 +27,7 @@ namespace H2Projekt.Application.Handlers.Bookings
                 throw new NonExistentException($"Room type with id {request.RoomTypeId} doesn't exist.");
             }
 
-            var rooms = await _roomRepository.GetAllRoomsByRoomTypeAsync(roomType.Id, cancellationToken);
-
-            var bookings = await _bookingRepository.GetAllBookingsForRoomTypeAsync(roomType.Id, cancellationToken);
-
-            if (!rooms.Any() || bookings.Count(booking => booking.FromDate <= request.ToDate && booking.ToDate >= request.FromDate) >= rooms.Count)
+            if (!roomType.Rooms.Any() || roomType.Bookings.Count(booking => booking.FromDate <= request.ToDate && booking.ToDate >= request.FromDate) >= roomType.Rooms.Count)
             {
                 throw new NonExistentException("There are no available rooms of the selected type for the given dates.");
             }

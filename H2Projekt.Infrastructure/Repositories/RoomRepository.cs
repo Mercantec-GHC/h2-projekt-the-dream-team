@@ -15,16 +15,7 @@ namespace H2Projekt.Infrastructure.Repositories
             return await _appDbContext.Rooms
                 .Include(r => r.RoomType)
                 .Include(r => r.Booking)
-                    .ThenInclude(b => b.RoomType)
-                .OrderBy(r => r.Id)
-                .ToListAsync(cancellationToken);
-        }
-
-        public async Task<List<Room>> GetAllRoomsByRoomTypeAsync(int roomTypeId, CancellationToken cancellationToken = default)
-        {
-            return await _appDbContext.Rooms
-                .Where(r => r.RoomTypeId == roomTypeId)
-                .Include(r => r.RoomType)
+                    .ThenInclude(b => b.Guest)
                 .Include(r => r.Booking)
                     .ThenInclude(b => b.RoomType)
                 .OrderBy(r => r.Id)
@@ -36,6 +27,8 @@ namespace H2Projekt.Infrastructure.Repositories
             return await _appDbContext.Rooms
                 .Include(r => r.RoomType)
                 .Include(r => r.Booking)
+                    .ThenInclude(b => b.Guest)
+                .Include(r => r.Booking)
                     .ThenInclude(b => b.RoomType)
                 .SingleOrDefaultAsync(r => r.Id == id, cancellationToken);
         }
@@ -43,29 +36,12 @@ namespace H2Projekt.Infrastructure.Repositories
         public async Task<Room?> GetRoomByNumberAsync(string number, CancellationToken cancellationToken = default)
         {
             return await _appDbContext.Rooms
-            .Include(r => r.RoomType)
-            .Include(r => r.Booking)
-                .ThenInclude(b => b.RoomType)
-            .SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
-        }
-
-        public async Task<bool> RoomExistsAsync(string number, CancellationToken cancellationToken = default)
-        {
-            return await _appDbContext.Rooms.AnyAsync(r => r.Number == number, cancellationToken);
-        }
-
-        public async Task<int> AddRoomAsync(Room roomType, CancellationToken cancellationToken = default)
-        {
-            await _appDbContext.Rooms.AddAsync(roomType);
-
-            return await _appDbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task DeleteRoomAsync(Room room, CancellationToken cancellationToken = default)
-        {
-            _appDbContext.Rooms.Remove(room);
-
-            await _appDbContext.SaveChangesAsync(cancellationToken);
+                .Include(r => r.RoomType)
+                .Include(r => r.Booking)
+                    .ThenInclude(b => b.Guest)
+                .Include(r => r.Booking)
+                    .ThenInclude(b => b.RoomType)
+                .SingleOrDefaultAsync(r => r.Number == number, cancellationToken);
         }
 
         #endregion
@@ -74,12 +50,29 @@ namespace H2Projekt.Infrastructure.Repositories
 
         public async Task<List<RoomType>> GetAllRoomTypesAsync(CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.RoomTypes.OrderBy(rt => rt.Id).ToListAsync(cancellationToken);
+            return await _appDbContext.RoomTypes
+                .Include(rt => rt.Bookings)
+                    .ThenInclude(b => b.Guest)
+                .Include(rt => rt.Bookings)
+                    .ThenInclude(b => b.Room)
+                .Include(rt => rt.Rooms)
+                    .ThenInclude(r => r.Booking)
+                .Include(rt => rt.RoomDiscounts)
+                .OrderBy(rt => rt.Id)
+                .ToListAsync(cancellationToken);
         }
 
         public async Task<RoomType?> GetRoomTypeByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            return await _appDbContext.RoomTypes.SingleOrDefaultAsync(rt => rt.Id == id, cancellationToken);
+            return await _appDbContext.RoomTypes
+                .Include(rt => rt.Bookings)
+                    .ThenInclude(b => b.Guest)
+                .Include(rt => rt.Bookings)
+                    .ThenInclude(b => b.Room)
+                .Include(rt => rt.Rooms)
+                    .ThenInclude(r => r.Booking)
+                .Include(rt => rt.RoomDiscounts)
+                .SingleOrDefaultAsync(rt => rt.Id == id, cancellationToken);
         }
 
         public async Task<bool> RoomTypeExistsAsync(string name, CancellationToken cancellationToken = default)
@@ -118,20 +111,6 @@ namespace H2Projekt.Infrastructure.Repositories
         public async Task<RoomDiscount?> GetRoomDiscountForPeriodAsync(int roomTypeId, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken = default)
         {
             return await _appDbContext.RoomDiscounts.Include(rd => rd.RoomType).SingleOrDefaultAsync(rd => rd.RoomTypeId == roomTypeId && rd.FromDate <= fromDate && rd.ToDate >= toDate, cancellationToken);
-        }
-
-        public async Task<int> AddRoomDiscountAsync(RoomDiscount roomDiscount, CancellationToken cancellationToken = default)
-        {
-            await _appDbContext.RoomDiscounts.AddAsync(roomDiscount);
-
-            return await _appDbContext.SaveChangesAsync(cancellationToken);
-        }
-
-        public async Task DeleteRoomDiscountAsync(RoomDiscount roomDiscount, CancellationToken cancellationToken = default)
-        {
-            _appDbContext.RoomDiscounts.Remove(roomDiscount);
-
-            await _appDbContext.SaveChangesAsync(cancellationToken);
         }
 
         #endregion

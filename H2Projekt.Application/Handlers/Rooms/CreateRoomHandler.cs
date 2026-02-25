@@ -16,7 +16,14 @@ namespace H2Projekt.Application.Handlers.Rooms
 
         public async Task<int> HandleAsync(CreateRoomCommand request, CancellationToken cancellationToken = default)
         {
-            var roomExists = await _roomRepository.RoomExistsAsync(request.Number, cancellationToken);
+            var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
+
+            if (roomType is null)
+            {
+                throw new NonExistentException($"Room type with ID {request.RoomTypeId} doesn't exist.");
+            }
+
+            var roomExists = roomType.Rooms.Any(room => room.Number == request.Number);
 
             if (roomExists)
             {
@@ -25,7 +32,9 @@ namespace H2Projekt.Application.Handlers.Rooms
 
             var room = new Room(request.Number, request.RoomTypeId, request.Status);
 
-            await _roomRepository.AddRoomAsync(room, cancellationToken);
+            roomType.AddRoom(room);
+
+            await _roomRepository.SaveChangesAsync(cancellationToken);
 
             return room.Id;
         }

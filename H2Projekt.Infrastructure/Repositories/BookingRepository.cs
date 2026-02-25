@@ -17,16 +17,6 @@ namespace H2Projekt.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<List<Booking>> GetAllBookingsForRoomTypeAsync(int roomTypeId, CancellationToken cancellationToken = default)
-        {
-            return await _appDbContext.Bookings
-                .Where(b => b.RoomTypeId == roomTypeId)
-                .Include(b => b.Guest)
-                .Include(b => b.RoomType)
-                .Include(b => b.Room)
-                .ToListAsync(cancellationToken);
-        }
-
         public async Task<Booking?> GetBookingByIdAsync(int id, CancellationToken cancellationToken = default)
         {
             return await _appDbContext.Bookings

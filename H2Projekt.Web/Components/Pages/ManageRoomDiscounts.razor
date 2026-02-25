@@ -214,6 +214,16 @@ else
             }
             else
             {
+                Console.WriteLine(JsonSerializer.Serialize(new UpdateRoomDiscountCommand()
+                {
+                    Id = roomDiscountToEdit.Id,
+                    RoomTypeId = roomDiscountToEdit.RoomType?.Id ?? 0,
+                    Description = roomDiscountToEdit.Description,
+                    FromDate = roomDiscountToEdit.FromDate,
+                    ToDate = roomDiscountToEdit.ToDate,
+                    PricePerNight = roomDiscountToEdit.PricePerNight,
+                }));
+
                 await Api.UpdateRoomDiscountAsync(new UpdateRoomDiscountCommand()
                 {
                     Id = roomDiscountToEdit.Id,
