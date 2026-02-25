@@ -4,15 +4,15 @@
 
 <div class="d-flex flex-wrap justify-content-center gap-2 w-fit">
     <div class="w-fit">
-        <InputDate class="form-control" @bind-Value:get="FromDate" @bind-Value:set="SetFromDate" />
+        <InputDate class="form-control" data-invalid="@isFromDateInvalid" @bind-Value:get="FromDate" @bind-Value:set="SetFromDate" />
     </div>
 
     <div class="w-fit">
-        <InputDate class="form-control" @bind-Value:get="ToDate" @bind-Value:set="SetToDate" />
+        <InputDate class="form-control" data-invalid="@isToDateInvalid" @bind-Value:get="ToDate" @bind-Value:set="SetToDate" />
     </div>
 
     <div class="w-fit">
-        <div role="button" class="card flex-row h-100 px-2" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
+        <div role="button" class="card flex-row h-100 px-2" data-invalid="@isNumberOfGuestsInvalid" data-bs-toggle="dropdown" aria-expanded="false" data-bs-auto-close="outside">
             <div class="d-flex align-items-center gap-2 px-1">
                 <span>@NumberOfAdults @(NumberOfAdults == 1 ? "voksen" : "voksne")</span>
 
@@ -55,8 +55,8 @@
     </div>
 
     <div>
-        <button class="btn btn-primary" @onclick="Search">
-            <span class="bi bi-search"></span>
+        <button class="btn btn-primary" @onclick="Search" disabled="@isSearchButtonDisabled">
+            <i class="bi bi-search"></i>
             Søg
         </button>
     </div>
@@ -146,4 +146,12 @@
         }
         catch (ApiException) { }
     }
+
+    private bool isFromDateInvalid => ToDate.ToDateOnly() < FromDate.ToDateOnly() || FromDate.ToDateOnly() < DateOnly.FromDateTime(DateTime.Now);
+
+    private bool isToDateInvalid => FromDate.ToDateOnly() > ToDate.ToDateOnly();
+
+    private bool isNumberOfGuestsInvalid => NumberOfAdults <= 0 && NumberOfChildren <= 0;
+
+    private bool isSearchButtonDisabled => isFromDateInvalid || isToDateInvalid || isNumberOfGuestsInvalid;
 }
