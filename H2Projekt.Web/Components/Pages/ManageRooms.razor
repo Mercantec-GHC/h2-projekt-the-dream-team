@@ -39,10 +39,12 @@ else
     <table id="dataTable" class="table table-striped">
         <thead>
             <tr>
-                <th width="100">Id</th>
+                <th width="100">ID</th>
                 <th width="100">Nummer</th>
                 <th width="100">Type</th>
                 <th width="100">Status</th>
+                <th width="100">Booket Af</th>
+                <th width="100">Booket i Periode</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
         </thead>
@@ -55,10 +57,16 @@ else
                     <td class="align-middle">@room.RoomType.Name</td>
                     <td class="align-middle">@room.Status</td>
                     <td class="align-middle">
+                        @(room.Booking?.Guest is not null ? $"{room.Booking.Guest.FirstName} {room.Booking.Guest.LastName}" : string.Empty)
+                    </td>
+                    <td class="align-middle">
+                        @(room.Booking is not null ? $"{room.Booking.FromDate:dd/MM/yyyy} - {room.Booking.ToDate:dd/MM/yyyy}" : string.Empty)
+                    </td>
+                    <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareRoomCreationOrUpdate(room)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareRoomCreationOrUpdate(room)" data-bs-toggle="modal" data-bs-target="#createEditModal" disabled="@(room.Status == RoomAvailabilityStatus.Occupied)">Rediger</button>
 
-                            <button class="btn btn-sm btn-danger" @onclick="() => PrepareRoomDeletion(room)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                            <button class="btn btn-sm btn-danger" @onclick="() => PrepareRoomDeletion(room)" data-bs-toggle="modal" data-bs-target="#deleteModal" disabled="@(room.Status == RoomAvailabilityStatus.Occupied)">Slet</button>
                         </div>
                     </td>
                 </tr>
@@ -154,6 +162,11 @@ else
 
     public void PrepareRoomCreationOrUpdate(RoomDto? room = null)
     {
+        if (room is not null && room.Status == RoomAvailabilityStatus.Occupied)
+        {
+            return;
+        }
+
         modalException = null;
 
         roomToEdit = new RoomDto();
@@ -169,6 +182,11 @@ else
 
     public void PrepareRoomDeletion(RoomDto room)
     {
+        if (room.Status == RoomAvailabilityStatus.Occupied)
+        {
+            return;
+        }
+
         modalException = null;
 
         roomToDelete = room.Id;
