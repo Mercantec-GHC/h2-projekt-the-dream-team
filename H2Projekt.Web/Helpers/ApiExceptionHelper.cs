@@ -9,18 +9,18 @@ namespace H2Projekt.Web.Helpers
         {
             var validationErrors = TryParseValidationProblemDetails(ex.Response);
 
-            if (validationErrors.Count > 0)
+            if (validationErrors.Any())
             {
                 return validationErrors.Select(error => new ParsedError(error, ex.StatusCode)).ToList();
             }
 
-            var problemDetailsTitle = TryParseProblemDetailsTitle(ex.Response);
+            var problemDetails = TryParseProblemDetails(ex.Response);
 
-            if (problemDetailsTitle is not null)
+            if (problemDetails is not null)
             {
                 return new List<ParsedError>()
                 {
-                    new ParsedError(problemDetailsTitle, ex.StatusCode)
+                    new ParsedError(problemDetails.Detail, ex.StatusCode)
                 };
             }
 
@@ -34,7 +34,10 @@ namespace H2Projekt.Web.Helpers
         {
             try
             {
-                var json = JsonSerializer.Deserialize<ValidationProblemDetails>(response);
+                var json = JsonSerializer.Deserialize<ValidationProblemDetails>(response, new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
 
                 if (json is null)
                 {
@@ -49,13 +52,16 @@ namespace H2Projekt.Web.Helpers
             }
         }
 
-        private static string? TryParseProblemDetailsTitle(string response)
+        private static ProblemDetails? TryParseProblemDetails(string response)
         {
             try
             {
-                var json = JsonSerializer.Deserialize<ProblemDetails>(response);
+                var json = JsonSerializer.Deserialize<ProblemDetails>(response, new JsonSerializerOptions()
+                {
+                    PropertyNameCaseInsensitive = true,
+                });
 
-                return json?.Title;
+                return json;
             }
             catch
             {
