@@ -24,6 +24,9 @@ namespace H2Projekt.Domain.Validators.Rooms
             RuleFor(roomDiscount => roomDiscount.ToDate)
                 .GreaterThanOrEqualTo(roomDiscount => roomDiscount.FromDate)
                 .WithMessage("Til dato skal være senere eller lig med Fra dato.");
+            RuleFor(roomDiscount => roomDiscount.PricePerNight)
+                .GreaterThan(0)
+                .WithMessage("Pris per nat skal være større end 0.");
         }
     }
 }

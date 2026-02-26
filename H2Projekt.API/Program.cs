@@ -1,3 +1,8 @@
+using FluentValidation;
+using H2Projekt.API;
+using H2Projekt.Application.Commands.Bookings.Validators;
+using H2Projekt.Application.Commands.Guests.Validators;
+using H2Projekt.Application.Commands.Rooms.Validators;
 using H2Projekt.Application.Handlers.Bookings;
 using H2Projekt.Application.Handlers.Guests;
 using H2Projekt.Application.Handlers.Rooms;
@@ -11,7 +16,27 @@ using System.Text.Json.Serialization;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add controllers to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<FluentValidationFilter>();
+});
+
+// Add command validators to the container.
+// - Bookings
+builder.Services.AddValidatorsFromAssemblyContaining<CreateBookingValidator>();
+// - Guests
+builder.Services.AddValidatorsFromAssemblyContaining<CreateGuestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateGuestValidator>();
+// - Rooms
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRoomValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoomValidator>();
+// - Room types
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRoomTypeValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<GetAvailableRoomTypesForStayValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoomTypeValidator>();
+// - Room discounts
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRoomDiscountValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoomDiscountValidator>();
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();

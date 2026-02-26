@@ -8,10 +8,14 @@ namespace H2Projekt.Domain.Validators.Rooms
         {
             RuleFor(roomType => roomType.Name)
                 .NotEmpty()
-                .WithMessage("Navn er påkrævet.");
+                .WithMessage("Navn er påkrævet.")
+                .MaximumLength(50)
+                .WithMessage("Navn må ikke overstige 50 tegn.");
             RuleFor(roomType => roomType.Description)
                 .NotEmpty()
-                .WithMessage("Beskrivelse er påkrævet.");
+                .WithMessage("Beskrivelse er påkrævet.")
+                .MaximumLength(200)
+                .WithMessage("Beskrivelse må ikke overstige 200 tegn.");
             RuleFor(roomType => roomType.MaxOccupancy)
                 .GreaterThan(0)
                 .WithMessage("Maksimal belægning skal være større end 0.");

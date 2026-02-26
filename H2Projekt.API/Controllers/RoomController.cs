@@ -42,6 +42,7 @@ namespace H2Projekt.API.Controllers
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> CreateRoom([FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
         {
@@ -54,6 +55,10 @@ namespace H2Projekt.API.Controllers
             catch (DuplicateException ex)
             {
                 return Conflict(ex.Message);
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.Message);
             }
             catch (ValidationException ex)
             {
