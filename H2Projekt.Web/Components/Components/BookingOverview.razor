@@ -100,7 +100,7 @@
 
     private void AllocateRoomsToUnassignedBookings()
     {
-        foreach (var booking in Bookings.Where(b => b.Room is null).OrderBy(b => b.Id))
+        foreach (var booking in Bookings.Where(b => b.Room is null).OrderBy(b => b.FromDate))
         {
             if (bookingsWithNoRoom.ContainsKey(booking.Id))
             {
