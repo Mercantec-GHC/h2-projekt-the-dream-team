@@ -41,7 +41,11 @@
         }
         else
         {
-            <button class="btn btn-primary" @onclick="() => OnBook.InvokeAsync(RoomType)" data-bs-toggle="modal" data-bs-target="#createBookingModal">Book nu</button>
+            <button class="btn btn-primary" @onclick="() => OnBook.InvokeAsync(RoomType)" data-bs-toggle="modal" data-bs-target="#createBookingModal">
+                <i class="bi bi-plus-lg"></i>
+
+                Book Nu
+            </button>
         }
     </div>
 </div>

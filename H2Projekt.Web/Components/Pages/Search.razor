@@ -16,7 +16,7 @@
     </div>
 }
 
-<div class="d-flex justify-content-center align-items-center min-h-screen">
+<div class="d-flex justify-content-center align-items-center min-h-inner-screen">
     <div class="d-flex flex-column gap-5 align-items-center">
         @if (GuestService.SelectedGuest is not null)
         {
@@ -73,9 +73,7 @@
                 <h5 class="fs-4 mb-0" id="createBookingModalLabel">Book Værelse</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
@@ -99,8 +97,17 @@
             </div>
 
             <div class="d-flex gap-3">
-                <button type="button" class="btn btn-success w-50" @onclick="BookRoom">Book Værelse</button>
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+                <button type="button" class="btn btn-success w-50" @onclick="BookRoom">
+                    <i class="bi bi-plus-lg"></i>
+
+                    Book Værelse
+                </button>
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
             </div>
         </div>
     </div>
