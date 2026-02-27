@@ -43,8 +43,11 @@ namespace H2Projekt.Application.Handlers.Rooms
                 return hasRoomsForRoomType && amountOfBookingsForRoomType != amountOfRoomsForRoomType;
             });
 
+            // Filter the room types based on the traveling with pets requirement, if the user is traveling with pets, only include the room types that allow pets, otherwise include all room types
+            var filteredRoomTypes = roomTypes.Where(roomType => !request.TravelingWithPets || roomType.PetsAllowed).ToList();
+
             // Find the best suitable room types based on the number of guests 
-            var initialBestSuitableRoomTypes = roomTypes.Where(roomType => roomType.MaxOccupancy == request.NumberOfAdults + request.NumberOfChildren);
+            var initialBestSuitableRoomTypes = filteredRoomTypes.Where(roomType => roomType.MaxOccupancy == request.NumberOfAdults + request.NumberOfChildren);
 
             // Create a variable to keep track of the suitable room types, starting with the best suitable room types based on the number of guests and filtering out the room types that are not available for the requested stay dates
             var suitableRoomTypes = initialBestSuitableRoomTypes.Where(roomType => IsRoomTypeAvailableForStay(roomType));
@@ -62,7 +65,7 @@ namespace H2Projekt.Application.Handlers.Rooms
                 while (!suitableRoomTypes.Any() && guests <= roomTypes.Max(roomType => roomType.MaxOccupancy))
                 {
                     // Find the next best suitable room type based on the number of guests 
-                    suitableRoomTypes = roomTypes
+                    suitableRoomTypes = filteredRoomTypes
                         .Where(roomType =>
                             IsRoomTypeAvailableForStay(roomType) &&
                             roomType.MaxOccupancy == guests &&
@@ -84,11 +87,11 @@ namespace H2Projekt.Application.Handlers.Rooms
                         PricePerNight = initialBestSuitableRoomTypes.FirstOrDefault(roomType => roomType.Id == suitableRoomType.Id)?.PricePerNight ?? initialBestSuitableRoomTypes.Max(roomType => roomType.PricePerNight),
                     })
                     .ToList(),
-                OtherRoomTypes = roomTypes
+                OtherRoomTypes = filteredRoomTypes
                     .Where(roomType => IsRoomTypeAvailableForStay(roomType) && !suitableRoomTypes.Any(suitableRoomType => roomType.Id == suitableRoomType.Id))
                     .Select(roomType => new RoomTypeDto(roomType))
                     .ToList(),
-                UnavailableRoomTypes = roomTypes
+                UnavailableRoomTypes = filteredRoomTypes
                     .Where(roomType => !IsRoomTypeAvailableForStay(roomType))
                     .Select(roomType => new RoomTypeDto(roomType))
                     .ToList()
