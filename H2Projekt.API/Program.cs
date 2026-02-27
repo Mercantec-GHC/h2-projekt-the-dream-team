@@ -60,6 +60,7 @@ builder.Services.AddScoped<GetBookingByIdHandler>();
 builder.Services.AddScoped<CreateBookingHandler>();
 builder.Services.AddScoped<AssignRoomToBookingHandler>();
 builder.Services.AddScoped<DeleteBookingHandler>();
+builder.Services.AddScoped<GetBookingsOverviewHandler>();
 // - Guests
 builder.Services.AddScoped<GetAllGuestsHandler>();
 builder.Services.AddScoped<GetGuestByIdHandler>();

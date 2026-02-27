@@ -20,6 +20,15 @@ namespace H2Projekt.API.Controllers
             return Ok(bookings);
         }
 
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<BookingDto>>> GetBookingsOverview([FromServices] GetBookingsOverviewHandler handler)
+        {
+            var result = await handler.HandleAsync();
+
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
