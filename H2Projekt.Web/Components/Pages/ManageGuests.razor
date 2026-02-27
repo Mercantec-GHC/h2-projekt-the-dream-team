@@ -27,7 +27,11 @@
         <h3 class="mb-0">Gæster</h3>
     </div>
 
-    <button type="button" class="btn btn-success" @onclick="() => PrepareGuestCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+    <button type="button" class="btn btn-success" @onclick="() => PrepareGuestCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">
+        <i class="bi bi-plus-lg"></i>
+
+        Tilføj
+    </button>
 </div>
 
 @if (guests is null)
