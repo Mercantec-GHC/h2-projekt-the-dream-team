@@ -90,9 +90,17 @@
             return;
         }
 
-        Guest = foundGuest;
+        var newGuestDto = new GuestDto()
+        {
+            Id = foundGuest.Id,
+            FirstName = foundGuest.FirstName,
+            LastName = foundGuest.LastName,
+            Email = foundGuest.Email,
+        };
 
-        await GuestChanged.InvokeAsync(foundGuest);
+        Guest = newGuestDto;
+
+        await GuestChanged.InvokeAsync(newGuestDto);
     }
 
     private async Task SetFromDate(DateTime value)
