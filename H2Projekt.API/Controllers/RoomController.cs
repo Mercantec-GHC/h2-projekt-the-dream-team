@@ -35,13 +35,14 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<ActionResult<int>> CreateRoom([FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
         {
@@ -53,7 +54,11 @@ namespace H2Projekt.API.Controllers
             }
             catch (DuplicateException ex)
             {
-                return Conflict(ex.Message);
+                return Conflict(ex.GetProblemDetails());
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -75,7 +80,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -96,7 +101,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
         }
 
@@ -113,6 +118,22 @@ namespace H2Projekt.API.Controllers
             return Ok(roomTypes);
         }
 
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<AvailableRoomTypesForStayDto>> GetAvailableRoomTypesForStay([FromServices] GetAvailableRoomTypesForStayHandler handler, [FromQuery] GetAvailableRoomTypesForStayCommand getAvailableRoomTypesForStayCommand)
+        {
+            try
+            {
+                var availableRoomTypesForStay = await handler.HandleAsync(getAvailableRoomTypesForStayCommand);
+
+                return Ok(availableRoomTypesForStay);
+            }
+            catch (ValidationException ex)
+            {
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+        }
+
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
@@ -127,7 +148,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (DuplicateException ex)
             {
-                return Conflict(ex.Message);
+                return Conflict(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -149,7 +170,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -170,7 +191,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
         }
 
@@ -201,7 +222,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (DuplicateException ex)
             {
-                return Conflict(ex.Message);
+                return Conflict(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -223,7 +244,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -244,7 +265,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
         }
 

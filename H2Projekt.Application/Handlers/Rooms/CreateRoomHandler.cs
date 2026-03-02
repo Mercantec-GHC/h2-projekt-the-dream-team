@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using H2Projekt.Application.Commands.Rooms;
+﻿using H2Projekt.Application.Commands.Rooms;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
@@ -9,17 +8,22 @@ namespace H2Projekt.Application.Handlers.Rooms
     public class CreateRoomHandler
     {
         private readonly IRoomRepository _roomRepository;
-        private readonly IValidator<Room> _validator;
 
-        public CreateRoomHandler(IRoomRepository roomRepository, IValidator<Room> validator)
+        public CreateRoomHandler(IRoomRepository roomRepository)
         {
             _roomRepository = roomRepository;
-            _validator = validator;
         }
 
         public async Task<int> HandleAsync(CreateRoomCommand request, CancellationToken cancellationToken = default)
         {
-            var roomExists = await _roomRepository.RoomExistsAsync(request.Number, cancellationToken);
+            var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
+
+            if (roomType is null)
+            {
+                throw new NonExistentException($"Room type with ID {request.RoomTypeId} doesn't exist.");
+            }
+
+            var roomExists = roomType.Rooms.Any(room => room.Number == request.Number);
 
             if (roomExists)
             {
@@ -28,14 +32,9 @@ namespace H2Projekt.Application.Handlers.Rooms
 
             var room = new Room(request.Number, request.RoomTypeId, request.Status);
 
-            var validationResult = await _validator.ValidateAsync(room);
+            roomType.AddRoom(room);
 
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
-
-            await _roomRepository.AddRoomAsync(room, cancellationToken);
+            await _roomRepository.SaveChangesAsync(cancellationToken);
 
             return room.Id;
         }

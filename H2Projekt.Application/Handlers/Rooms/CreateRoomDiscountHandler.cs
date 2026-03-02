@@ -1,5 +1,5 @@
-﻿using FluentValidation;
-using H2Projekt.Application.Commands.Rooms;
+﻿using H2Projekt.Application.Commands.Rooms;
+using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
 
@@ -8,26 +8,26 @@ namespace H2Projekt.Application.Handlers.Rooms
     public class CreateRoomDiscountHandler
     {
         private readonly IRoomRepository _roomRepository;
-        private readonly IValidator<RoomDiscount> _validator;
 
-        public CreateRoomDiscountHandler(IRoomRepository roomRepository, IValidator<RoomDiscount> validator)
+        public CreateRoomDiscountHandler(IRoomRepository roomRepository)
         {
             _roomRepository = roomRepository;
-            _validator = validator;
         }
 
         public async Task<int> HandleAsync(CreateRoomDiscountCommand request, CancellationToken cancellationToken = default)
         {
-            var roomDiscount = new RoomDiscount(request.RoomTypeId, request.Description, request.FromDate, request.ToDate, request.PricePerNight);
+            var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
 
-            var validationResult = await _validator.ValidateAsync(roomDiscount);
-
-            if (!validationResult.IsValid)
+            if (roomType is null)
             {
-                throw new ValidationException(validationResult.Errors);
+                throw new NonExistentException($"Room type with ID {request.RoomTypeId} doesn't exist.");
             }
 
-            await _roomRepository.AddRoomDiscountAsync(roomDiscount, cancellationToken);
+            var roomDiscount = new RoomDiscount(request.RoomTypeId, request.Description, request.FromDate, request.ToDate, request.PricePerNight);
+
+            roomType.AddRoomDiscount(roomDiscount);
+
+            await _roomRepository.SaveChangesAsync(cancellationToken);
 
             return roomDiscount.Id;
         }

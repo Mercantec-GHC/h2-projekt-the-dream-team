@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using H2Projekt.Application.Commands.Bookings;
+﻿using H2Projekt.Application.Commands.Bookings;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
@@ -11,14 +10,12 @@ namespace H2Projekt.Application.Handlers.Bookings
         private readonly IBookingRepository _bookingRepository;
         private readonly IGuestRepository _guestRepository;
         private readonly IRoomRepository _roomRepository;
-        private readonly IValidator<Guest> _validator;
 
-        public CreateBookingHandler(IBookingRepository bookingRepository, IGuestRepository guestRepository, IRoomRepository roomRepository, IValidator<Guest> validator)
+        public CreateBookingHandler(IBookingRepository bookingRepository, IGuestRepository guestRepository, IRoomRepository roomRepository)
         {
             _guestRepository = guestRepository;
             _bookingRepository = bookingRepository;
             _roomRepository = roomRepository;
-            _validator = validator;
         }
 
         public async Task<int> HandleAsync(CreateBookingCommand request, CancellationToken cancellationToken = default)
@@ -30,9 +27,7 @@ namespace H2Projekt.Application.Handlers.Bookings
                 throw new NonExistentException($"Room type with id {request.RoomTypeId} doesn't exist.");
             }
 
-            var isRoomTypeAvailable = await _bookingRepository.IsRoomTypeAvailableAsync(roomType, request.FromDate, request.ToDate, cancellationToken);
-
-            if (!isRoomTypeAvailable)
+            if (!roomType.Rooms.Any() || roomType.Bookings.Count(booking => booking.FromDate <= request.ToDate && booking.ToDate >= request.FromDate) >= roomType.Rooms.Count)
             {
                 throw new NonExistentException("There are no available rooms of the selected type for the given dates.");
             }
@@ -46,18 +41,9 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             var discount = await _roomRepository.GetRoomDiscountForPeriodAsync(roomType.Id, request.FromDate, request.ToDate, cancellationToken);
 
-            var pricePerNight = discount is not null ? discount.PricePerNight : roomType.PricePerNight;
-
-            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, pricePerNight);
+            var booking = new Booking(guest.Id, roomType.Id, request.FromDate, request.ToDate, request.NumberOfAdults, request.NumberOfChildren, request.TravelingWithPets, discount?.PricePerNight ?? roomType.PricePerNight);
 
             guest.AddBooking(booking);
-
-            var validationResult = await _validator.ValidateAsync(guest, cancellationToken);
-
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
 
             await _guestRepository.SaveChangesAsync(cancellationToken);
 

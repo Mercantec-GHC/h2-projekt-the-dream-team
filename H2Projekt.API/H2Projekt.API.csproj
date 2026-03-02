@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\H2Projekt.Application\H2Projekt.Application.csproj" />
+	<ProjectReference Include="..\H2Projekt.Application\H2Projekt.Application.csproj" />
     <ProjectReference Include="..\H2Projekt.Infrastructure\H2Projekt.Infrastructure.csproj" />
     <ProjectReference Include="..\H2Projekt.ServiceDefaults\H2Projekt.ServiceDefaults.csproj" />
   </ItemGroup>
@@ -18,6 +18,8 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0-rc.1.25451.107" />
+	<PackageReference Include="FluentValidation" Version="12.1.1" />
+	<PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
   </ItemGroup>
 
   <ItemGroup>

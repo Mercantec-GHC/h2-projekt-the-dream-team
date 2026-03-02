@@ -40,13 +40,6 @@ namespace H2Projekt.Infrastructure
                 .HasPrecision(10, 2);
 
             // Max length and required fields
-            modelBuilder.Entity<RoomDiscount>(rd =>
-            {
-                rd.Property(rd => rd.Description)
-                    .HasMaxLength(200)
-                    .IsRequired();
-            });
-
             modelBuilder.Entity<Guest>(g =>
             {
                 g.Property(g => g.FirstName)
@@ -60,19 +53,57 @@ namespace H2Projekt.Infrastructure
                     .IsRequired();
             });
 
-            // On delete behavior for bookings when a guest is deleted - cascade delete
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.Guest)
-                .WithMany(g => g.Bookings)
-                .HasForeignKey(b => b.GuestId)
+            modelBuilder.Entity<RoomDiscount>()
+                .Property(rd => rd.Description)
+                    .HasMaxLength(200)
+                    .IsRequired();
+
+            modelBuilder.Entity<RoomType>(rt =>
+            {
+                rt.Property(rt => rt.Name)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                rt.Property(rt => rt.Description)
+                    .HasMaxLength(200)
+                    .IsRequired();
+            });
+
+            // On delete behaviors
+            modelBuilder.Entity<Booking>(b =>
+            {
+                // On delete behavior for bookings when a guest is deleted - cascade delete
+                b.HasOne(b => b.Guest)
+                    .WithMany(g => g.Bookings)
+                    .HasForeignKey(b => b.GuestId)
+                    .OnDelete(DeleteBehavior.Cascade);
+
+                // On delete behavior for bookings when a room type is deleted - restrict delete
+                b.HasOne(b => b.RoomType)
+                    .WithMany(rt => rt.Bookings)
+                    .HasForeignKey(b => b.RoomTypeId)
+                    .OnDelete(DeleteBehavior.Restrict);
+
+                // On delete behavior for bookings when a room is deleted - restrict delete
+                b.HasOne(b => b.Room)
+                    .WithOne(r => r.Booking)
+                    .HasForeignKey<Booking>(b => b.RoomId)
+                    .OnDelete(DeleteBehavior.Restrict);
+            });
+
+            // On delete behavior for rooms when a room type is deleted - cascade delete
+            modelBuilder.Entity<Room>()
+                .HasOne(r => r.RoomType)
+                .WithMany(rt => rt.Rooms)
+                .HasForeignKey(r => r.RoomTypeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // On delete behavior for bookings when a room is deleted - restrict delete
-            modelBuilder.Entity<Booking>()
-                .HasOne(b => b.Room)
-                .WithMany(r => r.Bookings)
-                .HasForeignKey(b => b.RoomId)
-                .OnDelete(DeleteBehavior.Restrict);
+            // On delete behavior for room discounts when a room type is deleted - cascade delete
+            modelBuilder.Entity<RoomDiscount>()
+                .HasOne(rd => rd.RoomType)
+                .WithMany(rt => rt.RoomDiscounts)
+                .HasForeignKey(rd => rd.RoomTypeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

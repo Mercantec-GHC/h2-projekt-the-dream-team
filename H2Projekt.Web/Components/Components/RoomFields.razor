@@ -10,7 +10,25 @@
     <div>
         <label class="form-label">Værelsestype</label>
 
-        <RoomTypeDropdown OnRoomTypeChanged="(value) => Model.RoomType = value" />
+        <RoomTypeDropdown RoomType="Model.RoomType" OnRoomTypeChanged="(value) => Model.RoomType = value" />
+    </div>
+
+    <div>
+        <label class="form-label">Status</label>
+
+        <InputSelect @bind-Value="Model.Status" class="form-control">
+            @foreach (var status in Enum.GetValues<RoomAvailabilityStatus>())
+            {
+                @if (status == Model.Status)
+                {
+                    <option value="@status" selected>@status.ToString()</option>
+
+                    continue;
+                }
+
+                <option value="@status">@status.ToString()</option>
+            }
+        </InputSelect>
     </div>
 </div>
 

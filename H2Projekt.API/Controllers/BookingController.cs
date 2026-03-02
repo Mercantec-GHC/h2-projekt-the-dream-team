@@ -20,6 +20,15 @@ namespace H2Projekt.API.Controllers
             return Ok(bookings);
         }
 
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<BookingDto>>> GetBookingsOverview([FromServices] GetBookingsOverviewHandler handler)
+        {
+            var result = await handler.HandleAsync();
+
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -33,7 +42,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
         }
 
@@ -49,9 +58,9 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(bookingId);
             }
-            catch (DuplicateException ex)
+            catch (NonExistentException ex)
             {
-                return Conflict(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -59,21 +68,21 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> UpdateBooking([FromServices] UpdateBookingHandler handler, [FromBody] UpdateBookingCommand updateBookingCommand)
+        public async Task<ActionResult<int>> AssignRoomToBooking([FromServices] AssignRoomToBookingHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(updateBookingCommand);
+                var roomId = await handler.HandleAsync(id);
 
-                return Ok();
+                return Ok(roomId);
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
             catch (ValidationException ex)
             {
@@ -94,7 +103,7 @@ namespace H2Projekt.API.Controllers
             }
             catch (NonExistentException ex)
             {
-                return NotFound(ex.Message);
+                return NotFound(ex.GetProblemDetails());
             }
         }
     }

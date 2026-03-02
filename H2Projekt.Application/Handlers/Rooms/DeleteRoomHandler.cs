@@ -18,10 +18,12 @@ namespace H2Projekt.Application.Handlers.Rooms
 
             if (room is null)
             {
-                throw new NonExistentException($"Room with id {id} doesn't exist.");
+                throw new NonExistentException($"Room with ID {id} doesn't exist.");
             }
 
-            await _roomRepository.DeleteRoomAsync(room, cancellationToken);
+            room.RoomType.RemoveRoom(room);
+
+            await _roomRepository.SaveChangesAsync(cancellationToken);
         }
     }
 }

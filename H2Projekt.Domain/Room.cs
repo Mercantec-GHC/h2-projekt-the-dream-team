@@ -1,4 +1,6 @@
-﻿using H2Projekt.Domain.Enums;
+﻿using FluentValidation;
+using H2Projekt.Domain.Enums;
+using H2Projekt.Domain.Validators.Rooms;
 
 namespace H2Projekt.Domain
 {
@@ -10,7 +12,7 @@ namespace H2Projekt.Domain
         public RoomType RoomType { get; private set; } = default!;
 
         public RoomAvailabilityStatus Status { get; private set; }
-        public ICollection<Booking> Bookings { get; private set; } = new List<Booking>();
+        public Booking? Booking { get; private set; }
 
         public Room() { }
 
@@ -19,6 +21,8 @@ namespace H2Projekt.Domain
             Number = number;
             RoomTypeId = roomTypeId;
             Status = status;
+
+            ThrowIfInvalid();
         }
 
         public void UpdateDetails(string number, int roomTypeId, RoomAvailabilityStatus status)
@@ -26,11 +30,29 @@ namespace H2Projekt.Domain
             Number = number;
             RoomTypeId = roomTypeId;
             Status = status;
+
+            ThrowIfInvalid();
         }
 
-        public void UpdateDetails(RoomAvailabilityStatus status)
+        public void UpdateStatus(RoomAvailabilityStatus status)
         {
             Status = status;
+
+            ThrowIfInvalid();
+        }
+
+        private void ThrowIfInvalid()
+        {
+            var validator = new RoomValidator();
+
+            var result = validator.Validate(this);
+
+            if (result.IsValid)
+            {
+                return;
+            }
+
+            throw new ValidationException(result.Errors);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using FluentValidation;
-using H2Projekt.Application.Commands.Rooms;
+﻿using H2Projekt.Application.Commands.Rooms;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
 using H2Projekt.Domain;
@@ -9,12 +8,10 @@ namespace H2Projekt.Application.Handlers.Rooms
     public class CreateRoomTypeHandler
     {
         private readonly IRoomRepository _roomRepository;
-        private readonly IValidator<RoomType> _validator;
 
-        public CreateRoomTypeHandler(IRoomRepository roomRepository, IValidator<RoomType> validator)
+        public CreateRoomTypeHandler(IRoomRepository roomRepository)
         {
             _roomRepository = roomRepository;
-            _validator = validator;
         }
 
         public async Task<int> HandleAsync(CreateRoomTypeCommand request, CancellationToken cancellationToken = default)
@@ -26,14 +23,7 @@ namespace H2Projekt.Application.Handlers.Rooms
                 throw new DuplicateException($"Room type with name {request.Name} already exists.");
             }
 
-            var roomType = new RoomType(request.Name, request.Description, request.MaxOccupancy, request.PricePerNight);
-
-            var validationResult = await _validator.ValidateAsync(roomType);
-
-            if (!validationResult.IsValid)
-            {
-                throw new ValidationException(validationResult.Errors);
-            }
+            var roomType = new RoomType(request.Name, request.Description, request.MaxOccupancy, request.PetsAllowed, request.PricePerNight);
 
             await _roomRepository.AddRoomTypeAsync(roomType, cancellationToken);
 

@@ -18,12 +18,20 @@
 
 <div class="d-flex gap-3 justify-content-between mb-4">
     <div class="d-flex gap-3 align-items-center">
-        <a href="/admin" class="btn btn-secondary">Tilbage</a>
+        <a href="/admin" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i>
+
+            Tilbage
+        </a>
 
         <h3 class="mb-0">Gæster</h3>
     </div>
 
-    <button type="button" class="btn btn-success" @onclick="() => PrepareGuestCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+    <button type="button" class="btn btn-success" @onclick="() => PrepareGuestCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">
+        <i class="bi bi-plus-lg"></i>
+
+        Tilføj
+    </button>
 </div>
 
 @if (guests is null)
@@ -39,7 +47,7 @@ else
     <table id="dataTable" class="table table-striped">
         <thead>
             <tr>
-                <th width="100">Id</th>
+                <th width="100">ID</th>
                 <th width="100">Fornavn</th>
                 <th width="100">Efternavn</th>
                 <th width="100">Email</th>
@@ -56,9 +64,17 @@ else
                     <td class="align-middle">@guest.Email</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-secondary" @onclick="() => PrepareGuestCreationOrUpdate(guest)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareGuestCreationOrUpdate(guest)" data-bs-toggle="modal" data-bs-target="#createEditModal">
+                                <i class="bi bi-pencil-fill"></i>
 
-                            <button class="btn btn-danger" @onclick="() => PrepareGuestDeletion(guest)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                                Rediger
+                            </button>
+
+                            <button class="btn btn-sm btn-danger" @onclick="() => PrepareGuestDeletion(guest)" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="bi bi-trash-fill"></i>
+
+                                Slet
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -74,9 +90,7 @@ else
                 <h5 class="fs-4 mb-0" id="createEditModalLabel">@(guestToEdit?.Id > 0 ? "Rediger" : "Tilføj") Gæst</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
@@ -98,8 +112,28 @@ else
             </div>
 
             <div class="d-flex gap-3">
-                <button type="button" class="btn btn-primary w-50" @onclick="CreateOrSaveGuest">Gem</button>
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+                @if (guestToEdit?.Id > 0)
+                {
+                    <button type="button" class="btn btn-primary w-50" @onclick="CreateOrSaveGuest">
+                        <i class="bi bi-floppy"></i>
+
+                        Gem Gæst
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-success w-50" @onclick="CreateOrSaveGuest">
+                        <i class="bi bi-plus-lg"></i>
+
+                        Tilføj Gæst
+                    </button>
+                }
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
             </div>
         </div>
     </div>
@@ -112,9 +146,7 @@ else
                 <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Gæst</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
@@ -129,8 +161,17 @@ else
             }
 
             <div class="d-flex gap-3 mt-3">
-                <button type="button" class="btn btn-danger w-50" @onclick="DeleteGuest">Slet</button>
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+                <button type="button" class="btn btn-danger w-50" @onclick="DeleteGuest">
+                    <i class="bi bi-trash-fill"></i>
+
+                    Slet Gæst
+                </button>
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
             </div>
         </div>
     </div>

@@ -1,0 +1,38 @@
+﻿using FluentValidation;
+
+namespace H2Projekt.Domain.Validators.Bookings
+{
+    public class BookingValidator : AbstractValidator<Booking>
+    {
+        public BookingValidator()
+        {
+            RuleFor(booking => booking.GuestId)
+                .GreaterThan(0)
+                .WithMessage("Gæst ID'et skal være større end 0.");
+            RuleFor(booking => booking.RoomTypeId)
+                .GreaterThan(0)
+                .WithMessage("Værelsestype ID'et skal være større end 0.");
+            RuleFor(booking => booking.FromDate)
+                .GreaterThanOrEqualTo(DateOnly.FromDateTime(DateTime.Now))
+                .When(booking => booking.Id == 0)
+                .WithMessage("Fra dato skal være i dag eller i fremtiden for nye bookinger.");
+            RuleFor(booking => booking.FromDate)
+                .LessThanOrEqualTo(booking => booking.ToDate)
+                .WithMessage("Fra dato skal være tidligere eller lig med Til dato.");
+            RuleFor(booking => booking.ToDate)
+                .GreaterThanOrEqualTo(booking => booking.FromDate)
+                .WithMessage("Til dato skal være senere eller lig med Fra dato.");
+            RuleFor(request => request.NumberOfAdults)
+                .GreaterThanOrEqualTo(1)
+                .When(request => request.NumberOfChildren == 0)
+                .WithMessage("Antal voksne skal være mindst 1, hvis der ikke er børn.");
+            RuleFor(request => request.NumberOfChildren)
+                .GreaterThanOrEqualTo(1)
+                .When(request => request.NumberOfAdults == 0)
+                .WithMessage("Antal børn skal være mindst 1, hvis der ikke er voksne.");
+            RuleFor(booking => booking.Room)
+                .Must((booking, room) => room is null || room.RoomTypeId == booking.RoomTypeId)
+                .WithMessage("Tildelt værelse skal være af samme type som bookingens værelsestype.");
+        }
+    }
+}

@@ -1,4 +1,7 @@
-﻿namespace H2Projekt.Domain
+﻿using FluentValidation;
+using H2Projekt.Domain.Validators.Bookings;
+
+namespace H2Projekt.Domain
 {
     public class Booking : EntityBase
     {
@@ -10,6 +13,9 @@
 
         public DateOnly FromDate { get; private set; }
         public DateOnly ToDate { get; private set; }
+        public int NumberOfAdults { get; private set; }
+        public int NumberOfChildren { get; private set; }
+        public bool TravelingWithPets { get; private set; }
         public decimal PriceLocked { get; private set; }
 
         public int? RoomId { get; private set; }
@@ -17,19 +23,40 @@
 
         public Booking() { }
 
-        public Booking(int guestId, int roomTypeId, DateOnly fromDate, DateOnly toDate, decimal priceLocked)
+        public Booking(int guestId, int roomTypeId, DateOnly fromDate, DateOnly toDate, int numberOfAdults, int numberOfChildren, bool travelingWithPets, decimal priceLocked)
         {
             GuestId = guestId;
             RoomTypeId = roomTypeId;
             FromDate = fromDate;
             ToDate = toDate;
+            NumberOfAdults = numberOfAdults;
+            NumberOfChildren = numberOfChildren;
+            TravelingWithPets = travelingWithPets;
             PriceLocked = priceLocked;
+
+            ThrowIfInvalid();
         }
 
         public void AssignRoom(Room room)
         {
             RoomId = room.Id;
             Room = room;
+
+            ThrowIfInvalid();
+        }
+
+        private void ThrowIfInvalid()
+        {
+            var validator = new BookingValidator();
+
+            var result = validator.Validate(this);
+
+            if (result.IsValid)
+            {
+                return;
+            }
+
+            throw new ValidationException(result.Errors);
         }
     }
 }

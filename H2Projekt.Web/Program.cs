@@ -15,14 +15,23 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddOutputCache();
 
-builder.Services.AddHttpClient<ApiClient>(client =>
+builder.Services
+    .AddHttpClient<ApiClient>(client =>
     {
         // This URL uses "https+http://" to indicate HTTPS is preferred over HTTP.
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
+    })
+    .AddTypedClient((httpClient) =>
+    {
+        var apiClient = new ApiClient(httpClient);
+
+        apiClient.ReadResponseAsString = true;
+
+        return apiClient;
     });
 
-builder.Services.AddScoped(sp => new HttpClient
+builder.Services.AddScoped(_ => new HttpClient
 {
     BaseAddress = new Uri("https://localhost:7418/")
 });

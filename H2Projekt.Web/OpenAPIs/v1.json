@@ -48,6 +48,44 @@
         }
       }
     },
+    "/api/Booking/GetBookingsOverview": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Booking/GetBookingById/{id}": {
       "get": {
         "tags": [
@@ -216,34 +254,61 @@
         }
       }
     },
-    "/api/Booking/UpdateBooking": {
-      "put": {
+    "/api/Booking/AssignRoomToBooking/{id}": {
+      "patch": {
         "tags": [
           "Booking"
         ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBookingCommand"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBookingCommand"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateBookingCommand"
-              }
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "pattern": "^-?(?:0|[1-9]\\d*)$",
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "pattern": "^-?(?:0|[1-9]\\d*)$",
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "pattern": "^-?(?:0|[1-9]\\d*)$",
+                  "type": [
+                    "integer",
+                    "string"
+                  ],
+                  "format": "int32"
+                }
+              }
+            }
           },
           "404": {
             "description": "Not Found",
@@ -957,6 +1022,26 @@
               }
             }
           },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -1130,6 +1215,84 @@
                   "items": {
                     "$ref": "#/components/schemas/RoomTypeDto"
                   }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/Room/GetAvailableRoomTypesForStay": {
+      "get": {
+        "tags": [
+          "Room"
+        ],
+        "parameters": [
+          {
+            "name": "FromDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "ToDate",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "NumberOfAdults",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "NumberOfChildren",
+            "in": "query",
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "TravelingWithPets",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailableRoomTypesForStayDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailableRoomTypesForStayDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AvailableRoomTypesForStayDto"
                 }
               }
             }
@@ -1624,6 +1787,29 @@
   },
   "components": {
     "schemas": {
+      "AvailableRoomTypesForStayDto": {
+        "type": "object",
+        "properties": {
+          "suitableRoomTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoomTypeDto"
+            }
+          },
+          "otherRoomTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoomTypeDto"
+            }
+          },
+          "unavailableRoomTypes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoomTypeDto"
+            }
+          }
+        }
+      },
       "BookingDto": {
         "type": "object",
         "properties": {
@@ -1656,6 +1842,25 @@
               "string"
             ],
             "format": "double"
+          },
+          "numberOfAdults": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "numberOfChildren": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "travelingWithPets": {
+            "type": "boolean"
           },
           "room": {
             "oneOf": [
@@ -1711,6 +1916,60 @@
           }
         }
       },
+      "BookingWithoutRoomDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "guest": {
+            "$ref": "#/components/schemas/GuestWithoutBookingsDto"
+          },
+          "roomType": {
+            "$ref": "#/components/schemas/RoomTypeDto"
+          },
+          "fromDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "toDate": {
+            "type": "string",
+            "format": "date"
+          },
+          "priceLocked": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "numberOfAdults": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "numberOfChildren": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "travelingWithPets": {
+            "type": "boolean"
+          }
+        }
+      },
       "CreateBookingCommand": {
         "type": "object",
         "properties": {
@@ -1737,6 +1996,25 @@
           "toDate": {
             "type": "string",
             "format": "date"
+          },
+          "numberOfAdults": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "numberOfChildren": {
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ],
+            "format": "int32"
+          },
+          "travelingWithPets": {
+            "type": "boolean"
           }
         }
       },
@@ -1796,12 +2074,12 @@
             "format": "date"
           },
           "pricePerNight": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
-              "integer",
+              "number",
               "string"
             ],
-            "format": "int32"
+            "format": "double"
           }
         }
       },
@@ -1821,6 +2099,9 @@
               "string"
             ],
             "format": "int32"
+          },
+          "petsAllowed": {
+            "type": "boolean"
           },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
@@ -1921,7 +2202,11 @@
         }
       },
       "RoomAvailabilityStatus": {
-        "type": "integer"
+        "enum": [
+          "Available",
+          "Occupied",
+          "Maintenance"
+        ]
       },
       "RoomDiscountDto": {
         "type": "object",
@@ -1949,12 +2234,12 @@
             "format": "date"
           },
           "pricePerNight": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
-              "integer",
+              "number",
               "string"
             ],
-            "format": "int32"
+            "format": "double"
           }
         }
       },
@@ -1977,6 +2262,16 @@
           },
           "status": {
             "$ref": "#/components/schemas/RoomAvailabilityStatus"
+          },
+          "booking": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/BookingWithoutRoomDto"
+              }
+            ]
           }
         }
       },
@@ -2007,6 +2302,9 @@
               "string"
             ],
             "format": "int32"
+          },
+          "petsAllowed": {
+            "type": "boolean"
           },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
@@ -2051,27 +2349,6 @@
             "items": {
               "type": "string"
             }
-          }
-        }
-      },
-      "UpdateBookingCommand": {
-        "type": "object",
-        "properties": {
-          "bookingId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "roomId": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
           }
         }
       },
@@ -2147,12 +2424,12 @@
             "format": "date"
           },
           "pricePerNight": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
-              "integer",
+              "number",
               "string"
             ],
-            "format": "int32"
+            "format": "double"
           }
         }
       },
@@ -2180,6 +2457,9 @@
               "string"
             ],
             "format": "int32"
+          },
+          "petsAllowed": {
+            "type": "boolean"
           },
           "pricePerNight": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",

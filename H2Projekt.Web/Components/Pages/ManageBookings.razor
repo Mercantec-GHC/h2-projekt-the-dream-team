@@ -17,7 +17,11 @@
 }
 
 <div class="d-flex gap-3 align-items-center mb-4">
-    <a href="/admin" class="btn btn-secondary">Tilbage</a>
+    <a href="/admin" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i>
+
+        Tilbage
+    </a>
 
     <h3 class="mb-0">Bookings</h3>
 </div>
@@ -35,12 +39,15 @@ else
     <table id="dataTable" class="table table-striped">
         <thead>
             <tr>
-                <th width="100">Id</th>
+                <th width="100">ID</th>
                 <th width="100">Gæst</th>
                 <th width="100">Værelsestype</th>
                 <th width="100">Fra dato</th>
                 <th width="100">Til dato</th>
                 <th width="100">Total pris</th>
+                <th width="100">Antal voksne</th>
+                <th width="100">Antal børn</th>
+                <th width="100">Kæledyr</th>
                 <th width="100">Tildelt værelse</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
@@ -55,15 +62,30 @@ else
                     <td class="align-middle">@booking.FromDate.ToString("dd/MM/yyyy")</td>
                     <td class="align-middle">@booking.ToDate.ToString("dd/MM/yyyy")</td>
                     <td class="align-middle">@booking.PriceLocked.ToString("C")</td>
-                    <td class="align-middle">@(booking.Room?.Number ?? "")</td>
+                    <td class="align-middle">@booking.NumberOfAdults</td>
+                    <td class="align-middle">@booking.NumberOfChildren</td>
+                    <td class="align-middle">@((booking.TravelingWithPets ? "Ja" : "Nej"))</td>
+                    <td class="align-middle">
+                        @if (booking.Room is not null)
+                        {
+                            <span>#@booking.Room.Number</span>
+                        }
+                        else
+                        {
+                            <button class="btn btn-sm btn-primary" @onclick="() => AssignRoom(booking)">
+                                <i class="bi bi-check-lg"></i>
+
+                                Tildel
+                            </button>
+                        }
+                    </td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            @if (booking.Room is null)
-                            {
-                                <button type="button" class="btn btn-secondary" @onclick="() => PrepareBookingUpdate(booking)" data-bs-toggle="modal" data-bs-target="#assignRoomModal">Tildel værelse</button>
-                            }
+                            <button class="btn btn-sm btn-danger" @onclick="() => PrepareBookingDeletion(booking)" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="bi bi-trash-fill"></i>
 
-                            <button class="btn btn-danger" @onclick="() => PrepareBookingDeletion(booking)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                                Slet
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -72,44 +94,6 @@ else
     </table>
 }
 
-<div class="modal fade" id="assignRoomModal" tabindex="-1" aria-labelledby="assignRoomModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <h5 class="fs-4 mb-0" id="assignRoomModalLabel">Tildel værelse</h5>
-
-                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
-                </button>
-            </div>
-
-            <div class="modal-body my-3 p-0">
-                @if (modalException is not null)
-                {
-                    <div class="d-flex flex-column gap-2 mb-3">
-                        @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
-                        {
-                            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
-                        }
-                    </div>
-                }
-
-                @if (bookingToEdit is not null)
-                {
-                    <EditBookingFields Model="bookingToEdit" Rooms="rooms" Bookings="bookings" />
-                }
-            </div>
-
-            <div class="d-flex gap-3">
-                <button type="button" class="btn btn-primary w-50" @onclick="AssignRoom">Gem</button>
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-3">
@@ -117,9 +101,7 @@ else
                 <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Booking</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
@@ -134,8 +116,17 @@ else
             }
 
             <div class="d-flex gap-3 mt-3">
-                <button type="button" class="btn btn-danger w-50" @onclick="DeleteBooking">Slet</button>
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+                <button type="button" class="btn btn-danger w-50" @onclick="DeleteBooking">
+                    <i class="bi bi-trash-fill"></i>
+
+                    Slet Booking
+                </button>
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
             </div>
         </div>
     </div>
@@ -145,7 +136,6 @@ else
     private ApiException? exception;
     private ApiException? modalException;
 
-    private BookingDto? bookingToEdit;
     private int? bookingToDelete;
 
     private ICollection<BookingDto> bookings;
@@ -157,19 +147,34 @@ else
         rooms = await Api.GetAllRoomsAsync();
     }
 
-    public void PrepareBookingUpdate(BookingDto booking)
+    public async Task AssignRoom(BookingDto booking)
     {
-        modalException = null;
+        exception = null;
 
-        bookingToEdit = new BookingDto()
+        try
         {
-            Id = booking.Id,
-            Guest = booking.Guest,
-            RoomType = booking.RoomType,
-            FromDate = booking.FromDate,
-            ToDate = booking.ToDate,
-            Room = booking.Room,
-        };
+            var roomId = await Api.AssignRoomToBookingAsync(booking.Id);
+
+            var room = rooms.First(r => r.Id == roomId);
+
+            var bookingToUpdate = bookings.First(b => b.Id == booking.Id);
+
+            bookingToUpdate.Room = new RoomWithoutBookingsDto()
+            {
+                Id = room.Id,
+                Number = room.Number,
+                RoomType = room.RoomType,
+                Status = room.Status
+            };
+
+            exception = new ApiException(null, 200, $"Værelse #{room.Number} er tildelt booking #{booking.Id}.", null, null);
+
+            StateHasChanged();
+        }
+        catch (ApiException ex)
+        {
+            exception = ex;
+        }
     }
 
     public void PrepareBookingDeletion(BookingDto booking)
@@ -177,44 +182,6 @@ else
         modalException = null;
 
         bookingToDelete = booking.Id;
-    }
-
-    public async Task AssignRoom()
-    {
-        modalException = null;
-
-        if (bookingToEdit is null)
-        {
-            return;
-        }
-
-        try
-        {
-            await Api.UpdateBookingAsync(new UpdateBookingCommand()
-            {
-                BookingId = bookingToEdit.Id,
-                RoomId = bookingToEdit.Room.Id,
-            });
-
-            var booking = bookings.FirstOrDefault(r => r.Id == bookingToEdit.Id);
-
-            if (booking is not null)
-            {
-                booking.Room = bookingToEdit.Room;
-
-                exception = new ApiException(null, 200, $"Værelse #{bookingToEdit.Room.Number} er tildelt booking #{bookingToEdit.Id}.", null, null);
-            }
-
-            await JS.InvokeVoidAsync("hideModal", "#assignRoomModal");
-
-            bookingToEdit = null;
-
-            StateHasChanged();
-        }
-        catch (ApiException ex)
-        {
-            modalException = ex;
-        }
     }
 
     public async Task DeleteBooking()

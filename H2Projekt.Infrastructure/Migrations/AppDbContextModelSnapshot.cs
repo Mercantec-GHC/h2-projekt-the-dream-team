@@ -36,6 +36,12 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.Property<int>("GuestId")
                         .HasColumnType("integer");
 
+                    b.Property<int>("NumberOfAdults")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("NumberOfChildren")
+                        .HasColumnType("integer");
+
                     b.Property<decimal>("PriceLocked")
                         .HasPrecision(10, 2)
                         .HasColumnType("numeric(10,2)");
@@ -49,11 +55,15 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.Property<DateOnly>("ToDate")
                         .HasColumnType("date");
 
+                    b.Property<bool>("TravelingWithPets")
+                        .HasColumnType("boolean");
+
                     b.HasKey("Id");
 
                     b.HasIndex("GuestId");
 
-                    b.HasIndex("RoomId");
+                    b.HasIndex("RoomId")
+                        .IsUnique();
 
                     b.HasIndex("RoomTypeId");
 
@@ -132,9 +142,9 @@ namespace H2Projekt.Infrastructure.Migrations
                     b.Property<DateOnly>("FromDate")
                         .HasColumnType("date");
 
-                    b.Property<int>("PricePerNight")
+                    b.Property<decimal>("PricePerNight")
                         .HasPrecision(10, 2)
-                        .HasColumnType("integer");
+                        .HasColumnType("numeric(10,2)");
 
                     b.Property<int>("RoomTypeId")
                         .HasColumnType("integer");
@@ -158,14 +168,20 @@ namespace H2Projekt.Infrastructure.Migrations
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Description")
-                        .HasColumnType("text");
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<int>("MaxOccupancy")
                         .HasColumnType("integer");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(50)
+                        .HasColumnType("character varying(50)");
+
+                    b.Property<bool>("PetsAllowed")
+                        .HasColumnType("boolean");
 
                     b.Property<decimal>("PricePerNight")
                         .HasPrecision(10, 2)
@@ -188,14 +204,14 @@ namespace H2Projekt.Infrastructure.Migrations
                         .IsRequired();
 
                     b.HasOne("H2Projekt.Domain.Room", "Room")
-                        .WithMany("Bookings")
-                        .HasForeignKey("RoomId")
+                        .WithOne("Booking")
+                        .HasForeignKey("H2Projekt.Domain.Booking", "RoomId")
                         .OnDelete(DeleteBehavior.Restrict);
 
                     b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
-                        .WithMany()
+                        .WithMany("Bookings")
                         .HasForeignKey("RoomTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Guest");
@@ -208,7 +224,7 @@ namespace H2Projekt.Infrastructure.Migrations
             modelBuilder.Entity("H2Projekt.Domain.Room", b =>
                 {
                     b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
-                        .WithMany()
+                        .WithMany("Rooms")
                         .HasForeignKey("RoomTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -219,7 +235,7 @@ namespace H2Projekt.Infrastructure.Migrations
             modelBuilder.Entity("H2Projekt.Domain.RoomDiscount", b =>
                 {
                     b.HasOne("H2Projekt.Domain.RoomType", "RoomType")
-                        .WithMany()
+                        .WithMany("RoomDiscounts")
                         .HasForeignKey("RoomTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -234,7 +250,17 @@ namespace H2Projekt.Infrastructure.Migrations
 
             modelBuilder.Entity("H2Projekt.Domain.Room", b =>
                 {
+                    b.Navigation("Booking")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("H2Projekt.Domain.RoomType", b =>
+                {
                     b.Navigation("Bookings");
+
+                    b.Navigation("RoomDiscounts");
+
+                    b.Navigation("Rooms");
                 });
 #pragma warning restore 612, 618
         }

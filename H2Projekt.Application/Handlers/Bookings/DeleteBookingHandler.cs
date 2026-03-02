@@ -20,17 +20,10 @@ namespace H2Projekt.Application.Handlers.Bookings
 
             if (booking is null)
             {
-                throw new NonExistentException($"Booking with id {id} doesn't exist.");
+                throw new NonExistentException($"Booking with ID {id} doesn't exist.");
             }
 
-            var guest = await _guestRepository.GetGuestByIdAsync(booking.GuestId, cancellationToken);
-
-            if (guest is null)
-            {
-                throw new NonExistentException($"Guest with id {booking.GuestId} doesn't exist.");
-            }
-
-            guest.RemoveBooking(booking);
+            booking.Guest.RemoveBooking(booking);
 
             await _guestRepository.SaveChangesAsync(cancellationToken);
         }

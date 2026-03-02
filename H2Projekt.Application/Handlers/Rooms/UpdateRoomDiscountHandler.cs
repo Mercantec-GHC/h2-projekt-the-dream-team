@@ -1,39 +1,35 @@
-﻿using FluentValidation;
-using H2Projekt.Application.Commands.Rooms;
+﻿using H2Projekt.Application.Commands.Rooms;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Domain;
 
 namespace H2Projekt.Application.Handlers.Rooms
 {
     public class UpdateRoomDiscountHandler
     {
         private readonly IRoomRepository _roomRepository;
-        private readonly IValidator<RoomDiscount> _validator;
 
-        public UpdateRoomDiscountHandler(IRoomRepository roomRepository, IValidator<RoomDiscount> validator)
+        public UpdateRoomDiscountHandler(IRoomRepository roomRepository)
         {
             _roomRepository = roomRepository;
-            _validator = validator;
         }
 
         public async Task HandleAsync(UpdateRoomDiscountCommand request, CancellationToken cancellationToken = default)
         {
-            var existingRoomDiscount = await _roomRepository.GetRoomDiscountByIdAsync(request.Id, cancellationToken);
+            var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
 
-            if (existingRoomDiscount is null)
+            if (roomType is null)
             {
-                throw new NonExistentException($"Room discount with id {request.Id} doesn't exist.");
+                throw new NonExistentException($"Room type with ID {request.RoomTypeId} doesn't exist.");
             }
 
-            existingRoomDiscount.UpdateDetails(request.RoomTypeId, request.Description, request.FromDate, request.ToDate, request.PricePerNight);
+            var roomDiscount = roomType.RoomDiscounts.FirstOrDefault(room => room.Id == request.Id);
 
-            var validationResult = await _validator.ValidateAsync(existingRoomDiscount);
-
-            if (!validationResult.IsValid)
+            if (roomDiscount is null)
             {
-                throw new ValidationException(validationResult.Errors);
+                throw new NonExistentException($"Room discount with ID {request.Id} doesn't exist.");
             }
+
+            roomDiscount.UpdateDetails(request.RoomTypeId, request.Description, request.FromDate, request.ToDate, request.PricePerNight);
 
             await _roomRepository.SaveChangesAsync(cancellationToken);
         }

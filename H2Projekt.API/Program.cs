@@ -1,27 +1,54 @@
 using FluentValidation;
+using H2Projekt.API;
+using H2Projekt.Application.Commands.Bookings.Validators;
+using H2Projekt.Application.Commands.Guests.Validators;
+using H2Projekt.Application.Commands.Rooms.Validators;
 using H2Projekt.Application.Handlers.Bookings;
 using H2Projekt.Application.Handlers.Guests;
 using H2Projekt.Application.Handlers.Rooms;
 using H2Projekt.Application.Interfaces;
-using H2Projekt.Application.Validators.Bookings;
-using H2Projekt.Application.Validators.Guests;
-using H2Projekt.Application.Validators.Rooms;
-using H2Projekt.Domain;
 using H2Projekt.Infrastructure;
 using H2Projekt.Infrastructure.Repositories;
 using H2Projekt.ServiceDefaults;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add controllers to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<FluentValidationFilter>();
+});
+
+// Add command validators to the container.
+// - Bookings
+builder.Services.AddValidatorsFromAssemblyContaining<CreateBookingValidator>();
+// - Guests
+builder.Services.AddValidatorsFromAssemblyContaining<CreateGuestValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateGuestValidator>();
+// - Rooms
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRoomValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoomValidator>();
+// - Room types
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRoomTypeValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<GetAvailableRoomTypesForStayValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoomTypeValidator>();
+// - Room discounts
+builder.Services.AddValidatorsFromAssemblyContaining<CreateRoomDiscountValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<UpdateRoomDiscountValidator>();
 
 // Add service defaults & Aspire client integrations.
 builder.AddServiceDefaults();
 
 // Add services to the container.
 builder.Services.AddProblemDetails();
+
+// Configure JSON options to use string enums.
+builder.Services.ConfigureHttpJsonOptions(options =>
+{
+    options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+});
 
 // EF Core
 builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("Db")));
@@ -31,8 +58,9 @@ builder.Services.AddDbContext<AppDbContext>(opt => opt.UseNpgsql(builder.Configu
 builder.Services.AddScoped<GetAllBookingsHandler>();
 builder.Services.AddScoped<GetBookingByIdHandler>();
 builder.Services.AddScoped<CreateBookingHandler>();
-builder.Services.AddScoped<UpdateBookingHandler>();
+builder.Services.AddScoped<AssignRoomToBookingHandler>();
 builder.Services.AddScoped<DeleteBookingHandler>();
+builder.Services.AddScoped<GetBookingsOverviewHandler>();
 // - Guests
 builder.Services.AddScoped<GetAllGuestsHandler>();
 builder.Services.AddScoped<GetGuestByIdHandler>();
@@ -48,6 +76,7 @@ builder.Services.AddScoped<UpdateRoomHandler>();
 builder.Services.AddScoped<DeleteRoomHandler>();
 // - Room types
 builder.Services.AddScoped<GetAllRoomTypesHandler>();
+builder.Services.AddScoped<GetAvailableRoomTypesForStayHandler>();
 builder.Services.AddScoped<CreateRoomTypeHandler>();
 builder.Services.AddScoped<UpdateRoomTypeHandler>();
 builder.Services.AddScoped<DeleteRoomTypeHandler>();
@@ -56,13 +85,6 @@ builder.Services.AddScoped<GetAllRoomDiscountsHandler>();
 builder.Services.AddScoped<CreateRoomDiscountHandler>();
 builder.Services.AddScoped<UpdateRoomDiscountHandler>();
 builder.Services.AddScoped<DeleteRoomDiscountHandler>();
-
-// Validators
-builder.Services.AddScoped<IValidator<Booking>, BookingValidator>();
-builder.Services.AddScoped<IValidator<Guest>, GuestValidator>();
-builder.Services.AddScoped<IValidator<Room>, RoomValidator>();
-builder.Services.AddScoped<IValidator<RoomType>, RoomTypeValidator>();
-builder.Services.AddScoped<IValidator<RoomDiscount>, RoomDiscountValidator>();
 
 // Repositories
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();

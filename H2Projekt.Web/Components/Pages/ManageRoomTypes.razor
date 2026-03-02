@@ -18,12 +18,20 @@
 
 <div class="d-flex gap-3 justify-content-between mb-4">
     <div class="d-flex gap-3 align-items-center">
-        <a href="/admin" class="btn btn-secondary">Tilbage</a>
+        <a href="/admin" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i>
+
+            Tilbage
+        </a>
 
         <h3 class="mb-0">Værelsestyper</h3>
     </div>
 
-    <button type="button" class="btn btn-success" @onclick="() => PrepareRoomTypeCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">Tilføj</button>
+    <button type="button" class="btn btn-success" @onclick="() => PrepareRoomTypeCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">
+        <i class="bi bi-plus-lg"></i>
+
+        Tilføj
+    </button>
 </div>
 
 @if (roomTypes is null)
@@ -39,10 +47,11 @@ else
     <table id="dataTable" class="table table-striped">
         <thead>
             <tr>
-                <th width="100">Id</th>
+                <th width="100">ID</th>
                 <th width="100">Navn</th>
                 <th width="100">Beskrivelse</th>
                 <th width="100">Maks personer</th>
+                <th width="100">Kæledyr tilladt</th>
                 <th width="100">Pris pr. nat</th>
                 <th width="1" data-dt-order="disable"></th>
             </tr>
@@ -55,12 +64,21 @@ else
                     <td class="align-middle">@roomType.Name</td>
                     <td class="align-middle">@roomType.Description</td>
                     <td class="align-middle">@roomType.MaxOccupancy</td>
+                    <td class="align-middle">@((roomType.PetsAllowed ? "Ja" : "Nej"))</td>
                     <td class="align-middle">@roomType.PricePerNight.ToString("C")</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-secondary" @onclick="() => PrepareRoomTypeCreationOrUpdate(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">Rediger</button>
+                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareRoomTypeCreationOrUpdate(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">
+                                <i class="bi bi-pencil-fill"></i>
 
-                            <button class="btn btn-danger" @onclick="() => PrepareRoomTypeDeletion(roomType)" data-bs-toggle="modal" data-bs-target="#deleteModal">Slet</button>
+                                Rediger
+                            </button>
+
+                            <button class="btn btn-sm btn-danger" @onclick="() => PrepareRoomTypeDeletion(roomType)" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="bi bi-trash-fill"></i>
+
+                                Slet
+                            </button>
                         </div>
                     </td>
                 </tr>
@@ -76,9 +94,7 @@ else
                 <h5 class="fs-4 mb-0" id="createEditModalLabel">@(roomTypeToEdit?.Id > 0 ? "Rediger" : "Tilføj") Værelsestype</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
@@ -100,8 +116,28 @@ else
             </div>
 
             <div class="d-flex gap-3">
-                <button type="button" class="btn btn-primary w-50" data-bs-dismiss="modal" @onclick="CreateOrSaveRoomType">Gem</button>
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+                @if (roomTypeToEdit?.Id > 0)
+                {
+                    <button type="button" class="btn btn-primary w-50" @onclick="CreateOrSaveRoomType">
+                        <i class="bi bi-floppy"></i>
+
+                        Gem Værelsestype
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-success w-50" @onclick="CreateOrSaveRoomType">
+                        <i class="bi bi-plus-lg"></i>
+
+                        Tilføj Værelsestype
+                    </button>
+                }
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
             </div>
         </div>
     </div>
@@ -114,9 +150,7 @@ else
                 <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Værelsestype</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" width="16" height="16" viewBox="0 0 24 24">
-                        <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 6L6 18M6 6l12 12"></path>
-                    </svg>
+                    <i class="bi bi-x-lg"></i>
                 </button>
             </div>
 
@@ -131,8 +165,17 @@ else
             }
 
             <div class="d-flex gap-3 mt-3">
-                <button type="button" class="btn btn-danger w-50" data-bs-dismiss="modal" @onclick="DeleteRoomType">Slet</button>
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">Annullér</button>
+                <button type="button" class="btn btn-danger w-50" @onclick="DeleteRoomType">
+                    <i class="bi bi-trash-fill"></i>
+
+                    Slet
+                </button>
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
             </div>
         </div>
     </div>
@@ -164,6 +207,7 @@ else
             roomTypeToEdit.Name = roomType.Name;
             roomTypeToEdit.Description = roomType.Description;
             roomTypeToEdit.MaxOccupancy = roomType.MaxOccupancy;
+            roomTypeToEdit.PetsAllowed = roomType.PetsAllowed;
             roomTypeToEdit.PricePerNight = roomType.PricePerNight;
         }
     }
@@ -193,6 +237,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
                     PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
@@ -202,6 +247,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
                     PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
@@ -215,6 +261,7 @@ else
                     Name = roomTypeToEdit.Name,
                     Description = roomTypeToEdit.Description,
                     MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
                     PricePerNight = roomTypeToEdit.PricePerNight,
                 });
 
@@ -225,6 +272,7 @@ else
                     roomType.Name = roomTypeToEdit.Name;
                     roomType.Description = roomTypeToEdit.Description;
                     roomType.MaxOccupancy = roomTypeToEdit.MaxOccupancy;
+                    roomType.PetsAllowed = roomTypeToEdit.PetsAllowed;
                     roomType.PricePerNight = roomTypeToEdit.PricePerNight;
 
                     exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToEdit.Name}\" er opdateret.", null, null);
