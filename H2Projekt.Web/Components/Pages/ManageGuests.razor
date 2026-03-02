@@ -261,6 +261,11 @@ else
                     guest.LastName = guestToEdit.LastName;
                     guest.Email = guestToEdit.Email;
 
+                    if (GuestService.SelectedGuest?.Id == guest.Id)
+                    {
+                        await GuestService.SelectGuest(guest);
+                    }
+
                     exception = new ApiException(null, 200, $"Gæst \"{guestToEdit.FirstName}\" opdateret.", null, null);
                 }
             }
