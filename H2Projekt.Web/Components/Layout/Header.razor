@@ -39,7 +39,9 @@
         </button>
 
         <div class="dropdown-menu dropdown-menu-end px-2">
-            <div class="d-flex flex-column gap-3">
+            <div class="d-flex flex-column gap-2">
+                <GuestSidebar />
+
                 <button class="btn btn-subtle text-danger" @onclick="() => GuestService.SelectGuest(null)">
                     <i class="bi bi-box-arrow-right"></i>
 
