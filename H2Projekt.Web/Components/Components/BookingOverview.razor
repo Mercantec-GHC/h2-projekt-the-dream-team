@@ -2,139 +2,69 @@
 
 @inject ApiClient Api
 
-<h3>Booking Overview</h3>
+<div class="overflow-auto w-100 max-w-diagram h-diagram rounded-2">
+    <table class="table table-bordered w-100 fs-7 m-0">
+        <thead class="position-sticky top-0 z-1">
+            <tr>
+                <th></th>
 
-    <div class="overflow-auto w-100 max-w-diagram h-diagram rounded-2">
-        <table class="table table-bordered w-100 fs-7 m-0">
-            <thead class="position-sticky top-0 z-1">
-                <tr>
-                    <th></th>
-
-                    @foreach (var d in dates)
-                    {
-                        <th class="h-2rem min-w-10rem text-center">@d.ToString("dd/MM/yyyy")</th>
-                    }
-                </tr>
-            </thead>
-
-            <tbody class="position-sticky">
-                @foreach (var roomType in rooms.Select(r => r.RoomType).DistinctBy(rt => rt.Id))
+                @foreach (var date in Data.Dates)
                 {
-                    if (!rooms.Any(r => r.RoomType.Id == roomType.Id) || !bookings.Any(b => b.RoomType.Id == roomType.Id))
-                    {
-                        continue;
-                    }
+                    <th class="h-2rem min-w-10rem text-center">@date.ToString("dd/MM/yyyy")</th>
+                }
+            </tr>
+        </thead>
 
+        <tbody class="position-sticky">
+            @foreach (var roomType in Data.RoomTypes)
+            {
+                <tr>
+                    <td class="position-relative z-0 bg-primary-subtle border-end-0 p-0 text-center">@roomType.Name</td>
+                    <td class="position-relative z-0 bg-primary-subtle border-start-0" colspan="@(Data.Dates.Count)"></td>
+                </tr>
+
+                @foreach (var room in Rooms.Where(r => r.RoomType.Id == roomType.Id))
+                {
                     <tr>
-                        <td class="position-relative z-0 bg-primary-subtle border-end-0 p-0 text-center">@roomType.Name</td>
-                        <td class="position-relative z-0 bg-primary-subtle border-start-0" colspan="@(dates.Count)"></td>
-                    </tr>
+                        <td class="position-relative z-0 h-2rem min-w-10rem text-center">@room.Number</td>
 
-                    @foreach (var room in rooms.Where(r => r.RoomType.Id == roomType.Id))
-                    {
-                        <tr>
-                            <td class="position-relative z-0 h-2rem min-w-10rem text-center">@room.Number</td>
+                        @for (int i = 0; i < Data.Dates.Count; i++)
+                        {
+                            var date = Data.Dates.ElementAt(i).ToDateOnly();
 
-                            @for (int i = 0; i < dates.Count; i++)
+                            var booking = Data.Bookings.FirstOrDefault(b => (b.Room?.Id ?? b.PossibleRoom?.Id) == room.Id && b.FromDate.ToDateOnly() <= date && b.ToDate.ToDateOnly() >= date);
+
+                            if (booking is not null)
                             {
-                                var date = dates[i];
-                                var booking = GetActiveBookingForRoomOnDate(room, date);
+                                var span = booking.ToDate.ToDateOnly().DayNumber - date.DayNumber;
 
-                                if (booking is not null)
+                                <td colspan="@(span + 1)" class="position-relative z-0 h-2rem min-w-10rem text-center">
+                                    <div class="position-absolute d-flex justify-content-center align-items-center rounded-2 border border-dark inset-1 @(booking.Room is null ? "bg-dark-subtle" : "bg-primary text-white")">
+                                        @booking.Guest?.FirstName @booking.Guest?.LastName (#@booking.Id)
+                                    </div>
+                                </td>
+
+                                if (span > 0)
                                 {
-                                    var span = booking.ToDate.ToDateOnly().DayNumber - date.DayNumber;
-
-                                    <td colspan="@(span + 1)" class="position-relative z-0 h-2rem min-w-10rem text-center">
-                                        <div class="position-absolute d-flex justify-content-center align-items-center rounded-2 border border-dark inset-1 @(booking.Room is null ? "bg-dark-subtle" : "bg-primary text-white")">
-                                            @booking.Guest?.FirstName @booking.Guest?.LastName (#@booking.Id)
-                                        </div>
-                                    </td>
-
-                                    if (span > 0)
-                                    {
-                                        i += span;
-                                    }
-                                }
-                                else
-                                {
-                                    <td class="position-relative z-0 h-2rem min-w-10rem"></td>
+                                    i += span;
                                 }
                             }
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-    </div>
-}
-
-@code {
-    [Parameter] public ICollection<BookingDto> bookings { get; set; }
-    [Parameter] public ICollection<RoomDto> rooms { get; set; }
-
-    private Dictionary<int, int> bookingsWithNoRoom = new();
-    private List<DateOnly> dates = new();
-
-    protected override async Task OnInitializedAsync()
-    {
-        bookings = await Api.GetBookingsOverviewAsync();
-        rooms = await Api.GetAllRoomsAsync();
-
-        BuildDates();
-        AllocateRoomsToUnassignedBookings();
-    }
-
-    private void BuildDates()
-    {
-        dates.Clear();
-
-        var min = bookings.Min(b => b.FromDate.ToDateOnly());
-        var max = bookings.Max(b => b.ToDate.ToDateOnly());
-
-        for (var date = min; date <= max; date = date.AddDays(1))
-        {
-            dates.Add(date);
-        }
-    }
-
-    private void AllocateRoomsToUnassignedBookings()
-    {
-        foreach (var booking in bookings.Where(b => b.Room is null).OrderBy(b => b.FromDate))
-        {
-            if (bookingsWithNoRoom.ContainsKey(booking.Id))
-                continue;
-
-            var candidateRooms = rooms.Where(r => r.RoomType.Id == booking.RoomType.Id).ToList();
-
-            foreach (var room in candidateRooms)
-            {
-                bool overlaps = HasOverlappingBookingForRoom(booking, room);
-
-                if (!overlaps)
-                {
-                    bookingsWithNoRoom[booking.Id] = room.Id;
-                    break;
+                            else
+                            {
+                                <td class="position-relative z-0 h-2rem min-w-10rem"></td>
+                            }
+                        }
+                    </tr>
                 }
             }
-        }
-    }
+        </tbody>
+    </table>
+</div>
 
-    private BookingDto? GetActiveBookingForRoomOnDate(RoomDto room, DateOnly date)
-    {
-        return bookings.FirstOrDefault(b =>
-            (b.Room?.Id == room.Id || (b.Room is null && bookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) &&
-            b.FromDate.ToDateOnly() <= date &&
-            b.ToDate.ToDateOnly() >= date
-        );
-    }
+@code {
+    [Parameter]
+    public BookingOverviewDto Data { get; set; }
 
-    private bool HasOverlappingBookingForRoom(BookingDto booking, RoomDto room)
-    {
-        return bookings.Any(b =>
-            (b.Room?.Id == room.Id || (b.Room is null && bookingsWithNoRoom.TryGetValue(b.Id, out var rid) && rid == room.Id)) &&
-            b.Id != booking.Id &&
-            b.FromDate <= booking.ToDate &&
-            b.ToDate >= booking.FromDate
-        );
-    }
+    [Parameter]
+    public ICollection<RoomDto> Rooms { get; set; }
 }
