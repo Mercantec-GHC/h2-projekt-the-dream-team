@@ -1,0 +1,133 @@
+﻿@page "/guest/settings"
+@rendermode InteractiveServer
+@inherits BasePage
+
+@inject ApiClient Api
+
+<PageTitle>Gæst - Profil</PageTitle>
+
+@if (GuestService.SelectedGuest is not null)
+{
+    @if (exception is not null)
+    {
+        <div class="d-flex flex-column gap-2 mb-4">
+            @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+            {
+                <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+            }
+        </div>
+    }
+
+    <div class="d-flex gap-4">
+        <div class="card d-flex flex-column gap-3 p-3 min-w-15rem h-fit">
+            <GuestSidebar />
+        </div>
+
+
+        <div class="card p-4 w-50">
+            <h4 class="mb-3">
+                <i class="bi bi-person-fill"></i>
+                Min Profil
+            </h4>
+
+            @if (!isEditing)
+            {
+                <div class="mb-2"><strong>Fornavn:</strong> @GuestService.SelectedGuest.FirstName</div>
+                <div class="mb-2"><strong>Efternavn:</strong> @GuestService.SelectedGuest.LastName</div>
+                <div class="mb-2"><strong>Email:</strong> @GuestService.SelectedGuest.Email</div>
+
+                <button class="btn btn-primary mt-3" @onclick="EnableEdit">
+                    <i class="bi bi-pencil-fill"></i>
+                    Rediger
+                </button>
+            }
+            else
+            {
+                <div class="mb-3">
+                    <label>Fornavn</label>
+                    <InputText class="form-control" @bind-Value="guestToEdit.FirstName" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Efternavn</label>
+                    <InputText class="form-control" @bind-Value="guestToEdit.LastName" />
+                </div>
+
+                <div class="mb-3">
+                    <label>Email</label>
+                    <InputText class="form-control" @bind-Value="guestToEdit.Email" />
+                </div>
+
+                <div class="d-flex gap-3">
+                    <button class="btn btn-success" @onclick="SaveChanges">
+                        <i class="bi bi-floppy"></i>
+                        Gem
+                    </button>
+
+                    <button class="btn btn-secondary" @onclick="CancelEdit">
+                        Annullér
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+@code {
+    private ApiException? exception;
+    private bool isEditing = false;
+
+    private GuestDto? guestToEdit;
+
+
+    private void EnableEdit()
+    {
+        if (GuestService.SelectedGuest is null)
+            return;
+
+        guestToEdit = new GuestDto
+        {
+            Id = GuestService.SelectedGuest.Id,
+            FirstName = GuestService.SelectedGuest.FirstName,
+            LastName = GuestService.SelectedGuest.LastName,
+            Email = GuestService.SelectedGuest.Email
+        };
+
+        isEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+    }
+
+    private async Task SaveChanges()
+    {
+        if (GuestService.SelectedGuest is null || guestToEdit is null)
+            return;
+
+        try
+        {
+            await Api.UpdateGuestAsync(new UpdateGuestCommand
+            {
+                Id = guestToEdit.Id,
+                FirstName = guestToEdit.FirstName,
+                LastName = guestToEdit.LastName,
+                Email = guestToEdit.Email
+            });
+
+            var updatedGuest = await Api.GetGuestByIdAsync(guestToEdit.Id);
+
+            await GuestService.SelectGuest(updatedGuest);
+
+            isEditing = false;
+
+            guestToEdit = null;
+
+        }
+        catch (ApiException ex)
+        {
+            exception = ex;
+        }
+    }
+}
