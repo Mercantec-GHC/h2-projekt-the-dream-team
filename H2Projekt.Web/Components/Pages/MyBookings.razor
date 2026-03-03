@@ -1,10 +1,10 @@
-﻿@page "/guest/my-bookings"
+﻿@page "/guest/bookings"
 @rendermode InteractiveServer
 @inherits BasePage
 
 @inject ApiClient Api
 
-<PageTitle>Gæst - Bookinger</PageTitle>
+<PageTitle>Gæst - Mine Bookinger</PageTitle>
 
 @if (GuestService.SelectedGuest is not null)
 {
@@ -23,11 +23,19 @@
             <GuestSidebar />
         </div>
 
-        <div class="d-grid gap-3" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-            @foreach (var booking in GuestService.SelectedGuest.Bookings)
-            {
-                <BookingCard Booking="booking" OnDelete="PrepareBookingDeletion" />
-            }
+        <div class="card p-3 w-100">
+            <h4 class="mb-3">
+                <i class="bi bi-calendar-range"></i>
+
+                Mine Bookinger
+            </h4>
+
+            <div class="d-grid gap-3" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                @foreach (var booking in GuestService.SelectedGuest.Bookings)
+                {
+                    <BookingCard Booking="booking" OnDelete="PrepareBookingDeletion" />
+                }
+            </div>
         </div>
     </div>
 
