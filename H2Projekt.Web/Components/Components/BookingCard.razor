@@ -1,65 +1,55 @@
 ﻿<div class="card p-3">
-    <div class="h-100 d-flex flex-column @(IsUnavailable ? "opacity-50 grayscale" : "")">
-        <h5 class="fw-bold">@RoomType.Name</h5>
+    <div class="h-100 d-flex flex-column">
+        <h5 class="fw-bold d-flex align-items-center gap-2">
+            <span class="rounded-1 bg-dark-subtle px-1">@Booking.Id</span>
+            
+            @Booking.RoomType.Name
+        </h5>
 
-        <p class="text-body-secondary">@RoomType.Description</p>
+        <p class="text-body-secondary">@Booking.RoomType.Description</p>
 
         <ul class="p-0 mb-3 mt-auto fs-7">
-            <li class="mb-1 text-body-secondary d-flex">
-                <span class="w-100">Pris pr. nat:</span>
+            <li class="text-body-secondary d-flex mb-1">
+                <span class="w-100">Total pris:</span>
 
                 <div class="d-flex text-nowrap text-body fw-bold">
-                    @if (RoomDiscount is not null && RoomDiscount.PricePerNight > 0)
-                    {
-                        <span class="text-danger">@RoomDiscount.PricePerNight.ToString("C")&nbsp;</span>
-
-                        <span class="text-decoration-line-through opacity-50">@RoomType.PricePerNight.ToString("C")</span>
-                    }
-                    else
-                    {
-                        <span>@RoomType.PricePerNight.ToString("C")</span>
-                    }
+                    @Booking.PriceLocked.ToString("C")
                 </div>
             </li>
 
-            <li class="text-body-secondary d-flex">
-                <span class="w-100">Maks Gæster:</span>
+            <li class="text-body-secondary d-flex mb-1">
+                <span class="w-100">Antal Gæster:</span>
 
-                <span class="text-nowrap text-body fw-bold">@RoomType.MaxOccupancy</span>
+                <span class="text-nowrap text-body fw-bold">@(Booking.NumberOfAdults + Booking.NumberOfChildren)</span>
             </li>
 
-            @* <li class="text-body-secondary d-flex">
-                <span class="w-100">Kæledyr tilladt:</span>
+            <li class="text-body-secondary d-flex mb-1">
+                <span class="w-100">Rejser med kæledyr:</span>
 
-                <span class="text-nowrap text-body fw-bold">Ja/nej</span>
-            </li> *@
+                <span class="text-nowrap text-body fw-bold">@(Booking.TravelingWithPets ? "Ja" : "Nej")</span>
+            </li>
+
+            <li class="text-body-secondary d-flex">
+                <span class="w-100">Periode:</span>
+
+                <span class="text-nowrap text-body fw-bold">@Booking.FromDate.ToString("dd/MM/yyyy") - @Booking.ToDate.ToString("dd/MM/yyyy")</span>
+            </li>
         </ul>
 
-        @if (IsUnavailable)
-        {
-            <button class="btn btn-primary" disabled>Ikke tilgængelig</button>
-        }
-        else
-        {
-            <button class="btn btn-primary" @onclick="() => OnBook.InvokeAsync(RoomType)" data-bs-toggle="modal" data-bs-target="#createBookingModal">
-                <i class="bi bi-plus-lg"></i>
+        <button class="btn btn-danger" @onclick="() => OnDelete.InvokeAsync(Booking)" disabled="@(!BookingIsDeletable)" data-bs-toggle="modal" data-bs-target="#deleteModal">
+            <i class="bi bi-trash-fill"></i>
 
-                Book Nu
-            </button>
-        }
+            Slet Booking
+        </button>
     </div>
 </div>
 
 @code {
     [Parameter]
-    public RoomTypeDto RoomType { get; set; }
+    public BookingWithoutGuestDto Booking { get; set; }
 
     [Parameter]
-    public RoomDiscountDto? RoomDiscount { get; set; }
+    public EventCallback<BookingWithoutGuestDto> OnDelete { get; set; }
 
-    [Parameter]
-    public bool IsUnavailable { get; set; } = false;
-
-    [Parameter]
-    public EventCallback<RoomTypeDto> OnBook { get; set; }
+    private bool BookingIsDeletable => Booking.FromDate > DateTime.Now && Booking.ToDate > DateTime.Now;
 }

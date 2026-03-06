@@ -22,7 +22,7 @@ namespace H2Projekt.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<BookingDto>>> GetBookingsOverview([FromServices] GetBookingsOverviewHandler handler)
+        public async Task<ActionResult<BookingOverviewDto>> GetBookingOverview([FromServices] GetBookingsOverviewHandler handler)
         {
             var result = await handler.HandleAsync();
 

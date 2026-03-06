@@ -1,7 +1,7 @@
 ﻿@rendermode InteractiveServer
+@inherits BasePage
 
 @inject ApiClient Api
-@inject GuestService GuestService
 
 <header class="position-fixed top-0 z-1 w-100 d-flex justify-content-between gap-3 p-2 bg-white border-bottom border-2 border-body-secondary h-5rem">
     <div class="d-flex gap-2">
@@ -39,7 +39,9 @@
         </button>
 
         <div class="dropdown-menu dropdown-menu-end px-2">
-            <div class="d-flex flex-column gap-3">
+            <div class="d-flex flex-column gap-2">
+                <GuestSidebar />
+
                 <button class="btn btn-subtle text-danger" @onclick="() => GuestService.SelectGuest(null)">
                     <i class="bi bi-box-arrow-right"></i>
 

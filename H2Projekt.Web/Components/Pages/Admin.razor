@@ -16,7 +16,7 @@
             <div class="card-body text-center">
                 <h5 class="card-title text-muted">Bookings</h5>
 
-                <h2 class="display-4 fw-bold mb-0 mt-1">@(bookings?.Count ?? 0)</h2>
+                <h2 class="display-4 fw-bold mb-0 mt-1">@bookingsCount</h2>
 
                 <a href="/admin/manage-bookings" class="btn btn-primary mt-3 w-100">
                     <i class="bi bi-calendar-range-fill"></i>
@@ -99,12 +99,13 @@
 <!-- Gantt Diagram Section -->
 <div class="w-100 card shadow-sm">
     <div class="card-header bg-white">
+        <h3 class="text-center mb-0">Booking Overview</h3>
     </div>
 
     <div class="card-body p-0 h-diagram d-flex flex-column align-items-center justify-content-center">
-        @if (rooms is not null && rooms.Any() && bookings is not null && bookings.Any())
+        @if (rooms is not null && rooms.Any() && bookingOverview is not null)
         {
-            <BookingOverview Rooms="rooms" Bookings="bookings" />
+            <BookingOverview Data="bookingOverview" Rooms="rooms" />
         }
         else
         {
@@ -118,15 +119,19 @@
 </div>
 
 @code {
-    private ICollection<BookingDto> bookings;
+    private int bookingsCount = 0;
     private int guestsCount = 0;
     private ICollection<RoomDto> rooms;
     private int roomTypesCount = 0;
     private int roomDiscountsCount = 0;
 
+    private BookingOverviewDto bookingOverview;
+
     protected override async Task OnInitializedAsync()
     {
-        bookings = await Api.GetAllBookingsAsync();
+        var bookings = await Api.GetAllBookingsAsync();
+
+        bookingsCount = bookings.Count;
 
         var guests = await Api.GetAllGuestsAsync();
 
@@ -141,6 +146,8 @@
         var roomDiscounts = await Api.GetAllRoomDiscountsAsync();
 
         roomDiscountsCount = roomDiscounts.Count;
+
+        bookingOverview = await Api.GetBookingOverviewAsync();
 
         StateHasChanged();
     }

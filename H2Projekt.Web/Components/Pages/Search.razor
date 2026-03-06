@@ -46,7 +46,7 @@
                     <div class="d-grid gap-3 w-fit" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                         @foreach (var roomType in availableRoomTypesForStay.SuitableRoomTypes)
                         {
-                            <BookingCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" OnBook="PrepareBookingCreation" />
+                            <RoomTypeCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" OnBook="PrepareBookingCreation" />
                         }
                     </div>
 
@@ -58,7 +58,7 @@
                     {
                         var isUnavailable = availableRoomTypesForStay.UnavailableRoomTypes.Any(unavailableRoomType => unavailableRoomType.Id == roomType.Id);
 
-                        <BookingCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" IsUnavailable="isUnavailable" OnBook="PrepareBookingCreation" />
+                        <RoomTypeCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" IsUnavailable="isUnavailable" OnBook="PrepareBookingCreation" />
                     }
                 </div>
             </div>
