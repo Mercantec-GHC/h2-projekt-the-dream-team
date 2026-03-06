@@ -23,14 +23,20 @@
                 <span class="text-nowrap text-body fw-bold">@(Booking.NumberOfAdults + Booking.NumberOfChildren)</span>
             </li>
 
-            <li class="text-body-secondary d-flex">
+            <li class="text-body-secondary d-flex mb-1">
                 <span class="w-100">Rejser med kæledyr:</span>
 
                 <span class="text-nowrap text-body fw-bold">@(Booking.TravelingWithPets ? "Ja" : "Nej")</span>
             </li>
+
+            <li class="text-body-secondary d-flex">
+                <span class="w-100">Periode:</span>
+
+                <span class="text-nowrap text-body fw-bold">@Booking.FromDate.ToString("dd/MM/yyyy") - @Booking.ToDate.ToString("dd/MM/yyyy")</span>
+            </li>
         </ul>
 
-        <button class="btn btn-danger" @onclick="() => OnDelete.InvokeAsync(Booking)" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        <button class="btn btn-danger" @onclick="() => OnDelete.InvokeAsync(Booking)" disabled="@(!BookingIsDeletable)" data-bs-toggle="modal" data-bs-target="#deleteModal">
             <i class="bi bi-trash-fill"></i>
 
             Slet Booking
@@ -44,4 +50,6 @@
 
     [Parameter]
     public EventCallback<BookingWithoutGuestDto> OnDelete { get; set; }
+
+    private bool BookingIsDeletable => Booking.FromDate > DateTime.Now && Booking.ToDate > DateTime.Now;
 }
