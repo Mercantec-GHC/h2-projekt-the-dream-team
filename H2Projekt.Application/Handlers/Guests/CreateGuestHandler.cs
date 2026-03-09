@@ -14,7 +14,7 @@ namespace H2Projekt.Application.Handlers.Guests
             _repository = repository;
         }
 
-        public async Task<int> HandleAsync(CreateGuestCommand request, CancellationToken cancellationToken = default)
+        public async Task<int> HandleAsync(CreateGuestCommand request, CancellationToken cancellationToken)
         {
             var guestExists = await _repository.GuestExistsAsync(request.Email, cancellationToken);
 

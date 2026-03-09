@@ -8,7 +8,7 @@ namespace H2Projekt.Infrastructure.Repositories
     {
         public BookingRepository(AppDbContext appDbContext) : base(appDbContext) { }
 
-        public async Task<List<Booking>> GetAllBookingsAsync(CancellationToken cancellationToken = default)
+        public async Task<List<Booking>> GetAllBookingsAsync(CancellationToken cancellationToken)
         {
             return await _appDbContext.Bookings
                 .Include(b => b.Guest)
@@ -17,7 +17,7 @@ namespace H2Projekt.Infrastructure.Repositories
                 .ToListAsync(cancellationToken);
         }
 
-        public async Task<Booking?> GetBookingByIdAsync(int id, CancellationToken cancellationToken = default)
+        public async Task<Booking?> GetBookingByIdAsync(int id, CancellationToken cancellationToken)
         {
             return await _appDbContext.Bookings
                 .Include(b => b.Guest)

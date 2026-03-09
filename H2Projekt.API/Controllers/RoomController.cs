@@ -15,27 +15,40 @@ namespace H2Projekt.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<RoomDto>>> GetAllRooms([FromServices] GetAllRoomsHandler handler)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<List<RoomDto>>> GetAllRooms(CancellationToken cancellationToken, [FromServices] GetAllRoomsHandler handler)
         {
-            var rooms = await handler.HandleAsync();
+            try
+            {
+                var rooms = await handler.HandleAsync(cancellationToken);
 
-            return Ok(rooms);
+                return Ok(rooms);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpGet("{number}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<RoomDto?>> GetRoomByNumber([FromServices] GetRoomByNumberHandler handler, string number)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<RoomDto?>> GetRoomByNumber(CancellationToken cancellationToken, [FromServices] GetRoomByNumberHandler handler, string number)
         {
             try
             {
-                var room = await handler.HandleAsync(number);
+                var room = await handler.HandleAsync(number, cancellationToken);
 
                 return Ok(room);
             }
             catch (NonExistentException ex)
             {
                 return NotFound(ex.GetProblemDetails());
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
         }
 
@@ -44,11 +57,12 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<int>> CreateRoom([FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<int>> CreateRoom(CancellationToken cancellationToken, [FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
         {
             try
             {
-                var roomId = await handler.HandleAsync(createRoomCommand);
+                var roomId = await handler.HandleAsync(createRoomCommand, cancellationToken);
 
                 return Ok(roomId);
             }
@@ -64,17 +78,22 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> UpdateRoom([FromServices] UpdateRoomHandler handler, [FromBody] UpdateRoomCommand updateRoomCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult> UpdateRoom(CancellationToken cancellationToken, [FromServices] UpdateRoomHandler handler, [FromBody] UpdateRoomCommand updateRoomCommand)
         {
             try
             {
-                await handler.HandleAsync(updateRoomCommand);
+                await handler.HandleAsync(updateRoomCommand, cancellationToken);
 
                 return Ok();
             }
@@ -86,22 +105,31 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteRoom([FromServices] DeleteRoomHandler handler, int id)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult> DeleteRoom(CancellationToken cancellationToken, [FromServices] DeleteRoomHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(id);
+                await handler.HandleAsync(id, cancellationToken);
 
                 return Ok();
             }
             catch (NonExistentException ex)
             {
                 return NotFound(ex.GetProblemDetails());
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
         }
 
@@ -111,20 +139,29 @@ namespace H2Projekt.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<RoomTypeDto>>> GetAllRoomTypes([FromServices] GetAllRoomTypesHandler handler)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<List<RoomTypeDto>>> GetAllRoomTypes(CancellationToken cancellationToken, [FromServices] GetAllRoomTypesHandler handler)
         {
-            var roomTypes = await handler.HandleAsync();
+            try
+            {
+                var roomTypes = await handler.HandleAsync(cancellationToken);
 
-            return Ok(roomTypes);
+                return Ok(roomTypes);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<AvailableRoomTypesForStayDto>> GetAvailableRoomTypesForStay([FromServices] GetAvailableRoomTypesForStayHandler handler, [FromQuery] GetAvailableRoomTypesForStayCommand getAvailableRoomTypesForStayCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<AvailableRoomTypesForStayDto>> GetAvailableRoomTypesForStay(CancellationToken cancellationToken, [FromServices] GetAvailableRoomTypesForStayHandler handler, [FromQuery] GetAvailableRoomTypesForStayCommand getAvailableRoomTypesForStayCommand)
         {
             try
             {
-                var availableRoomTypesForStay = await handler.HandleAsync(getAvailableRoomTypesForStayCommand);
+                var availableRoomTypesForStay = await handler.HandleAsync(getAvailableRoomTypesForStayCommand, cancellationToken);
 
                 return Ok(availableRoomTypesForStay);
             }
@@ -132,17 +169,22 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<int>> CreateRoomType([FromServices] CreateRoomTypeHandler handler, [FromBody] CreateRoomTypeCommand createRoomTypeCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<int>> CreateRoomType(CancellationToken cancellationToken, [FromServices] CreateRoomTypeHandler handler, [FromBody] CreateRoomTypeCommand createRoomTypeCommand)
         {
             try
             {
-                var roomId = await handler.HandleAsync(createRoomTypeCommand);
+                var roomId = await handler.HandleAsync(createRoomTypeCommand, cancellationToken);
 
                 return Ok(roomId);
             }
@@ -154,17 +196,22 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> UpdateRoomType([FromServices] UpdateRoomTypeHandler handler, [FromBody] UpdateRoomTypeCommand updateRoomTypeCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult> UpdateRoomType(CancellationToken cancellationToken, [FromServices] UpdateRoomTypeHandler handler, [FromBody] UpdateRoomTypeCommand updateRoomTypeCommand)
         {
             try
             {
-                await handler.HandleAsync(updateRoomTypeCommand);
+                await handler.HandleAsync(updateRoomTypeCommand, cancellationToken);
 
                 return Ok();
             }
@@ -176,22 +223,31 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteRoomType([FromServices] DeleteRoomTypeHandler handler, int id)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult> DeleteRoomType(CancellationToken cancellationToken, [FromServices] DeleteRoomTypeHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(id);
+                await handler.HandleAsync(id, cancellationToken);
 
                 return Ok();
             }
             catch (NonExistentException ex)
             {
                 return NotFound(ex.GetProblemDetails());
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
         }
 
@@ -201,22 +257,31 @@ namespace H2Projekt.API.Controllers
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<RoomDiscountDto>>> GetAllRoomDiscounts([FromServices] GetAllRoomDiscountsHandler handler)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<List<RoomDiscountDto>>> GetAllRoomDiscounts(CancellationToken cancellationToken, [FromServices] GetAllRoomDiscountsHandler handler)
         {
-            var roomDiscounts = await handler.HandleAsync();
+            try
+            {
+                var roomDiscounts = await handler.HandleAsync(cancellationToken);
 
-            return Ok(roomDiscounts);
+                return Ok(roomDiscounts);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<int>> CreateRoomDiscount([FromServices] CreateRoomDiscountHandler handler, [FromBody] CreateRoomDiscountCommand createRoomDiscountCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<int>> CreateRoomDiscount(CancellationToken cancellationToken, [FromServices] CreateRoomDiscountHandler handler, [FromBody] CreateRoomDiscountCommand createRoomDiscountCommand)
         {
             try
             {
-                var roomId = await handler.HandleAsync(createRoomDiscountCommand);
+                var roomId = await handler.HandleAsync(createRoomDiscountCommand, cancellationToken);
 
                 return Ok(roomId);
             }
@@ -228,17 +293,22 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult> UpdateRoomDiscount([FromServices] UpdateRoomDiscountHandler handler, [FromBody] UpdateRoomDiscountCommand updateRoomDiscountCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult> UpdateRoomDiscount(CancellationToken cancellationToken, [FromServices] UpdateRoomDiscountHandler handler, [FromBody] UpdateRoomDiscountCommand updateRoomDiscountCommand)
         {
             try
             {
-                await handler.HandleAsync(updateRoomDiscountCommand);
+                await handler.HandleAsync(updateRoomDiscountCommand, cancellationToken);
 
                 return Ok();
             }
@@ -250,22 +320,31 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteRoomDiscount([FromServices] DeleteRoomDiscountHandler handler, int id)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult> DeleteRoomDiscount(CancellationToken cancellationToken, [FromServices] DeleteRoomDiscountHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(id);
+                await handler.HandleAsync(id, cancellationToken);
 
                 return Ok();
             }
             catch (NonExistentException ex)
             {
                 return NotFound(ex.GetProblemDetails());
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
         }
 

@@ -6,27 +6,27 @@ namespace H2Projekt.Application.Interfaces
     {
         #region Rooms
 
-        Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken = default);
-        Task<Room?> GetRoomByIdAsync(int id, CancellationToken cancellationToken = default);
-        Task<Room?> GetRoomByNumberAsync(string number, CancellationToken cancellationToken = default);
+        Task<List<Room>> GetAllRoomsAsync(CancellationToken cancellationToken);
+        Task<Room?> GetRoomByIdAsync(int id, CancellationToken cancellationToken);
+        Task<Room?> GetRoomByNumberAsync(string number, CancellationToken cancellationToken);
 
         #endregion
 
         #region Room Types
 
-        Task<List<RoomType>> GetAllRoomTypesAsync(CancellationToken cancellationToken = default);
-        Task<RoomType?> GetRoomTypeByIdAsync(int id, CancellationToken cancellationToken = default);
-        Task<bool> RoomTypeExistsAsync(string name, CancellationToken cancellationToken = default);
-        Task<int> AddRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default);
-        Task DeleteRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken = default);
+        Task<List<RoomType>> GetAllRoomTypesAsync(CancellationToken cancellationToken);
+        Task<RoomType?> GetRoomTypeByIdAsync(int id, CancellationToken cancellationToken);
+        Task<bool> RoomTypeExistsAsync(string name, CancellationToken cancellationToken);
+        Task<int> AddRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken);
+        Task DeleteRoomTypeAsync(RoomType roomType, CancellationToken cancellationToken);
 
         #endregion
 
         #region Room Discounts
 
-        Task<List<RoomDiscount>> GetAllRoomDiscountsAsync(CancellationToken cancellationToken = default);
-        Task<RoomDiscount?> GetRoomDiscountByIdAsync(int id, CancellationToken cancellationToken = default);
-        Task<RoomDiscount?> GetRoomDiscountForPeriodAsync(int roomTypeId, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken = default);
+        Task<List<RoomDiscount>> GetAllRoomDiscountsAsync(CancellationToken cancellationToken);
+        Task<RoomDiscount?> GetRoomDiscountByIdAsync(int id, CancellationToken cancellationToken);
+        Task<RoomDiscount?> GetRoomDiscountForPeriodAsync(int roomTypeId, DateOnly fromDate, DateOnly toDate, CancellationToken cancellationToken);
 
         #endregion
     }

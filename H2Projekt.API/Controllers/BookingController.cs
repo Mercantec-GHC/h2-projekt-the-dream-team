@@ -13,30 +13,47 @@ namespace H2Projekt.API.Controllers
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<List<BookingDto>>> GetAllBookings([FromServices] GetAllBookingsHandler handler)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<List<BookingDto>>> GetAllBookings(CancellationToken cancellationToken, [FromServices] GetAllBookingsHandler handler)
         {
-            var bookings = await handler.HandleAsync();
+            try
+            {
+                var bookings = await handler.HandleAsync(cancellationToken);
 
-            return Ok(bookings);
+                return Ok(bookings);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        public async Task<ActionResult<BookingOverviewDto>> GetBookingOverview([FromServices] GetBookingsOverviewHandler handler)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<BookingOverviewDto>> GetBookingOverview(CancellationToken cancellationToken, [FromServices] GetBookingsOverviewHandler handler)
         {
-            var result = await handler.HandleAsync();
+            try
+            {
+                var result = await handler.HandleAsync(cancellationToken);
 
-            return Ok(result);
+                return Ok(result);
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<BookingDto?>> GetBookingById([FromServices] GetBookingByIdHandler handler, int id)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<BookingDto?>> GetBookingById(CancellationToken cancellationToken, [FromServices] GetBookingByIdHandler handler, int id)
         {
             try
             {
-                var booking = await handler.HandleAsync(id);
+                var booking = await handler.HandleAsync(id, cancellationToken);
 
                 return Ok(booking);
             }
@@ -44,17 +61,22 @@ namespace H2Projekt.API.Controllers
             {
                 return NotFound(ex.GetProblemDetails());
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<int>> CreateBooking([FromServices] CreateBookingHandler handler, [FromBody] CreateBookingCommand createBookingCommand)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<int>> CreateBooking(CancellationToken cancellationToken, [FromServices] CreateBookingHandler handler, [FromBody] CreateBookingCommand createBookingCommand)
         {
             try
             {
-                var bookingId = await handler.HandleAsync(createBookingCommand);
+                var bookingId = await handler.HandleAsync(createBookingCommand, cancellationToken);
 
                 return Ok(bookingId);
             }
@@ -66,17 +88,22 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<int>> AssignRoomToBooking([FromServices] AssignRoomToBookingHandler handler, int id)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<int>> AssignRoomToBooking(CancellationToken cancellationToken, [FromServices] AssignRoomToBookingHandler handler, int id)
         {
             try
             {
-                var roomId = await handler.HandleAsync(id);
+                var roomId = await handler.HandleAsync(id, cancellationToken);
 
                 return Ok(roomId);
             }
@@ -88,22 +115,31 @@ namespace H2Projekt.API.Controllers
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
         }
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult> DeleteBooking([FromServices] DeleteBookingHandler handler, int id)
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult> DeleteBooking(CancellationToken cancellationToken, [FromServices] DeleteBookingHandler handler, int id)
         {
             try
             {
-                await handler.HandleAsync(id);
+                await handler.HandleAsync(id, cancellationToken);
 
                 return Ok();
             }
             catch (NonExistentException ex)
             {
                 return NotFound(ex.GetProblemDetails());
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
         }
     }

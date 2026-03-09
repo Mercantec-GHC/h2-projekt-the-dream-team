@@ -11,7 +11,7 @@ namespace H2Projekt.Infrastructure.Repositories
             _appDbContext = appDbContext;
         }
 
-        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        public async Task<int> SaveChangesAsync(CancellationToken cancellationToken)
         {
             return await _appDbContext.SaveChangesAsync(cancellationToken);
         }

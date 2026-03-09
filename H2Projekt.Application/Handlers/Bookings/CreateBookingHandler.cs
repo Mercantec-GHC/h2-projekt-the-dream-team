@@ -18,7 +18,7 @@ namespace H2Projekt.Application.Handlers.Bookings
             _roomRepository = roomRepository;
         }
 
-        public async Task<int> HandleAsync(CreateBookingCommand request, CancellationToken cancellationToken = default)
+        public async Task<int> HandleAsync(CreateBookingCommand request, CancellationToken cancellationToken)
         {
             var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
 

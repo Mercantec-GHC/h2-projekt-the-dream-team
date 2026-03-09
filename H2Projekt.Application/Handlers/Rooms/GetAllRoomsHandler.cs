@@ -12,7 +12,7 @@ namespace H2Projekt.Application.Handlers.Rooms
             _roomRepository = roomRepository;
         }
 
-        public async Task<List<RoomDto>> HandleAsync(CancellationToken cancellationToken = default)
+        public async Task<List<RoomDto>> HandleAsync(CancellationToken cancellationToken)
         {
             var rooms = await _roomRepository.GetAllRoomsAsync(cancellationToken);
 

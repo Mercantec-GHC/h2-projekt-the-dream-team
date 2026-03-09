@@ -11,8 +11,9 @@ namespace H2Projekt.API.Controllers
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<ActionResult<List<Rule>>> GetRules()
+        public async Task<ActionResult<List<Rule>>> GetRules(CancellationToken cancellationToken)
         {
             try
             {
@@ -23,15 +24,19 @@ namespace H2Projekt.API.Controllers
                     return NotFound("Rules file not found.");
                 }
 
-                var jsonContent = await System.IO.File.ReadAllTextAsync(filePath);
+                var jsonContent = await System.IO.File.ReadAllTextAsync(filePath, cancellationToken);
 
                 var rules = JsonSerializer.Deserialize<List<Rule>>(jsonContent) ?? new List<Rule>();
 
                 return Ok(rules);
             }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Internal server error: {ex.Message}");
             }
         }
     }

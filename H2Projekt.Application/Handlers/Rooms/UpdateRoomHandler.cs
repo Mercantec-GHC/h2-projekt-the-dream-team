@@ -13,7 +13,7 @@ namespace H2Projekt.Application.Handlers.Rooms
             _roomRepository = roomRepository;
         }
 
-        public async Task HandleAsync(UpdateRoomCommand request, CancellationToken cancellationToken = default)
+        public async Task HandleAsync(UpdateRoomCommand request, CancellationToken cancellationToken)
         {
             var roomType = await _roomRepository.GetRoomTypeByIdAsync(request.RoomTypeId, cancellationToken);
 

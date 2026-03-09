@@ -16,7 +16,7 @@ namespace H2Projekt.Application.Handlers.Rooms
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<AvailableRoomTypesForStayDto> HandleAsync(GetAvailableRoomTypesForStayCommand request, CancellationToken cancellationToken = default)
+        public async Task<AvailableRoomTypesForStayDto> HandleAsync(GetAvailableRoomTypesForStayCommand request, CancellationToken cancellationToken)
         {
             // Get all rooms
             var rooms = await _roomRepository.GetAllRoomsAsync(cancellationToken);

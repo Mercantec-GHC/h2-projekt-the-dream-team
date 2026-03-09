@@ -12,7 +12,7 @@ namespace H2Projekt.Application.Handlers.Guests
             _guestRepository = guestRepository;
         }
 
-        public async Task<List<GuestDto>> HandleAsync(CancellationToken cancellationToken = default)
+        public async Task<List<GuestDto>> HandleAsync(CancellationToken cancellationToken)
         {
             var guests = await _guestRepository.GetAllGuestsAsync(cancellationToken);
 

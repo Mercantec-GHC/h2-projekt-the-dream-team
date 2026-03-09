@@ -15,13 +15,13 @@ namespace H2Projekt.Application.Handlers.Bookings
             _roomRepository = roomRepository;
         }
 
-        public async Task<BookingOverviewDto> HandleAsync()
+        public async Task<BookingOverviewDto> HandleAsync(CancellationToken cancellationToken)
         {
             // Get all bookings 
-            var bookings = await _bookingRepository.GetAllBookingsAsync();
+            var bookings = await _bookingRepository.GetAllBookingsAsync(cancellationToken);
 
             // Get all rooms 
-            var rooms = await _roomRepository.GetAllRoomsAsync();
+            var rooms = await _roomRepository.GetAllRoomsAsync(cancellationToken);
 
             // Create a dictionary to track bookings without assigned rooms and their possible room assignments
             var bookingsWithNoRoom = new Dictionary<int, int>();
