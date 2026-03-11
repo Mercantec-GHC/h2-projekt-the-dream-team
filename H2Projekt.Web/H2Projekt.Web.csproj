@@ -26,6 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Components\Pages\" />
     <Folder Include="Layout\" />
   </ItemGroup>
 
@@ -33,6 +34,11 @@
     <OpenApiReference Include="OpenAPIs\v1.json" ClassName="ApiClient">
       <SourceUri>https://localhost:7418/openapi/v1.json</SourceUri>
     </OpenApiReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\Images\" />
+    <Folder Include="wwwroot\Videos\" />
   </ItemGroup>
 
 </Project>
