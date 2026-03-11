@@ -27,5 +27,10 @@ namespace H2Projekt.Application.Dto.Guests
             LastName = lastName;
             Email = email;
         }
+
+        public bool IsAdmin()
+        {
+            return Id <= 2;
+        }
     }
 }

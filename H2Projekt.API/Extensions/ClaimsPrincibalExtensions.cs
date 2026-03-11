@@ -1,10 +1,11 @@
-﻿using System.Security.Claims;
+﻿using H2Projekt.Application.Dto.Guests;
+using System.Security.Claims;
 
 namespace H2Projekt.API.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-        public static WorkContext? GetWorkContextOrNull(this ClaimsPrincipal principal)
+        public static GuestDto? GetWorkContextOrNull(this ClaimsPrincipal principal)
         {
             if (principal?.Identity is null || !principal.Identity.IsAuthenticated)
             {
@@ -21,7 +22,7 @@ namespace H2Projekt.API.Extensions
                 return null;
             }
 
-            return new WorkContext(id, firstNameClaim, lastNameClaim, emailClaim);
+            return new GuestDto(id, firstNameClaim, lastNameClaim, emailClaim);
         }
     }
 }
