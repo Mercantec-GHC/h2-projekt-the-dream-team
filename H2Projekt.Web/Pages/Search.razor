@@ -1,30 +1,32 @@
 ﻿@page "/"
 @inherits BasePage
+@inject IJSRuntime JS
 
 @inject ApiClient Api
-@inject IJSRuntime JS
 
 <PageTitle>Søg</PageTitle>
 
-@if (exception is not null)
-{
-    <div class="d-flex flex-column gap-2 mb-5">
-        @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
-        {
-            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
-        }
-    </div>
-}
+
+
+    @if (exception is not null)
+    {
+        <div class="d-flex flex-column gap-2 mb-5">
+            @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+            {
+                <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+            }
+        </div>
+    }
 
 <div class="d-flex justify-content-center align-items-center min-h-inner-screen">
     <div class="d-flex flex-column gap-5 align-items-center">
         @if (WorkContext is not null)
         {
-            <h1 class="m-0">Velkommen, @WorkContext.FirstName!</h1>
+            <h1 class="heading-gold glass-card-luxury">Velkommen, @WorkContext.FirstName!</h1>
         }
         else
         {
-            <h1 class="m-0">Velkommen!</h1>
+            <h1 class="heading-gold glass-card-luxury">Velkommen!</h1>
         }
 
         <div class="card p-2">
@@ -36,82 +38,83 @@
                           AvailableRoomTypesForStayChanged="(value) => availableRoomTypesForStay = value" />
         </div>
 
-        @if (availableRoomTypesForStay is not null)
-        {
-            <div class="d-flex flex-column align-items-center gap-3">
-                @if (availableRoomTypesForStay.SuitableRoomTypes.Any())
-                {
-                    <h3 class="mb-0">Bedste valg baseret på din søgning</h3>
+            @if (availableRoomTypesForStay is not null)
+            {
+                <div class="d-flex flex-column align-items-center gap-3">
+                    @if (availableRoomTypesForStay.SuitableRoomTypes.Any())
+                    {
+                        <h3 class="heading-gold glass-card-luxury">Bedste valg baseret på din søgning</h3>
+
+                        <div class="d-grid gap-3 w-fit" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                            @foreach (var roomType in availableRoomTypesForStay.SuitableRoomTypes)
+                            {
+                                <RoomTypeCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" OnBook="PrepareBookingCreation" />
+                            }
+                        </div>
+
+                        <h3 class="heading-gold glass-card-luxury">Andre valgmuligheder</h3>
+                    }
 
                     <div class="d-grid gap-3 w-fit" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-                        @foreach (var roomType in availableRoomTypesForStay.SuitableRoomTypes)
+                        @foreach (var roomType in availableRoomTypesForStay.OtherRoomTypes.Concat(availableRoomTypesForStay.UnavailableRoomTypes).OrderBy(roomType => roomType.Id))
                         {
-                            <RoomTypeCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" OnBook="PrepareBookingCreation" />
+                            var isUnavailable = availableRoomTypesForStay.UnavailableRoomTypes.Any(unavailableRoomType => unavailableRoomType.Id == roomType.Id);
+
+                            <RoomTypeCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" IsUnavailable="isUnavailable" OnBook="PrepareBookingCreation" />
                         }
                     </div>
+                </div>
+            }
+        </div>
+    </div>
 
-                    <h3 class="mb-0">Andre valgmuligheder</h3>
-                }
+    <div class="modal modal-lg fade" id="createBookingModal" tabindex="-1" aria-labelledby="createBookingModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content p-3">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="fs-4 mb-0" id="createBookingModalLabel">Book Værelse</h5>
 
-                <div class="d-grid gap-3 w-fit" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-                    @foreach (var roomType in availableRoomTypesForStay.OtherRoomTypes.Concat(availableRoomTypesForStay.UnavailableRoomTypes).OrderBy(roomType => roomType.Id))
+                    <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                        <i class="bi bi-x-lg"></i>
+                    </button>
+                </div>
+
+                <div class="modal-body my-3 p-0">
+                    @if (modalException is not null)
                     {
-                        var isUnavailable = availableRoomTypesForStay.UnavailableRoomTypes.Any(unavailableRoomType => unavailableRoomType.Id == roomType.Id);
+                        <div class="d-flex flex-column gap-2 mb-3">
+                            @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                            {
+                                <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                            }
+                        </div>
+                    }
 
-                        <RoomTypeCard RoomType="roomType" RoomDiscount="GetDiscount(roomType)" IsUnavailable="isUnavailable" OnBook="PrepareBookingCreation" />
+                    @if (roomType is not null)
+                    {
+                        var roomDiscountsForRoomType = roomDiscounts.Where(roomDiscount => roomDiscount.RoomType.Id == roomType.Id).ToList();
+
+                        <CreateBooking @bind-Guest="guest" RoomType="roomType" RoomDiscounts="roomDiscountsForRoomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
                     }
                 </div>
-            </div>
-        }
-    </div>
-</div>
 
-<div class="modal modal-lg fade" id="createBookingModal" tabindex="-1" aria-labelledby="createBookingModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content p-3">
-            <div class="d-flex align-items-center justify-content-between">
-                <h5 class="fs-4 mb-0" id="createBookingModalLabel">Book Værelse</h5>
+                <div class="d-flex gap-3">
+                    <button type="button" class="btn btn-success w-50" @onclick="CreateBooking">
+                        <i class="bi bi-plus-lg"></i>
 
-                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="bi bi-x-lg"></i>
-                </button>
-            </div>
+                        Book Værelse
+                    </button>
 
-            <div class="modal-body my-3 p-0">
-                @if (modalException is not null)
-                {
-                    <div class="d-flex flex-column gap-2 mb-3">
-                        @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
-                        {
-                            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
-                        }
-                    </div>
-                }
+                    <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                        <i class="bi bi-x-lg"></i>
 
-                @if (roomType is not null)
-                {
-                    var roomDiscountsForRoomType = roomDiscounts.Where(roomDiscount => roomDiscount.RoomType.Id == roomType.Id).ToList();
-
-                    <CreateBooking @bind-Guest="guest" RoomType="roomType" RoomDiscounts="roomDiscountsForRoomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
-                }
-            </div>
-
-            <div class="d-flex gap-3">
-                <button type="button" class="btn btn-success w-50" @onclick="CreateBooking">
-                    <i class="bi bi-plus-lg"></i>
-
-                    Book Værelse
-                </button>
-
-                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
-                    <i class="bi bi-x-lg"></i>
-
-                    Annullér
-                </button>
+                        Annullér
+                    </button>
+                </div>
             </div>
         </div>
     </div>
-</div>
+
 @code {
     private ApiException? exception;
     private ApiException? modalException;
