@@ -36,7 +36,6 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [Authorize]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]

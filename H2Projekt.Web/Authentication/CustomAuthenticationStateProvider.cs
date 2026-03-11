@@ -115,7 +115,7 @@ namespace H2Projekt.Web.Authentication
                 var expiresAt = DateTimeOffset.FromUnixTimeSeconds(expSeconds);
 
                 // If the token has expired
-                if (expiresAt < DateTimeOffset.UtcNow.AddMinutes(-1))
+                if (expiresAt < DateTimeOffset.UtcNow)
                 {
                     // Refresh the token to get a new access token and update the authentication state
                     await RefreshAsync();
