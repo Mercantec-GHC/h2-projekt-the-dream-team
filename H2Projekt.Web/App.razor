@@ -3,13 +3,6 @@
         <Found Context="routeData">
             <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
                 <NotAuthorized>
-                    @foreach (var claim in context.User.Claims)
-                    {
-                        <div class="alert alert-warning">
-                            Your claim: <strong>@claim.Type</strong> = @claim.Value
-                        </div>
-                    }
-
                     <div class="alert alert-danger">
                         You are not authorized to view this page.
 
