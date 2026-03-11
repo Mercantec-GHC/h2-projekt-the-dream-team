@@ -15,7 +15,7 @@ namespace H2Projekt.API.Extensions
             var idClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "id")?.Value;
             var firstNameClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "firstName")?.Value;
             var lastNameClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "lastName")?.Value;
-            var emailClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
+            var emailClaim = principal.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.Email)?.Value;
 
             if (string.IsNullOrEmpty(idClaim) || string.IsNullOrEmpty(firstNameClaim) || string.IsNullOrEmpty(lastNameClaim) || !int.TryParse(idClaim, out var id) || string.IsNullOrEmpty(emailClaim))
             {

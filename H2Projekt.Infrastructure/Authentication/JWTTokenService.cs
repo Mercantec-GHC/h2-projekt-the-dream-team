@@ -32,7 +32,7 @@ namespace H2Projekt.Infrastructure.Authentication
                 new Claim("id", guest.Id.ToString()),
                 new Claim("firstName", guest.FirstName),
                 new Claim("lastName", guest.LastName),
-                new Claim("email", guest.Email),
+                new Claim(ClaimTypes.Email, guest.Email),
                 new Claim(ClaimTypes.Role, guest.Id <= 2 ? "Admin" : "User"), // Important to use ClaimTypes for this one
                 new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
                 new Claim("exp", new DateTimeOffset(expires).ToUnixTimeSeconds().ToString()),

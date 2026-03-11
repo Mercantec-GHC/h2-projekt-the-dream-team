@@ -20,7 +20,7 @@ namespace H2Projekt.Web.Helpers
             {
                 return new List<ParsedError>()
                 {
-                    new ParsedError(problemDetails.Detail, ex.StatusCode)
+                    new ParsedError(problemDetails.Detail ?? problemDetails.Title, ex.StatusCode)
                 };
             }
 
