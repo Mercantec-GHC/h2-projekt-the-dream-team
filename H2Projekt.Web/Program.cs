@@ -3,6 +3,7 @@ using H2Projekt.Web.Authentication;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using System.Globalization;
 
 var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
@@ -39,5 +40,8 @@ builder.Services.AddAuthorizationCore();
 // Add Authentication Services
 builder.Services.AddScoped<CustomAuthenticationStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
+
+CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("da-DK");
+CultureInfo.DefaultThreadCurrentUICulture = new CultureInfo("da-DK");
 
 await builder.Build().RunAsync();
