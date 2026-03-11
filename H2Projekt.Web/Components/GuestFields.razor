@@ -1,0 +1,34 @@
+﻿<div class="d-flex flex-column gap-3">
+    <div>
+        <label class="form-label">Fornavn</label>
+
+        <InputText class="form-control" @bind-Value="Model.FirstName" placeholder="Indtast fornavn" />
+    </div>
+
+    <div>
+        <label class="form-label">Efternavn</label>
+
+        <InputText class="form-control" @bind-Value="Model.LastName" placeholder="Indtast efternavn" />
+    </div>
+
+    <div>
+        <label class="form-label">Email</label>
+
+        <InputText class="form-control" @bind-Value:get="Model.Email" @bind-Value:set="SetEmail" placeholder="Indtast email" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public GuestDto Model { get; set; } = new GuestDto();
+
+    [Parameter]
+    public EventCallback<string> EmailChanged { get; set; }
+
+    private async Task SetEmail(string email)
+    {
+        Model.Email = email;
+     
+        await EmailChanged.InvokeAsync(email);
+    }
+}

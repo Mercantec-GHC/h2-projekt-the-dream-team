@@ -1,0 +1,323 @@
+﻿@page "/admin/manage-room-types"
+@inherits BasePage
+
+@inject ApiClient Api
+@inject IJSRuntime JS
+
+<PageTitle>Admin - Værelsestyper</PageTitle>
+
+@if (exception is not null)
+{
+    <div class="d-flex flex-column gap-2 mb-4">
+        @foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+        {
+            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+        }
+    </div>
+}
+
+<div class="d-flex gap-3 justify-content-between mb-4">
+    <div class="d-flex gap-3 align-items-center">
+        <a href="/admin" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i>
+
+            Tilbage
+        </a>
+
+        <h3 class="mb-0">Værelsestyper</h3>
+    </div>
+
+    <button type="button" class="btn btn-success" @onclick="() => PrepareRoomTypeCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">
+        <i class="bi bi-plus-lg"></i>
+
+        Tilføj
+    </button>
+</div>
+
+@if (roomTypes is null)
+{
+    <p>Henter data...</p>
+}
+else if (roomTypes.Count == 0)
+{
+    <em>Ingen værelsestyper fundet.</em>
+}
+else
+{
+    <table id="dataTable" class="table table-striped">
+        <thead>
+            <tr>
+                <th width="100">ID</th>
+                <th width="100">Navn</th>
+                <th width="100">Beskrivelse</th>
+                <th width="100">Maks personer</th>
+                <th width="100">Kæledyr tilladt</th>
+                <th width="100">Pris pr. nat</th>
+                <th width="1" data-dt-order="disable"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var roomType in roomTypes)
+            {
+                <tr>
+                    <td class="align-middle">@roomType.Id</td>
+                    <td class="align-middle">@roomType.Name</td>
+                    <td class="align-middle">@roomType.Description</td>
+                    <td class="align-middle">@roomType.MaxOccupancy</td>
+                    <td class="align-middle">@((roomType.PetsAllowed ? "Ja" : "Nej"))</td>
+                    <td class="align-middle">@roomType.PricePerNight.ToString("C")</td>
+                    <td class="align-middle">
+                        <div class="d-flex gap-2 w-100 justify-content-end">
+                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareRoomTypeCreationOrUpdate(roomType)" data-bs-toggle="modal" data-bs-target="#createEditModal">
+                                <i class="bi bi-pencil-fill"></i>
+
+                                Rediger
+                            </button>
+
+                            <button class="btn btn-sm btn-danger" @onclick="() => PrepareRoomTypeDeletion(roomType)" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="bi bi-trash-fill"></i>
+
+                                Slet
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+<div class="modal fade" id="createEditModal" tabindex="-1" aria-labelledby="createEditModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="createEditModalLabel">@(roomTypeToEdit?.Id > 0 ? "Rediger" : "Tilføj") Værelsestype</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <div class="modal-body my-3 p-0">
+                @if (modalException is not null)
+                {
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                        {
+                            <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                        }
+                    </div>
+                }
+
+                @if (roomTypeToEdit is not null)
+                {
+                    <RoomTypeFields Model="roomTypeToEdit" />
+                }
+            </div>
+
+            <div class="d-flex gap-3">
+                @if (roomTypeToEdit?.Id > 0)
+                {
+                    <button type="button" class="btn btn-primary w-50" @onclick="CreateOrSaveRoomType">
+                        <i class="bi bi-floppy"></i>
+
+                        Gem Værelsestype
+                    </button>
+                }
+                else
+                {
+                    <button type="button" class="btn btn-success w-50" @onclick="CreateOrSaveRoomType">
+                        <i class="bi bi-plus-lg"></i>
+
+                        Tilføj Værelsestype
+                    </button>
+                }
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModal" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3">
+            <div class="d-flex align-items-center justify-content-between">
+                <h5 class="fs-4 mb-0" id="deleteModalLabel">Slet Værelsestype</h5>
+
+                <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            @if (modalException is not null)
+            {
+                <div class="modal-body mt-3 p-0 d-flex flex-column gap-2 mb-3">
+                    @foreach (var error in ApiExceptionHelper.ParseErrors(modalException))
+                    {
+                        <div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+                    }
+                </div>
+            }
+
+            <div class="d-flex gap-3 mt-3">
+                <button type="button" class="btn btn-danger w-50" @onclick="DeleteRoomType">
+                    <i class="bi bi-trash-fill"></i>
+
+                    Slet
+                </button>
+
+                <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
+                    <i class="bi bi-x-lg"></i>
+
+                    Annullér
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private ApiException? exception;
+    private ApiException? modalException;
+
+    private RoomTypeDto? roomTypeToEdit;
+    private int? roomTypeToDelete;
+
+    private ICollection<RoomTypeDto> roomTypes;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        roomTypes = await Api.GetAllRoomTypesAsync();
+    }
+
+    public void PrepareRoomTypeCreationOrUpdate(RoomTypeDto? roomType = null)
+    {
+        modalException = null;
+
+        roomTypeToEdit = new RoomTypeDto();
+
+        if (roomType is not null)
+        {
+            roomTypeToEdit.Id = roomType.Id;
+            roomTypeToEdit.Name = roomType.Name;
+            roomTypeToEdit.Description = roomType.Description;
+            roomTypeToEdit.MaxOccupancy = roomType.MaxOccupancy;
+            roomTypeToEdit.PetsAllowed = roomType.PetsAllowed;
+            roomTypeToEdit.PricePerNight = roomType.PricePerNight;
+        }
+    }
+
+    public void PrepareRoomTypeDeletion(RoomTypeDto roomType)
+    {
+        modalException = null;
+
+        roomTypeToDelete = roomType.Id;
+    }
+
+    public async Task CreateOrSaveRoomType()
+    {
+        modalException = null;
+
+        if (roomTypeToEdit is null)
+        {
+            return;
+        }
+
+        try
+        {
+            if (roomTypeToEdit.Id == 0)
+            {
+                var roomTypeId = await Api.CreateRoomTypeAsync(new CreateRoomTypeCommand()
+                {
+                    Name = roomTypeToEdit.Name,
+                    Description = roomTypeToEdit.Description,
+                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
+                });
+
+                roomTypes.Add(new RoomTypeDto()
+                {
+                    Id = roomTypeId,
+                    Name = roomTypeToEdit.Name,
+                    Description = roomTypeToEdit.Description,
+                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
+                });
+
+                exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToEdit.Name}\" er oprettet.", null, null);
+            }
+            else
+            {
+                await Api.UpdateRoomTypeAsync(new UpdateRoomTypeCommand()
+                {
+                    Id = roomTypeToEdit.Id,
+                    Name = roomTypeToEdit.Name,
+                    Description = roomTypeToEdit.Description,
+                    MaxOccupancy = roomTypeToEdit.MaxOccupancy,
+                    PetsAllowed = roomTypeToEdit.PetsAllowed,
+                    PricePerNight = roomTypeToEdit.PricePerNight,
+                });
+
+                var roomType = roomTypes.FirstOrDefault(r => r.Id == roomTypeToEdit.Id);
+
+                if (roomType is not null)
+                {
+                    roomType.Name = roomTypeToEdit.Name;
+                    roomType.Description = roomTypeToEdit.Description;
+                    roomType.MaxOccupancy = roomTypeToEdit.MaxOccupancy;
+                    roomType.PetsAllowed = roomTypeToEdit.PetsAllowed;
+                    roomType.PricePerNight = roomTypeToEdit.PricePerNight;
+
+                    exception = new ApiException(null, 200, $"Værelsestype \"{roomTypeToEdit.Name}\" er opdateret.", null, null);
+                }
+            }
+
+            await JS.InvokeVoidAsync("hideModal", "#createEditModal");
+
+            roomTypeToEdit = null;
+
+            StateHasChanged();
+        }
+        catch (ApiException ex)
+        {
+            modalException = ex;
+        }
+    }
+
+    public async Task DeleteRoomType()
+    {
+        modalException = null;
+
+        if (!roomTypeToDelete.HasValue || !roomTypes.Any(rt => rt.Id == roomTypeToDelete.Value))
+        {
+            return;
+        }
+
+        try
+        {
+            await Api.DeleteRoomTypeAsync(roomTypeToDelete.Value);
+
+            await JS.InvokeVoidAsync("hideModal", "#deleteModal");
+
+            roomTypes.Remove(roomTypes.First(rt => rt.Id == roomTypeToDelete.Value));
+
+            exception = new ApiException(null, 200, $"Værelsestype #{roomTypeToDelete.Value} er slettet.", null, null);
+        }
+        catch (ApiException ex)
+        {
+            modalException = ex;
+        }
+    }
+}

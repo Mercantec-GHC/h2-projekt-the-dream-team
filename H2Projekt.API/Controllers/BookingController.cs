@@ -1,18 +1,24 @@
 ﻿using FluentValidation;
+using H2Projekt.API.Extensions;
 using H2Projekt.Application.Commands.Bookings;
 using H2Projekt.Application.Dto.Bookings;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Bookings;
+using H2Projekt.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2Projekt.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class BookingController : ControllerBase
+    public class BookingController : BaseController
     {
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<List<BookingDto>>> GetAllBookings(CancellationToken cancellationToken, [FromServices] GetAllBookingsHandler handler)
         {
@@ -28,8 +34,11 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<BookingOverviewDto>> GetBookingOverview(CancellationToken cancellationToken, [FromServices] GetBookingsOverviewHandler handler)
         {
@@ -45,32 +54,11 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpGet("{id}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
-        public async Task<ActionResult<BookingDto?>> GetBookingById(CancellationToken cancellationToken, [FromServices] GetBookingByIdHandler handler, int id)
-        {
-            try
-            {
-                var booking = await handler.HandleAsync(id, cancellationToken);
-
-                return Ok(booking);
-            }
-            catch (NonExistentException ex)
-            {
-                return NotFound(ex.GetProblemDetails());
-            }
-            catch (OperationCanceledException)
-            {
-                return StatusCode(StatusCodes.Status499ClientClosedRequest);
-            }
-        }
-
+        // TODO: [Authorize]?
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<int>> CreateBooking(CancellationToken cancellationToken, [FromServices] CreateBookingHandler handler, [FromBody] CreateBookingCommand createBookingCommand)
         {
@@ -80,13 +68,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(bookingId);
             }
-            catch (NonExistentException ex)
-            {
-                return NotFound(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -94,10 +82,13 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPatch("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<int>> AssignRoomToBooking(CancellationToken cancellationToken, [FromServices] AssignRoomToBookingHandler handler, int id)
         {
@@ -107,13 +98,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(roomId);
             }
-            catch (NonExistentException ex)
-            {
-                return NotFound(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -123,10 +114,17 @@ namespace H2Projekt.API.Controllers
 
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> DeleteBooking(CancellationToken cancellationToken, [FromServices] DeleteBookingHandler handler, int id)
         {
+            if (!WorkContext.IsAdmin() && !WorkContext.Guest.Bookings.Any(b => b.Id == id))
+            {
+                return Forbid();
+            }
+
             try
             {
                 await handler.HandleAsync(id, cancellationToken);

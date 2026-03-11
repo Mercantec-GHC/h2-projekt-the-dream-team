@@ -69,6 +69,12 @@ namespace H2Projekt.Infrastructure
                     .IsRequired();
             });
 
+            // Password hash length and required
+            modelBuilder.Entity<Guest>()
+                .Property(e => e.PasswordHash)
+                .HasMaxLength(60)
+                .IsRequired();
+
             // On delete behaviors
             modelBuilder.Entity<Booking>(b =>
             {

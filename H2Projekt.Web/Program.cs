@@ -1,20 +1,21 @@
-using H2Projekt.ServiceDefaults;
 using H2Projekt.Web;
-using H2Projekt.Web.Components;
-using H2Projekt.Web.Services;
+using H2Projekt.Web.Authentication;
+using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 
-var builder = WebApplication.CreateBuilder(args);
+var builder = WebAssemblyHostBuilder.CreateDefault(args);
 
-// Add service defaults & Aspire client integrations.
-builder.AddServiceDefaults();
+builder.RootComponents.Add<App>("#app");
+builder.RootComponents.Add<HeadOutlet>("head::after");
 
-// Add services to the container.
-builder.Services.AddRazorComponents()
-    .AddInteractiveServerComponents();
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
 
-builder.Services.AddOutputCache();
+// Add Authorization Message Handler
+builder.Services.AddScoped<AuthenticationHeaderHandler>();
 
+// Register ApiClient with authorization handler
 builder.Services
     .AddHttpClient<ApiClient>(client =>
     {
@@ -22,6 +23,7 @@ builder.Services
         // Learn more about service discovery scheme resolution at https://aka.ms/dotnet/sdschemes.
         client.BaseAddress = new("https+http://apiservice");
     })
+    .AddHttpMessageHandler<AuthenticationHeaderHandler>()
     .AddTypedClient((httpClient) =>
     {
         var apiClient = new ApiClient(httpClient);
@@ -31,34 +33,11 @@ builder.Services
         return apiClient;
     });
 
-builder.Services.AddScoped(_ => new HttpClient
-{
-    BaseAddress = new Uri("https://localhost:7418/")
-});
+// Add Authorization
+builder.Services.AddAuthorizationCore();
 
-builder.Services.AddScoped<GuestService>();
+// Add Authentication Services
+builder.Services.AddScoped<CustomAuthenticationStateProvider>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthenticationStateProvider>();
 
-var app = builder.Build();
-
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error", createScopeForErrors: true);
-
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAntiforgery();
-
-app.UseOutputCache();
-
-app.MapStaticAssets();
-
-app.MapRazorComponents<App>()
-    .AddInteractiveServerRenderMode();
-
-app.MapDefaultEndpoints();
-
-app.Run();
+await builder.Build().RunAsync();

@@ -1,0 +1,153 @@
+﻿@inject ApiClient Api
+@inject IJSRuntime JS
+
+<div class="d-flex gap-3">
+    <div class="card p-3 d-flex flex-column gap-3 w-100">
+        <h5 class="mb-0">Dine oplysninger</h5>
+
+        <GuestFields Model="Guest" EmailChanged="FindAndSetGuest" />
+    </div>
+
+    <div class="card p-3 d-flex flex-column gap-3 w-100">
+        <h5 class="mb-0">Vælg datoer</h5>
+
+        <div>
+            <label class="form-label">Fra dato</label>
+
+            <InputDate class="form-control" @bind-Value:get="FromDate" @bind-Value:set="SetFromDate" />
+        </div>
+
+        <div>
+            <label class="form-label">Til dato</label>
+
+            <InputDate class="form-control" @bind-Value:get="ToDate" @bind-Value:set="SetToDate" />
+        </div>
+
+        <div class="mt-auto">
+            <span>Total pris pr. nat:</span>
+
+            <div class="d-flex text-nowrap fw-bold">
+                @{
+                    var originalTotal = CalculateOriginalTotal();
+                    var discountedTotal = CalculateDiscountedTotal();
+
+                    @if (discountedTotal > 0 && originalTotal != discountedTotal)
+                    {
+                        <span class="text-danger">@discountedTotal.ToString("C")&nbsp;</span>
+
+                        <span class="text-decoration-line-through opacity-50">@originalTotal.ToString("C")</span>
+                    }
+                    else
+                    {
+                        <span>@originalTotal.ToString("C")</span>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public GuestDto Guest { get; set; }
+
+    [Parameter]
+    public EventCallback<GuestDto> GuestChanged { get; set; }
+
+    [Parameter]
+    public RoomTypeDto? RoomType { get; set; }
+
+    [Parameter]
+    public List<RoomDiscountDto> RoomDiscounts { get; set; }
+
+    [Parameter]
+    public DateTime FromDate { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> ToDateChanged { get; set; }
+
+    [Parameter]
+    public DateTime ToDate { get; set; }
+
+    [Parameter]
+    public EventCallback<DateTime> FromDateChanged { get; set; }
+
+    private ICollection<GuestDto> guests = new List<GuestDto>();
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        guests = await Api.GetAllGuestsAsync();
+    }
+
+    private async Task FindAndSetGuest(string email)
+    {
+        var foundGuest = guests.FirstOrDefault(g => g.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+        if (foundGuest is null)
+        {
+            return;
+        }
+
+        var newGuestDto = new GuestDto()
+        {
+            Id = foundGuest.Id,
+            FirstName = foundGuest.FirstName,
+            LastName = foundGuest.LastName,
+            Email = foundGuest.Email,
+        };
+
+        Guest = newGuestDto;
+
+        await GuestChanged.InvokeAsync(newGuestDto);
+    }
+
+    private async Task SetFromDate(DateTime value)
+    {
+        FromDate = value;
+
+        await FromDateChanged.InvokeAsync(value);
+    }
+
+    private async Task SetToDate(DateTime value)
+    {
+        ToDate = value;
+
+        await ToDateChanged.InvokeAsync(value);
+    }
+
+    private decimal CalculateOriginalTotal()
+    {
+        if (RoomType is null)
+        {
+            return 0M;
+        }
+
+        var nights = (ToDate - FromDate).Days;
+
+        return Math.Max(0M, (decimal)RoomType.PricePerNight * nights);
+    }
+
+    private decimal CalculateDiscountedTotal()
+    {
+        if (RoomType is null || !RoomDiscounts.Any())
+        {
+            return 0M;
+        }
+
+        decimal total = 0M;
+
+        for (var date = FromDate.ToDateOnly(); date < ToDate.ToDateOnly(); date = date.AddDays(1))
+        {
+            var discount = RoomDiscounts.FirstOrDefault(d => date >= d.FromDate.ToDateOnly() && date < d.ToDate.ToDateOnly());
+
+            total += (decimal)(discount?.PricePerNight ?? RoomType.PricePerNight);
+        }
+
+        return Math.Max(0M, total);
+    }
+}

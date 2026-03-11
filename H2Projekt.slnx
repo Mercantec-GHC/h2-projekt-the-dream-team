@@ -10,5 +10,5 @@
   <Project Path="H2Projekt.Domain/H2Projekt.Domain.csproj" />
   <Project Path="H2Projekt.Infrastructure/H2Projekt.Infrastructure.csproj" />
   <Project Path="H2Projekt.ServiceDefaults/H2Projekt.ServiceDefaults.csproj" />
-  <Project Path="H2Projekt.Web/H2Projekt.Web.csproj" />
+  <Project Path="H2Projekt.Web/H2Projekt.Web.csproj" Id="7941ffa9-7c2d-4f7c-825c-9cfd66f358b7" />
 </Solution>

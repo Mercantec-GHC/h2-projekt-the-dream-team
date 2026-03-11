@@ -24,6 +24,13 @@ namespace H2Projekt.Domain.Validators.Guests
                 .WithMessage("Email skal være i et gyldigt format.")
                 .MaximumLength(100)
                 .WithMessage("Email må ikke overstige 100 tegn.");
+            RuleFor(guest => guest.PasswordHash)
+                .NotEmpty()
+                .WithMessage("Password hash er påkrævet.")
+                .MinimumLength(64)
+                .MaximumLength(64)
+                .WithMessage("Password hash skal være 64 tegn langt (SHA-256 hash).")
+                .When(guest => !string.IsNullOrEmpty(guest.PasswordHash));
             RuleFor(guest => guest.Bookings)
                 .ForEach(booking => booking.SetValidator(new BookingValidator()))
                 .When(guest => guest.Bookings is not null && guest.Bookings.Any());

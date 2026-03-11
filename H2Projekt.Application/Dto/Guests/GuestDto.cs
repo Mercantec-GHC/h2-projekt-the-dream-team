@@ -1,5 +1,6 @@
 ﻿using H2Projekt.Application.Dto.Bookings;
 using H2Projekt.Domain;
+using H2Projekt.Domain.Enums;
 
 namespace H2Projekt.Application.Dto.Guests
 {
@@ -18,6 +19,14 @@ namespace H2Projekt.Application.Dto.Guests
             LastName = guest.LastName;
             Email = guest.Email;
             Bookings = guest.Bookings.Select(b => new BookingWithoutGuestDto(b)).ToList();
+        }
+
+        public GuestDto(int id, string firstName, string lastName, string email)
+        {
+            Id = id;
+            FirstName = firstName;
+            LastName = lastName;
+            Email = email;
         }
     }
 }

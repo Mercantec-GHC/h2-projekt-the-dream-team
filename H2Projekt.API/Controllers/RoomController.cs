@@ -1,20 +1,26 @@
 ﻿using FluentValidation;
+using H2Projekt.API.Extensions;
 using H2Projekt.Application.Commands.Rooms;
 using H2Projekt.Application.Dto.Rooms;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Rooms;
+using H2Projekt.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2Projekt.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class RoomController : ControllerBase
+    public class RoomController : BaseController
     {
         #region Rooms
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<List<RoomDto>>> GetAllRooms(CancellationToken cancellationToken, [FromServices] GetAllRoomsHandler handler)
         {
@@ -30,33 +36,14 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [HttpGet("{number}")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
-        public async Task<ActionResult<RoomDto?>> GetRoomByNumber(CancellationToken cancellationToken, [FromServices] GetRoomByNumberHandler handler, string number)
-        {
-            try
-            {
-                var room = await handler.HandleAsync(number, cancellationToken);
-
-                return Ok(room);
-            }
-            catch (NonExistentException ex)
-            {
-                return NotFound(ex.GetProblemDetails());
-            }
-            catch (OperationCanceledException)
-            {
-                return StatusCode(StatusCodes.Status499ClientClosedRequest);
-            }
-        }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<int>> CreateRoom(CancellationToken cancellationToken, [FromServices] CreateRoomHandler handler, [FromBody] CreateRoomCommand createRoomCommand)
         {
@@ -66,17 +53,17 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(roomId);
             }
-            catch (DuplicateException ex)
+            catch (ValidationException ex)
             {
-                return Conflict(ex.GetProblemDetails());
+                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
             }
             catch (NonExistentException ex)
             {
                 return NotFound(ex.GetProblemDetails());
             }
-            catch (ValidationException ex)
+            catch (DuplicateException ex)
             {
-                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+                return Conflict(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -84,10 +71,13 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> UpdateRoom(CancellationToken cancellationToken, [FromServices] UpdateRoomHandler handler, [FromBody] UpdateRoomCommand updateRoomCommand)
         {
@@ -97,13 +87,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok();
             }
-            catch (NonExistentException ex)
-            {
-                return NotFound(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -111,8 +101,11 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> DeleteRoom(CancellationToken cancellationToken, [FromServices] DeleteRoomHandler handler, int id)
@@ -137,8 +130,11 @@ namespace H2Projekt.API.Controllers
 
         #region Room Types
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<List<RoomTypeDto>>> GetAllRoomTypes(CancellationToken cancellationToken, [FromServices] GetAllRoomTypesHandler handler)
         {
@@ -154,8 +150,10 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<AvailableRoomTypesForStayDto>> GetAvailableRoomTypesForStay(CancellationToken cancellationToken, [FromServices] GetAvailableRoomTypesForStayHandler handler, [FromQuery] GetAvailableRoomTypesForStayCommand getAvailableRoomTypesForStayCommand)
         {
@@ -175,10 +173,13 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<int>> CreateRoomType(CancellationToken cancellationToken, [FromServices] CreateRoomTypeHandler handler, [FromBody] CreateRoomTypeCommand createRoomTypeCommand)
         {
@@ -188,13 +189,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(roomId);
             }
-            catch (DuplicateException ex)
-            {
-                return Conflict(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (DuplicateException ex)
+            {
+                return Conflict(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -202,10 +203,13 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> UpdateRoomType(CancellationToken cancellationToken, [FromServices] UpdateRoomTypeHandler handler, [FromBody] UpdateRoomTypeCommand updateRoomTypeCommand)
         {
@@ -215,13 +219,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok();
             }
-            catch (NonExistentException ex)
-            {
-                return NotFound(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -229,8 +233,11 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> DeleteRoomType(CancellationToken cancellationToken, [FromServices] DeleteRoomTypeHandler handler, int id)
@@ -255,6 +262,7 @@ namespace H2Projekt.API.Controllers
 
         #region Room Discounts
 
+        [AllowAnonymous]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
@@ -272,10 +280,13 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<int>> CreateRoomDiscount(CancellationToken cancellationToken, [FromServices] CreateRoomDiscountHandler handler, [FromBody] CreateRoomDiscountCommand createRoomDiscountCommand)
         {
@@ -285,13 +296,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(roomId);
             }
-            catch (DuplicateException ex)
-            {
-                return Conflict(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (DuplicateException ex)
+            {
+                return Conflict(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -299,10 +310,13 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> UpdateRoomDiscount(CancellationToken cancellationToken, [FromServices] UpdateRoomDiscountHandler handler, [FromBody] UpdateRoomDiscountCommand updateRoomDiscountCommand)
         {
@@ -312,13 +326,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok();
             }
-            catch (NonExistentException ex)
-            {
-                return NotFound(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -326,8 +340,11 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> DeleteRoomDiscount(CancellationToken cancellationToken, [FromServices] DeleteRoomDiscountHandler handler, int id)

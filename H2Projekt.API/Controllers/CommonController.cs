@@ -6,7 +6,7 @@ namespace H2Projekt.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class CommonController : ControllerBase
+    public class CommonController : BaseController
     {
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]

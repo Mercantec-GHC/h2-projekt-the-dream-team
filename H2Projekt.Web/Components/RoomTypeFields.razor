@@ -1,0 +1,39 @@
+﻿<div class="d-flex flex-column gap-3">
+    <div>
+        <label class="form-label">Navn</label>
+
+        <InputText class="form-control" @bind-Value="Model.Name" placeholder="Indtast navn" />
+    </div>
+
+    <div>
+        <label class="form-label">Beskrivelse</label>
+
+        <InputTextArea class="form-control" @bind-Value="Model.Description" placeholder="Indtast beskrivelse" />
+    </div>
+
+    <div>
+        <label class="form-label">Maks personer</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.MaxOccupancy" placeholder="Indtast maks antal personer" />
+    </div>
+
+    <div>
+        <label class="form-label">Kæledyr tilladt</label>
+
+        <InputSelect @bind-Value="Model.PetsAllowed" class="form-select">
+            <option value="true">Ja</option>
+            <option value="false">Nej</option>
+        </InputSelect>
+    </div>
+
+    <div>
+        <label class="form-label">Pris pr. nat</label>
+
+        <InputNumber class="form-control" @bind-Value="Model.PricePerNight" placeholder="Indtast pris pr. nat" />
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public RoomTypeDto Model { get; set; } = new RoomTypeDto();
+}

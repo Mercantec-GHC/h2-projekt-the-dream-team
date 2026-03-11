@@ -1,18 +1,24 @@
 ﻿using FluentValidation;
+using H2Projekt.API.Extensions;
 using H2Projekt.Application.Commands.Guests;
 using H2Projekt.Application.Dto.Guests;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Guests;
+using H2Projekt.Domain.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace H2Projekt.API.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class GuestController : ControllerBase
+    public class GuestController : BaseController
     {
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<List<GuestDto>>> GetAllGuests(CancellationToken cancellationToken, [FromServices] GetAllGuestsHandler handler)
         {
@@ -28,12 +34,18 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        // TODO: [Authorize]?
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<GuestDto?>> GetGuestById(CancellationToken cancellationToken, [FromServices] GetGuestByIdHandler handler, int id)
         {
+            if (!WorkContext.IsAdmin() && WorkContext.Guest.Id != id)
+            {
+                return Forbid();
+            }
+
             try
             {
                 var guest = await handler.HandleAsync(id, cancellationToken);
@@ -50,6 +62,7 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        // TODO: [Authorize]?
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -72,10 +85,13 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<int>> CreateGuest(CancellationToken cancellationToken, [FromServices] CreateGuestHandler handler, [FromBody] CreateGuestCommand createGuestCommand)
         {
@@ -85,13 +101,13 @@ namespace H2Projekt.API.Controllers
 
                 return Ok(guestId);
             }
-            catch (DuplicateException ex)
-            {
-                return Conflict(ex.GetProblemDetails());
-            }
             catch (ValidationException ex)
             {
                 return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
+            }
+            catch (DuplicateException ex)
+            {
+                return Conflict(ex.GetProblemDetails());
             }
             catch (OperationCanceledException)
             {
@@ -99,10 +115,11 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        // TODO: [Authorize]?
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> UpdateGuest(CancellationToken cancellationToken, [FromServices] UpdateGuestHandler handler, [FromBody] UpdateGuestCommand updateGuestCommand)
         {
@@ -126,8 +143,11 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> DeleteGuest(CancellationToken cancellationToken, [FromServices] DeleteGuestHandler handler, int id)
