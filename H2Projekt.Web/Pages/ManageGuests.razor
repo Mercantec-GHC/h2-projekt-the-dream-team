@@ -16,22 +16,14 @@
     </div>
 }
 
-<div id="toolbar" class="d-flex gap-3 justify-content-between mb-4">
-    <div class="d-flex gap-3 align-items-center">
-        <a href="/admin" class="btn btn-secondary">
-            <i class="bi bi-arrow-left"></i>
+<div id="toolbar" class="d-flex gap-3 align-items-center mb-4">
+    <a href="/admin" class="btn btn-secondary">
+        <i class="bi bi-arrow-left"></i>
 
-            Tilbage
-        </a>
+        Tilbage
+    </a>
 
-        <h3 class="heading-gold">Gæster</h3>
-    </div>
-
-    <button type="button" class="btn btn-success" @onclick="() => PrepareGuestCreationOrUpdate()" data-bs-toggle="modal" data-bs-target="#createEditModal">
-        <i class="bi bi-plus-lg"></i>
-
-        Tilføj
-    </button>
+    <h3 class="heading-gold">Gæster</h3>
 </div>
 
 @if (guests is null)
@@ -64,7 +56,7 @@ else
                     <td class="align-middle">@guest.Email</td>
                     <td class="align-middle">
                         <div class="d-flex gap-2 w-100 justify-content-end">
-                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareGuestCreationOrUpdate(guest)" data-bs-toggle="modal" data-bs-target="#createEditModal">
+                            <button type="button" class="btn btn-sm btn-secondary" @onclick="() => PrepareGuestUpdate(guest)" data-bs-toggle="modal" data-bs-target="#createEditModal">
                                 <i class="bi bi-pencil-fill"></i>
 
                                 Rediger
@@ -87,7 +79,7 @@ else
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content p-3">
             <div class="d-flex align-items-center justify-content-between">
-                <h5 class="fs-4 mb-0" id="createEditModalLabel">@(guestToEdit?.Id > 0 ? "Rediger" : "Tilføj") Gæst</h5>
+                <h5 class="fs-4 mb-0" id="createEditModalLabel">Rediger Gæst</h5>
 
                 <button type="button" class="d-flex justify-content-center align-items-center rounded-2 text-black fs-7 min-w-2rem min-h-2rem w-2rem h-2rem border-0" data-bs-dismiss="modal" aria-label="Close">
                     <i class="bi bi-x-lg"></i>
@@ -112,22 +104,11 @@ else
             </div>
 
             <div class="d-flex gap-3">
-                @if (guestToEdit?.Id > 0)
-                {
-                    <button type="button" class="btn btn-primary w-50" @onclick="CreateOrSaveGuest">
-                        <i class="bi bi-floppy"></i>
+                <button type="button" class="btn btn-primary w-50" @onclick="SaveGuest">
+                    <i class="bi bi-floppy"></i>
 
-                        Gem Gæst
-                    </button>
-                }
-                else
-                {
-                    <button type="button" class="btn btn-success w-50" @onclick="CreateOrSaveGuest">
-                        <i class="bi bi-plus-lg"></i>
-
-                        Tilføj Gæst
-                    </button>
-                }
+                    Gem Gæst
+                </button>
 
                 <button type="button" class="btn btn-secondary w-50" data-bs-dismiss="modal">
                     <i class="bi bi-x-lg"></i>
@@ -191,19 +172,17 @@ else
         guests = await Api.GetAllGuestsAsync();
     }
 
-    public void PrepareGuestCreationOrUpdate(GuestDto? guest = null)
+    public void PrepareGuestUpdate(GuestDto guest)
     {
         modalException = null;
 
-        guestToEdit = new GuestDto();
-
-        if (guest is not null)
+        guestToEdit = new GuestDto()
         {
-            guestToEdit.Id = guest.Id;
-            guestToEdit.FirstName = guest.FirstName;
-            guestToEdit.LastName = guest.LastName;
-            guestToEdit.Email = guest.Email;
-        }
+            Id = guest.Id,
+            FirstName = guest.FirstName,
+            LastName = guest.LastName,
+            Email = guest.Email,
+        };
     }
 
     public void PrepareGuestDeletion(GuestDto guest)
@@ -213,61 +192,39 @@ else
         guestToDelete = guest.Id;
     }
 
-    public async Task CreateOrSaveGuest()
+    public async Task SaveGuest()
     {
         modalException = null;
 
-        if (guestToEdit is null)
+        if (guestToEdit is null || guestToEdit.Id == 0)
         {
             return;
         }
 
         try
         {
-            if (guestToEdit.Id == 0)
+            await Api.UpdateGuestAsync(new UpdateGuestCommand()
             {
-                var guestId = await Api.CreateGuestAsync(new CreateGuestCommand()
-                {
-                    FirstName = guestToEdit.FirstName,
-                    LastName = guestToEdit.LastName,
-                    Email = guestToEdit.Email,
-                });
+                Id = guestToEdit.Id,
+                FirstName = guestToEdit.FirstName,
+                LastName = guestToEdit.LastName,
+                Email = guestToEdit.Email,
+            });
 
-                guests.Add(new GuestDto()
-                {
-                    Id = guestId,
-                    FirstName = guestToEdit.FirstName,
-                    LastName = guestToEdit.LastName,
-                    Email = guestToEdit.Email,
-                });
+            var guest = guests.FirstOrDefault(r => r.Id == guestToEdit.Id);
 
-                exception = new ApiException(null, 200, $"Gæst \"{guestToEdit.FirstName}\" oprettet.", null, null);
-            }
-            else
+            if (guest is not null)
             {
-                await Api.UpdateGuestAsync(new UpdateGuestCommand()
+                guest.FirstName = guestToEdit.FirstName;
+                guest.LastName = guestToEdit.LastName;
+                guest.Email = guestToEdit.Email;
+
+                if (WorkContext?.Id == guest.Id)
                 {
-                    Id = guestToEdit.Id,
-                    FirstName = guestToEdit.FirstName,
-                    LastName = guestToEdit.LastName,
-                    Email = guestToEdit.Email,
-                });
-
-                var guest = guests.FirstOrDefault(r => r.Id == guestToEdit.Id);
-
-                if (guest is not null)
-                {
-                    guest.FirstName = guestToEdit.FirstName;
-                    guest.LastName = guestToEdit.LastName;
-                    guest.Email = guestToEdit.Email;
-
-                    if (WorkContext?.Id == guest.Id)
-                    {
-                        await AuthService.RefreshAsync();
-                    }
-
-                    exception = new ApiException(null, 200, $"Gæst \"{guestToEdit.FirstName}\" opdateret.", null, null);
+                    await AuthService.RefreshAsync();
                 }
+
+                exception = new ApiException(null, 200, $"Gæst \"{guestToEdit.FirstName}\" opdateret.", null, null);
             }
 
             await JS.InvokeVoidAsync("hideModal", "#createEditModal");

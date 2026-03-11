@@ -33,7 +33,7 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        // TODO: [Authorize]?
+        [Authorize]
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -61,13 +61,18 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        // TODO: [Authorize]?
+        [Authorize]
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<GuestDto>> GetGuestByEmail(CancellationToken cancellationToken, [FromServices] GetGuestByEmailHandler handler, string email)
         {
+            if (!WorkContext.IsAdmin() && WorkContext.Email != email)
+            {
+                return Forbid();
+            }
+
             try
             {
                 var guest = await handler.HandleAsync(email, cancellationToken);
@@ -84,37 +89,7 @@ namespace H2Projekt.API.Controllers
             }
         }
 
-        [Authorize(Roles = "Admin")]
-        [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status409Conflict)]
-        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
-        public async Task<ActionResult<int>> CreateGuest(CancellationToken cancellationToken, [FromServices] CreateGuestHandler handler, [FromBody] CreateGuestCommand createGuestCommand)
-        {
-            try
-            {
-                var guestId = await handler.HandleAsync(createGuestCommand, cancellationToken);
-
-                return Ok(guestId);
-            }
-            catch (ValidationException ex)
-            {
-                return BadRequest(new ValidationProblemDetails(ex.Errors.ToDictionary()));
-            }
-            catch (DuplicateException ex)
-            {
-                return Conflict(ex.GetProblemDetails());
-            }
-            catch (OperationCanceledException)
-            {
-                return StatusCode(StatusCodes.Status499ClientClosedRequest);
-            }
-        }
-
-        // TODO: [Authorize]?
+        [Authorize]
         [HttpPut]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -122,6 +97,11 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> UpdateGuest(CancellationToken cancellationToken, [FromServices] UpdateGuestHandler handler, [FromBody] UpdateGuestCommand updateGuestCommand)
         {
+            if (!WorkContext.IsAdmin() && WorkContext.Id != updateGuestCommand.Id)
+            {
+                return Forbid();
+            }
+
             try
             {
                 await handler.HandleAsync(updateGuestCommand, cancellationToken);

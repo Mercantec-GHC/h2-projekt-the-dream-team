@@ -34,7 +34,6 @@ builder.Services.AddValidatorsFromAssemblyContaining<RegisterValidator>();
 // - Bookings
 builder.Services.AddValidatorsFromAssemblyContaining<CreateBookingValidator>();
 // - Guests
-builder.Services.AddValidatorsFromAssemblyContaining<CreateGuestValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<UpdateGuestValidator>();
 // - Rooms
 builder.Services.AddValidatorsFromAssemblyContaining<CreateRoomValidator>();
@@ -103,7 +102,6 @@ builder.Services.AddScoped<GetBookingsOverviewHandler>();
 // - Guests
 builder.Services.AddScoped<GetAllGuestsHandler>();
 builder.Services.AddScoped<GetGuestByIdHandler>();
-builder.Services.AddScoped<CreateGuestHandler>();
 builder.Services.AddScoped<UpdateGuestHandler>();
 builder.Services.AddScoped<DeleteGuestHandler>();
 builder.Services.AddScoped<GetGuestByEmailHandler>();
