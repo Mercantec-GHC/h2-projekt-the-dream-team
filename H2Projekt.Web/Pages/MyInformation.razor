@@ -66,9 +66,9 @@
 
 @code {
     private ApiException? exception;
-    
+
     private bool isEditing = false;
-    
+
     private GuestDto? guestToEdit;
 
     private void EnableEdit()
@@ -111,9 +111,7 @@
                 Email = guestToEdit.Email
             });
 
-			WorkContext.FirstName = guestToEdit.FirstName;
-            WorkContext.LastName = guestToEdit.LastName;
-			WorkContext.Email = guestToEdit.Email;
+            // await AuthService.UpdateDetails(guestToEdit.FirstName, guestToEdit.LastName, guestToEdit.Email);
 
             isEditing = false;
 

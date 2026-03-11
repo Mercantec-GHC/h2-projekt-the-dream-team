@@ -27,9 +27,9 @@ namespace H2Projekt.Domain.Validators.Guests
             RuleFor(guest => guest.PasswordHash)
                 .NotEmpty()
                 .WithMessage("Password hash er påkrævet.")
-                .MinimumLength(64)
-                .MaximumLength(64)
-                .WithMessage("Password hash skal være 64 tegn langt (SHA-256 hash).")
+                .MinimumLength(60)
+                .MaximumLength(60)
+                .WithMessage("Password hash skal være 60 tegn langt (SHA-256 hash).")
                 .When(guest => !string.IsNullOrEmpty(guest.PasswordHash));
             RuleFor(guest => guest.Bookings)
                 .ForEach(booking => booking.SetValidator(new BookingValidator()))

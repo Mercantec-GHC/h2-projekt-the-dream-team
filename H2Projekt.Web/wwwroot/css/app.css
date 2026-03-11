@@ -200,6 +200,10 @@ code {
     margin-top: 3.45rem !important;
 }
 
+.-mb-px {
+    margin-bottom: -1px !important;
+}
+
 .fs-7 {
     font-size: 0.875rem;
     line-height: 1.25rem;

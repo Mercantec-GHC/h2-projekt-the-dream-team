@@ -1,5 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Text.Json;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace H2Projekt.Web.Helpers
 {
@@ -34,10 +34,7 @@ namespace H2Projekt.Web.Helpers
         {
             try
             {
-                var json = JsonSerializer.Deserialize<ValidationProblemDetails>(response, new JsonSerializerOptions()
-                {
-                    PropertyNameCaseInsensitive = true,
-                });
+                var json = JsonSerializer.Deserialize<ValidationProblemDetails>(response);
 
                 if (json is null)
                 {
@@ -67,6 +64,12 @@ namespace H2Projekt.Web.Helpers
             {
                 return null;
             }
+        }
+
+        private class ValidationProblemDetails
+        {
+            [JsonPropertyName("errors")]
+            public Dictionary<string, string[]> Errors { get; set; }
         }
     }
 
