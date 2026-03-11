@@ -57,5 +57,29 @@ namespace H2Projekt.API.Controllers
                 return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
         }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<ActionResult> Test()
+        {
+            if (WorkContext is null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(WorkContext);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpGet]
+        public async Task<ActionResult> TestAdmin()
+        {
+            if (WorkContext is null)
+            {
+                return BadRequest();
+            }
+
+            return Ok(WorkContext);
+        }
     }
 }

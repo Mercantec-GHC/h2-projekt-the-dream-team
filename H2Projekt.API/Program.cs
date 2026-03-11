@@ -86,10 +86,7 @@ builder.Services
         };
     });
 
-builder.Services.AddAuthorization(options =>
-{
-    // You can add policies later, e.g. AdminOnly
-});
+builder.Services.AddAuthorization();
 
 // Application handlers
 // - Authentication

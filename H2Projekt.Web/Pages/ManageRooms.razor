@@ -1,8 +1,8 @@
 ﻿@page "/admin/manage-rooms"
 @inherits BasePage
+@attribute [Authorize(Roles = "Admin")]
 
 @inject ApiClient Api
-@inject IJSRuntime JS
 
 <PageTitle>Admin - Værelser</PageTitle>
 
@@ -16,7 +16,7 @@
     </div>
 }
 
-<div class="d-flex gap-3 justify-content-between mb-4">
+<div id="toolbar" class="d-flex gap-3 justify-content-between mb-4">
     <div class="d-flex gap-3 align-items-center">
         <a href="/admin" class="btn btn-secondary">
             <i class="bi bi-arrow-left"></i>
@@ -195,13 +195,8 @@ else
     private ICollection<RoomTypeDto> roomTypes;
     private ICollection<RoomDto> rooms;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender)
-        {
-            return;
-        }
-
         roomTypes = await Api.GetAllRoomTypesAsync();
         rooms = await Api.GetAllRoomsAsync();
     }

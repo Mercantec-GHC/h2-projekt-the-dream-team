@@ -1,8 +1,8 @@
 ﻿@page "/admin/manage-room-discounts"
 @inherits BasePage
+@attribute [Authorize(Roles = "Admin")]
 
 @inject ApiClient Api
-@inject IJSRuntime JS
 
 <PageTitle>Admin - Værelsestilbud</PageTitle>
 
@@ -16,7 +16,7 @@
     </div>
 }
 
-<div class="d-flex gap-3 justify-content-between mb-4">
+<div id="toolbar" class="d-flex gap-3 justify-content-between mb-4">
     <div class="d-flex gap-3 align-items-center">
         <a href="/admin" class="btn btn-secondary">
             <i class="bi bi-arrow-left"></i>
@@ -190,13 +190,8 @@ else
 
     private ICollection<RoomDiscountDto> roomDiscounts;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender)
-        {
-            return;
-        }
-
         roomDiscounts = await Api.GetAllRoomDiscountsAsync();
     }
 

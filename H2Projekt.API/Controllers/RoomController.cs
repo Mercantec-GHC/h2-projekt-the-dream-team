@@ -4,7 +4,6 @@ using H2Projekt.Application.Commands.Rooms;
 using H2Projekt.Application.Dto.Rooms;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Rooms;
-using H2Projekt.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

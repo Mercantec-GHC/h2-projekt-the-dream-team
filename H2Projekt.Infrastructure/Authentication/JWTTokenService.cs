@@ -28,12 +28,13 @@ namespace H2Projekt.Infrastructure.Authentication
             // Define the claims to be included in the token
             var claims = new List<Claim>
             {
-                new Claim(JwtRegisteredClaimNames.Sub, guest.Id.ToString()),
+                new Claim("id", guest.Id.ToString()),
                 new Claim("firstName", guest.FirstName),
                 new Claim("lastName", guest.LastName),
-                new Claim(JwtRegisteredClaimNames.Email, guest.Email),
-                new Claim(ClaimTypes.Role, guest.Id <= 2 ? "Admin" : "User"),
-                new Claim(JwtRegisteredClaimNames.Exp, expires.ToString()),
+                new Claim("email", guest.Email),
+                new Claim(ClaimTypes.Role, guest.Id <= 2 ? "Admin" : "User"), // Important to use ClaimTypes for this one
+                new Claim("iat", DateTimeOffset.UtcNow.ToUnixTimeSeconds().ToString()),
+                new Claim("exp", new DateTimeOffset(expires).ToUnixTimeSeconds().ToString()),
             };
 
             // Generate a security key from the secret key

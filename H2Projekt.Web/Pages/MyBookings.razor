@@ -1,8 +1,8 @@
 ﻿@page "/guest/bookings"
 @inherits BasePage
+@attribute [Authorize]
 
 @inject ApiClient Api
-@inject IJSRuntime JS
 
 <PageTitle>Gæst - Mine Bookinger</PageTitle>
 

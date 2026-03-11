@@ -2,7 +2,6 @@
 @inherits BasePage
 
 @inject ApiClient Api
-@inject IJSRuntime JS
 
 <PageTitle>Søg</PageTitle>
 
@@ -138,13 +137,8 @@
 
     private ICollection<RoomDiscountDto> roomDiscounts;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender)
-        {
-            return;
-        }
-
         roomDiscounts = await Api.GetAllRoomDiscountsAsync();
     }
 

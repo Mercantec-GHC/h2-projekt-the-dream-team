@@ -156,6 +156,10 @@ code {
     min-width: 15rem !important;
 }
 
+.max-w-20rem {
+    max-width: 20rem !important;
+}
+
 .h-fit {
     height: fit-content !important;
 }
@@ -254,6 +258,7 @@ code {
     border: 0.063rem solid var(--bs-border-color-translucent);
     box-shadow: var(--bs-box-shadow-sm) !important;
     border-radius: var(--bs-border-radius);
+    display: none;
 }
 
     .dt-container .dt-layout-row:not(:nth-child(2)) {
@@ -266,9 +271,9 @@ code {
         gap: 0.5rem;
     }
 
-    .dt-container:first-child {
-        display: none;
-    }
+#toolbar ~ .dt-container {
+    display: block;
+}
 
 /* Bootstrap */
 

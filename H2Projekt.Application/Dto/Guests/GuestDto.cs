@@ -1,6 +1,5 @@
 ﻿using H2Projekt.Application.Dto.Bookings;
 using H2Projekt.Domain;
-using H2Projekt.Domain.Enums;
 
 namespace H2Projekt.Application.Dto.Guests
 {

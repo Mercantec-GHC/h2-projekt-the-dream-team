@@ -9,6 +9,7 @@
 		<li class="nav-item">
 			<a class="nav-link active" aria-current="page" href="login">Log Ind</a>
 		</li>
+
 		<li class="nav-item">
 			<a class="nav-link" href="register">Registrér</a>
 		</li>
@@ -54,7 +55,7 @@
 
 			await AuthService.LoginAsync(loginResult.Token);
 
-			Nav.NavigateTo("/");
+			Nav.NavigateTo("/", true);
 		}
 		catch (ApiException ex)
 		{

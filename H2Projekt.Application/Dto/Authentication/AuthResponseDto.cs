@@ -3,6 +3,5 @@
     public class AuthResponseDto
     {
         public string Token { get; set; }
-        public DateTimeOffset ExpiresAtUtc { get; set; }
     }
 }

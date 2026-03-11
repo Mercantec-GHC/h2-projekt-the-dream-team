@@ -1,5 +1,6 @@
 ﻿@page "/admin"
 @inherits BasePage
+@attribute [Authorize(Roles = "Admin")]
 
 @inject ApiClient Api
 
@@ -126,33 +127,32 @@
 
     private BookingOverviewDto bookingOverview;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender)
+        try
         {
-            return;
+            var bookings = await Api.GetAllBookingsAsync();
+
+            bookingsCount = bookings.Count;
+
+            var guests = await Api.GetAllGuestsAsync();
+
+            guestsCount = guests.Count;
+
+            rooms = await Api.GetAllRoomsAsync();
+
+            var roomTypes = await Api.GetAllRoomTypesAsync();
+
+            roomTypesCount = roomTypes.Count;
+
+            var roomDiscounts = await Api.GetAllRoomDiscountsAsync();
+
+            roomDiscountsCount = roomDiscounts.Count;
+
+            bookingOverview = await Api.GetBookingOverviewAsync();
+
+            StateHasChanged();
         }
-
-        var bookings = await Api.GetAllBookingsAsync();
-
-        bookingsCount = bookings.Count;
-
-        var guests = await Api.GetAllGuestsAsync();
-
-        guestsCount = guests.Count;
-
-        rooms = await Api.GetAllRoomsAsync();
-
-        var roomTypes = await Api.GetAllRoomTypesAsync();
-
-        roomTypesCount = roomTypes.Count;
-
-        var roomDiscounts = await Api.GetAllRoomDiscountsAsync();
-
-        roomDiscountsCount = roomDiscounts.Count;
-
-        bookingOverview = await Api.GetBookingOverviewAsync();
-
-        StateHasChanged();
+        catch { }
     }
 }

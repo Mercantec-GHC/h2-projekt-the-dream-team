@@ -1,13 +1,17 @@
 ﻿using H2Projekt.Web.Authentication;
 using Microsoft.AspNetCore.Components;
+using Microsoft.JSInterop;
 using System.Security.Claims;
 
 namespace H2Projekt.Web
 {
-    public class BasePage : ComponentBase
+    public class BasePage : ComponentBase, IDisposable
     {
         [Inject]
         protected CustomAuthenticationStateProvider AuthService { get; set; }
+
+        [Inject]
+        protected IJSRuntime JS { get; set; }
 
         protected GuestDto? WorkContext { get; set; }
 
@@ -18,9 +22,27 @@ namespace H2Projekt.Web
                 return;
             }
 
+            await JS.InvokeVoidAsync("initDataTable");
+
+            await OnAccessTokenChanged(null, null);
+
+            AuthService.OnAccessTokenChanged += OnAccessTokenChanged;
+
+            StateHasChanged();
+        }
+
+        private async Task OnAccessTokenChanged(object? sender, string? token)
+        {
             var state = await AuthService.GetAuthenticationStateAsync();
 
             WorkContext = GetWorkContextOrNull(state.User);
+
+            await InvokeAsync(StateHasChanged);
+        }
+
+        public void Dispose()
+        {
+            AuthService.OnAccessTokenChanged -= OnAccessTokenChanged;
         }
 
         private GuestDto? GetWorkContextOrNull(ClaimsPrincipal principal)
@@ -30,12 +52,12 @@ namespace H2Projekt.Web
                 return null;
             }
 
-            var idClaim = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var firstNameClaim = principal.FindFirst("firstName")?.Value;
-            var lastNameClaim = principal.FindFirst("lastName")?.Value;
-            var emailClaim = principal.FindFirst(ClaimTypes.Email)?.Value;
+            var idClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "id")?.Value;
+            var firstNameClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "firstName")?.Value;
+            var lastNameClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "lastName")?.Value;
+            var emailClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
 
-            if (idClaim is null || firstNameClaim is null || lastNameClaim is null || !int.TryParse(idClaim, out var id) || emailClaim is null)
+            if (string.IsNullOrEmpty(idClaim) || string.IsNullOrEmpty(firstNameClaim) || string.IsNullOrEmpty(lastNameClaim) || !int.TryParse(idClaim, out var id) || string.IsNullOrEmpty(emailClaim))
             {
                 return null;
             }

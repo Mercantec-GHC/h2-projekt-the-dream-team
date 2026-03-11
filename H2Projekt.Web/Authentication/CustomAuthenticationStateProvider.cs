@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -11,13 +10,13 @@ namespace H2Projekt.Web.Authentication
         private static readonly AuthenticationState anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
         private readonly IJSRuntime _js;
-        private readonly HttpClient _httpClient;
 
-        public CustomAuthenticationStateProvider(IJSRuntime js, HttpClient httpClient)
+        public CustomAuthenticationStateProvider(IJSRuntime js)
         {
             _js = js;
-            _httpClient = httpClient;
         }
+
+        public event Func<object?, string?, Task>? OnAccessTokenChanged;
 
         public async Task LoginAsync(string token)
         {
@@ -26,6 +25,13 @@ namespace H2Projekt.Web.Authentication
 
             // Notify the authentication state has changed with the new authenticated state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+            // If there are any subscribers to the OnAccessTokenChanged event, invoke the event with the new token
+            if (OnAccessTokenChanged is not null)
+            {
+                // Invoke the event with the new token
+                await OnAccessTokenChanged(this, token);
+            }
         }
 
         public async Task LogoutAsync()
@@ -35,6 +41,13 @@ namespace H2Projekt.Web.Authentication
 
             // Clear the token from local storage
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+            // If there are any subscribers to the OnAccessTokenChanged event, invoke the event with null to indicate that the user has logged out
+            if (OnAccessTokenChanged is not null)
+            {
+                // Invoke the event with null to indicate that the user has logged out
+                await OnAccessTokenChanged(this, null);
+            }
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()

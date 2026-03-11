@@ -4,7 +4,6 @@ using H2Projekt.Application.Commands.Bookings;
 using H2Projekt.Application.Dto.Bookings;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Bookings;
-using H2Projekt.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -120,7 +119,7 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult> DeleteBooking(CancellationToken cancellationToken, [FromServices] DeleteBookingHandler handler, int id)
         {
-            if (!WorkContext.IsAdmin() && !WorkContext.Guest.Bookings.Any(b => b.Id == id))
+            if (!WorkContext.IsAdmin() && !WorkContext.Bookings.Any(b => b.Id == id))
             {
                 return Forbid();
             }

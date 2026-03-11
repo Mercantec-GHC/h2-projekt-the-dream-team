@@ -4,7 +4,6 @@ using H2Projekt.Application.Commands.Guests;
 using H2Projekt.Application.Dto.Guests;
 using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Guests;
-using H2Projekt.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -41,7 +40,7 @@ namespace H2Projekt.API.Controllers
         [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
         public async Task<ActionResult<GuestDto?>> GetGuestById(CancellationToken cancellationToken, [FromServices] GetGuestByIdHandler handler, int id)
         {
-            if (!WorkContext.IsAdmin() && WorkContext.Guest.Id != id)
+            if (!WorkContext.IsAdmin() && WorkContext.Id != id)
             {
                 return Forbid();
             }

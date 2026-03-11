@@ -46,13 +46,8 @@ else
 @code {
     private ICollection<Rule>? rules;
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (!firstRender)
-        {
-            return;
-        }
-
         rules = await Api.GetRulesAsync();
     }
 }

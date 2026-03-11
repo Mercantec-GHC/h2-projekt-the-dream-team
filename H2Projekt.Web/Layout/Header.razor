@@ -1,45 +1,56 @@
 ﻿@inherits BasePage
 
+@inject NavigationManager Nav
+
 <header class="position-fixed top-0 z-1 w-100 d-flex justify-content-between gap-3 p-2 bg-white border-bottom border-2 border-body-secondary h-5rem">
-	<div class="d-flex gap-2">
-		<NavLink class="btn btn-subtle" href="" Match="NavLinkMatch.All">
-			<i class="bi bi-search"></i> Søg
-		</NavLink>
+    <div class="d-flex gap-2">
+        <NavLink class="btn btn-subtle" href="" Match="NavLinkMatch.All">
+            <i class="bi bi-search"></i> Søg
+        </NavLink>
 
-		<NavLink class="btn btn-subtle" href="admin">
-			<i class="bi bi-gear-fill"</i> Admin
-		</NavLink>
+        <NavLink class="btn btn-subtle" href="admin">
+            <i class="bi bi-gear-fill"</i> Admin
+        </NavLink>
 
-		<NavLink class="btn btn-subtle" href="rules">
-			<i class="bi bi-list-ol"</i> Regler
-		</NavLink>
-	</div>
+        <NavLink class="btn btn-subtle" href="rules">
+            <i class="bi bi-list-ol"</i> Regler
+        </NavLink>
+    </div>
 
 
-	@if (WorkContext is null)
-	{
-		<NavLink class="btn btn-subtle" href="login">
-			<i class="bi bi-box-arrow-in-right"></i> Login
-		</NavLink>
-	}
-	else
-	{
-		<button class="btn btn-subtle" data-bs-toggle="dropdown" aria-expanded="false">
-			<i class="bi bi-person-fill"></i>
+    @if (WorkContext is null)
+    {
+        <NavLink class="btn btn-subtle" href="login">
+            <i class="bi bi-box-arrow-in-right"></i> Login
+        </NavLink>
+    }
+    else
+    {
+        <button class="btn btn-subtle" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-person-fill"></i>
 
-			<span>@WorkContext.FirstName @WorkContext.LastName</span>
-		</button>
+            <span>@WorkContext.FirstName @WorkContext.LastName</span>
+        </button>
 
-		<div class="dropdown-menu dropdown-menu-end px-2">
-			<div class="d-flex flex-column gap-2">
-				<GuestSidebar />
+        <div class="dropdown-menu dropdown-menu-end px-2">
+            <div class="d-flex flex-column gap-2">
+                <GuestSidebar />
 
-				<button class="btn btn-subtle text-danger" @onclick="AuthService.LogoutAsync">
-					<i class="bi bi-box-arrow-right"></i>
+                <button class="btn btn-subtle text-danger" @onclick="HandleLogout">
+                    <i class="bi bi-box-arrow-right"></i>
 
-					Log ud
-				</button>
-			</div>
-		</div>
-	}
+                    Log ud
+                </button>
+            </div>
+        </div>
+    }
 </header>
+
+@code {
+    private async Task HandleLogout()
+    {
+        await AuthService.LogoutAsync();
+
+        Nav.NavigateTo("/", true);
+    }
+}

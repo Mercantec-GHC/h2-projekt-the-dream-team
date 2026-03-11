@@ -1,5 +1,4 @@
 ﻿using FluentValidation;
-using H2Projekt.Domain.Enums;
 using H2Projekt.Domain.Validators.Guests;
 
 namespace H2Projekt.Domain

@@ -1,5 +1,4 @@
-﻿using H2Projekt.API.Context;
-using H2Projekt.Domain.Enums;
+﻿using H2Projekt.Application.Dto.Guests;
 using System.Security.Claims;
 
 namespace H2Projekt.API.Extensions
@@ -13,12 +12,12 @@ namespace H2Projekt.API.Extensions
                 return null;
             }
 
-            var idClaim = principal.FindFirstValue(ClaimTypes.NameIdentifier);
-            var firstNameClaim = principal.FindFirstValue("firstName");
-            var lastNameClaim = principal.FindFirstValue("lastName");
-            var emailClaim = principal.FindFirstValue(ClaimTypes.Email);
+            var idClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "id")?.Value;
+            var firstNameClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "firstName")?.Value;
+            var lastNameClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "lastName")?.Value;
+            var emailClaim = principal.Claims.FirstOrDefault(claim => claim.Type == "email")?.Value;
 
-            if (idClaim is null || firstNameClaim is null || lastNameClaim is null || !int.TryParse(idClaim, out var id) || emailClaim is null)
+            if (string.IsNullOrEmpty(idClaim) || string.IsNullOrEmpty(firstNameClaim) || string.IsNullOrEmpty(lastNameClaim) || !int.TryParse(idClaim, out var id) || string.IsNullOrEmpty(emailClaim))
             {
                 return null;
             }

@@ -14,21 +14,11 @@
     <div>
         <label class="form-label">Email</label>
 
-        <InputText class="form-control" @bind-Value:get="Model.Email" @bind-Value:set="SetEmail" placeholder="Indtast email" />
+        <InputText class="form-control" @bind-Value="Model.Email" placeholder="Indtast email" />
     </div>
 </div>
 
 @code {
     [Parameter]
     public GuestDto Model { get; set; } = new GuestDto();
-
-    [Parameter]
-    public EventCallback<string> EmailChanged { get; set; }
-
-    private async Task SetEmail(string email)
-    {
-        Model.Email = email;
-     
-        await EmailChanged.InvokeAsync(email);
-    }
 }

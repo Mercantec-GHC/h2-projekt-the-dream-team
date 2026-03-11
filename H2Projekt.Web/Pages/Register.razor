@@ -1,20 +1,76 @@
 ﻿@page "/register"
 @inherits BasePage
 
+@inject ApiClient Api
+@inject NavigationManager Nav
+
 <div class="d-flex flex-column min-h-inner-screen justify-content-center max-w-20rem mx-auto">
     <ul class="nav nav-tabs mx-auto -mb-px z-1">
         <li class="nav-item">
             <a class="nav-link" href="login">Log Ind</a>
         </li>
+
         <li class="nav-item">
             <a class="nav-link active" aria-current="page" href="register">Registrér</a>
         </li>
     </ul>
 
-    <div class="card p-3 d-flex flex-column gap-3">
-    </div>
+
+	<div class="card p-3 d-flex flex-column gap-3">
+		@if (exception is not null)
+		{
+			<div class="d-flex flex-column gap-2">
+				@foreach (var error in ApiExceptionHelper.ParseErrors(exception))
+				{
+					<div class="alert alert-@error.Severity p-2 m-0">@error.Message</div>
+				}
+			</div>
+		}
+
+		<div>
+			<label class="form-label">Fornavn</label>
+
+			<InputText class="form-control" @bind-Value="Model.FirstName" placeholder="Indtast fornavn" />
+		</div>
+
+		<div>
+			<label class="form-label">Efternavn</label>
+
+			<InputText class="form-control" @bind-Value="Model.LastName" placeholder="Indtast efternavn" />
+		</div>
+
+		<div>
+			<label class="form-label">Email</label>
+
+			<InputText class="form-control" @bind-Value="Model.Email" placeholder="Indtast email" />
+		</div>
+
+		<div>
+			<label class="form-label">Adgangskode</label>
+
+			<InputText type="password" class="form-control" @bind-Value="Model.Password" placeholder="Indtast adgangskode" />
+		</div>
+
+		<button class="btn btn-primary" @onclick="HandleRegister">Registrér</button>
+	</div>
 </div>
 
 @code {
+	private ApiException? exception;
 
+	private RegisterCommand Model = new RegisterCommand();
+
+	private async Task HandleRegister()
+	{
+		try
+		{
+			await Api.RegisterAsync(Model);
+
+			Nav.NavigateTo("/login");
+		}
+		catch (ApiException ex)
+		{
+			exception = ex;
+		}
+	}
 }

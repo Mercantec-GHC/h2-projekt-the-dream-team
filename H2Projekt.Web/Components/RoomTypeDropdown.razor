@@ -36,13 +36,6 @@
 
         roomTypes = await Api.GetAllRoomTypesAsync();
 
-        await OnParametersSetAsync();
-
-        StateHasChanged();
-    }
-
-    protected override async Task OnParametersSetAsync()
-    {
         if (RoomType is not null)
         {
             await SetRoomType(RoomType.Id.ToString(), false);
@@ -51,6 +44,8 @@
         {
             await Reset();
         }
+
+        StateHasChanged();
     }
 
     private async Task SetRoomType(string roomTypeId, bool invoke = true)

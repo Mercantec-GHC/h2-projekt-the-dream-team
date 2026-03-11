@@ -18,7 +18,7 @@ namespace H2Projekt.Web.Authentication
             if (!string.IsNullOrEmpty(accessToken))
             {
                 Console.WriteLine($"Bearer {accessToken}");
-             
+
                 request.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", accessToken);
             }
 

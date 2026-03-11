@@ -1,11 +1,10 @@
 ﻿@inject ApiClient Api
-@inject IJSRuntime JS
 
 <div class="d-flex gap-3">
     <div class="card p-3 d-flex flex-column gap-3 w-100">
         <h5 class="mb-0">Dine oplysninger</h5>
 
-        <GuestFields Model="Guest" EmailChanged="FindAndSetGuest" />
+        <GuestFields Model="Guest" />
     </div>
 
     <div class="card p-3 d-flex flex-column gap-3 w-100">
@@ -71,40 +70,6 @@
 
     [Parameter]
     public EventCallback<DateTime> FromDateChanged { get; set; }
-
-    private ICollection<GuestDto> guests = new List<GuestDto>();
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (!firstRender)
-        {
-            return;
-        }
-
-        guests = await Api.GetAllGuestsAsync();
-    }
-
-    private async Task FindAndSetGuest(string email)
-    {
-        var foundGuest = guests.FirstOrDefault(g => g.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
-
-        if (foundGuest is null)
-        {
-            return;
-        }
-
-        var newGuestDto = new GuestDto()
-        {
-            Id = foundGuest.Id,
-            FirstName = foundGuest.FirstName,
-            LastName = foundGuest.LastName,
-            Email = foundGuest.Email,
-        };
-
-        Guest = newGuestDto;
-
-        await GuestChanged.InvokeAsync(newGuestDto);
-    }
 
     private async Task SetFromDate(DateTime value)
     {
