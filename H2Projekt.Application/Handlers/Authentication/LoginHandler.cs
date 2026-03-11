@@ -2,6 +2,7 @@
 using H2Projekt.Application.Dto.Authentication;
 using H2Projekt.Application.Helpers;
 using H2Projekt.Application.Interfaces;
+using H2Projekt.Domain;
 using System.Security.Authentication;
 
 namespace H2Projekt.Application.Handlers.Authentication
@@ -31,9 +32,16 @@ namespace H2Projekt.Application.Handlers.Authentication
                 throw new InvalidCredentialException("Invalid email or password.");
             }
 
+            var refreshToken = _tokenService.GenerateRefreshToken();
+
+            guest.SetRefreshToken(refreshToken);
+
+            await _guestRepository.SaveChangesAsync(cancellationToken);
+
             return new AuthResponseDto()
             {
-                Token = _tokenService.GenerateToken(guest)
+                AccessToken = _tokenService.GenerateAccessToken(guest),
+                RefreshToken = refreshToken
             };
         }
     }

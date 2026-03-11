@@ -4,6 +4,7 @@ namespace H2Projekt.Application.Interfaces
 {
     public interface IJWTTokenService
     {
-        string GenerateToken(Guest guest);
+        string GenerateAccessToken(Guest guest);
+        string GenerateRefreshToken();
     }
 }

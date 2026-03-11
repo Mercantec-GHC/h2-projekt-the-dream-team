@@ -111,7 +111,7 @@
                 Email = guestToEdit.Email
             });
 
-            // await AuthService.UpdateDetails(guestToEdit.FirstName, guestToEdit.LastName, guestToEdit.Email);
+            await AuthService.RefreshAsync();
 
             isEditing = false;
 

@@ -53,7 +53,7 @@
 		{
 			var loginResult = await Api.LoginAsync(Model);
 
-			await AuthService.LoginAsync(loginResult.Token);
+			await AuthService.LoginAsync(loginResult);
 
 			Nav.NavigateTo("/", true);
 		}

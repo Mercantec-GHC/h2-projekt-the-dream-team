@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace H2Projekt.Infrastructure.Authentication
@@ -17,7 +18,7 @@ namespace H2Projekt.Infrastructure.Authentication
             _configuration = configuration;
         }
 
-        public string GenerateToken(Guest guest)
+        public string GenerateAccessToken(Guest guest)
         {
             // Get the JWT settings from the configuration
             var jwtSettings = _configuration.GetSection("Jwt");
@@ -54,6 +55,18 @@ namespace H2Projekt.Infrastructure.Authentication
 
             // Return an AuthResponseDto containing the serialized token and its expiration time
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public string GenerateRefreshToken()
+        {
+            var randomBytes = new byte[64];
+
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomBytes);
+            }
+
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }

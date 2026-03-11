@@ -1,6 +1,7 @@
 ﻿using H2Projekt.API.Extensions;
 using H2Projekt.Application.Commands.Authentication;
 using H2Projekt.Application.Dto.Authentication;
+using H2Projekt.Application.Exceptions;
 using H2Projekt.Application.Handlers.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,6 +36,30 @@ namespace H2Projekt.API.Controllers
             }
         }
 
+        [Authorize]
+        [HttpPost]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status499ClientClosedRequest)]
+        public async Task<ActionResult<AuthResponseDto>> Refresh(CancellationToken cancellationToken, [FromServices] RefreshHandler handler, [FromBody] string refreshToken)
+        {
+            try
+            {
+                var guestId = await handler.HandleAsync(refreshToken, cancellationToken);
+
+                return Ok(guestId);
+            }
+            catch (NonExistentException ex)
+            {
+                return NotFound(ex.GetProblemDetails());
+            }
+            catch (OperationCanceledException)
+            {
+                return StatusCode(StatusCodes.Status499ClientClosedRequest);
+            }
+        }
+
         [AllowAnonymous]
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -56,30 +81,6 @@ namespace H2Projekt.API.Controllers
             {
                 return StatusCode(StatusCodes.Status499ClientClosedRequest);
             }
-        }
-
-        [Authorize]
-        [HttpGet]
-        public async Task<ActionResult> Test()
-        {
-            if (WorkContext is null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(WorkContext);
-        }
-
-        [Authorize(Roles = "Admin")]
-        [HttpGet]
-        public async Task<ActionResult> TestAdmin()
-        {
-            if (WorkContext is null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(WorkContext);
         }
     }
 }

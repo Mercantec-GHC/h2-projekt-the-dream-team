@@ -38,6 +38,16 @@ namespace H2Projekt.Infrastructure.Repositories
                 .SingleOrDefaultAsync(g => g.Email == email, cancellationToken);
         }
 
+        public async Task<Guest?> GetGuestByRefreshTokenAsync(string refreshToken, CancellationToken cancellationToken)
+        {
+            return await _appDbContext.Guests
+                .Include(g => g.Bookings)
+                    .ThenInclude(b => b.RoomType)
+                .Include(g => g.Bookings)
+                    .ThenInclude(b => b.Room)
+                .SingleOrDefaultAsync(g => g.RefreshToken == refreshToken, cancellationToken);
+        }
+
         public async Task<bool> GuestExistsAsync(string email, CancellationToken cancellationToken)
         {
             return await _appDbContext.Guests.AnyAsync(g => g.Email == email, cancellationToken);

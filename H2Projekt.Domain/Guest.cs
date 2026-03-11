@@ -9,6 +9,7 @@ namespace H2Projekt.Domain
         public string LastName { get; private set; } = default!;
         public string Email { get; private set; } = default!;
         public string PasswordHash { get; private set; } = default!;
+        public string? RefreshToken { get; private set; } = null;
 
         private readonly List<Booking> bookings = new List<Booking>();
         public IReadOnlyCollection<Booking> Bookings => bookings.AsReadOnly();
@@ -32,6 +33,11 @@ namespace H2Projekt.Domain
             Email = email;
 
             ThrowIfInvalid();
+        }
+
+        public void SetRefreshToken(string refreshToken)
+        {
+            RefreshToken = refreshToken;
         }
 
         public void AddBooking(Booking booking)

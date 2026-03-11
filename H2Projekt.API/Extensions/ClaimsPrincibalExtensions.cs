@@ -1,5 +1,4 @@
-﻿using H2Projekt.Application.Dto.Guests;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 namespace H2Projekt.API.Extensions
 {

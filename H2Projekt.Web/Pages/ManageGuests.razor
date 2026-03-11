@@ -261,6 +261,11 @@ else
                     guest.LastName = guestToEdit.LastName;
                     guest.Email = guestToEdit.Email;
 
+                    if (WorkContext?.Id == guest.Id)
+                    {
+                        await AuthService.RefreshAsync();
+                    }
+
                     exception = new ApiException(null, 200, $"Gæst \"{guestToEdit.FirstName}\" opdateret.", null, null);
                 }
             }

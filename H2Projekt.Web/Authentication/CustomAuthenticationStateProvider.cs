@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
+using Newtonsoft.Json.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 
@@ -10,18 +11,23 @@ namespace H2Projekt.Web.Authentication
         private static readonly AuthenticationState anonymous = new AuthenticationState(new ClaimsPrincipal(new ClaimsIdentity()));
 
         private readonly IJSRuntime _js;
+        private readonly ApiClient _apiClient;
 
-        public CustomAuthenticationStateProvider(IJSRuntime js)
+        public CustomAuthenticationStateProvider(IJSRuntime js, ApiClient apiClient)
         {
             _js = js;
+            _apiClient = apiClient;
         }
 
         public event Func<object?, string?, Task>? OnAccessTokenChanged;
 
-        public async Task LoginAsync(string token)
+        public async Task LoginAsync(AuthResponseDto token)
         {
-            // Store the token in local storage
-            await _js.InvokeVoidAsync("localStorage.setItem", "accessToken", token);
+            // Store the access token in local storage
+            await _js.InvokeVoidAsync("localStorage.setItem", "accessToken", token.AccessToken);
+
+            // Store the refresh token in local storage
+            await _js.InvokeVoidAsync("localStorage.setItem", "refreshToken", token.RefreshToken);
 
             // Notify the authentication state has changed with the new authenticated state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
@@ -30,16 +36,19 @@ namespace H2Projekt.Web.Authentication
             if (OnAccessTokenChanged is not null)
             {
                 // Invoke the event with the new token
-                await OnAccessTokenChanged(this, token);
+                await OnAccessTokenChanged(this, token.AccessToken);
             }
         }
 
         public async Task LogoutAsync()
         {
-            // Remove the token from local storage
+            // Remove the access token from local storage
             await _js.InvokeVoidAsync("localStorage.removeItem", "accessToken");
 
-            // Clear the token from local storage
+            // Remove the refresh token from local storage
+            await _js.InvokeVoidAsync("localStorage.removeItem", "refreshToken");
+
+            // Notify the authentication state has changed with the new unauthenticated state
             NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
 
             // If there are any subscribers to the OnAccessTokenChanged event, invoke the event with null to indicate that the user has logged out
@@ -50,12 +59,43 @@ namespace H2Projekt.Web.Authentication
             }
         }
 
+        public async Task RefreshAsync()
+        {
+            // Get the refresh token from local storage
+            var refreshToken = await _js.InvokeAsync<string>("localStorage.getItem", "refreshToken");
+
+            // Call the Refresh endpoint to get a new token 
+            var newToken = await _apiClient.RefreshAsync(refreshToken);
+
+            // If the new token is null, return
+            if (newToken is null)
+            {
+                return;
+            }
+
+            // Store the new access token in local storage
+            await _js.InvokeVoidAsync("localStorage.setItem", "accessToken", newToken.AccessToken);
+
+            // Store the new refresh token in local storage
+            await _js.InvokeVoidAsync("localStorage.setItem", "refreshToken", newToken.RefreshToken);
+
+            // Notify the authentication state has changed with the new authenticated state
+            NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+
+            // If there are any subscribers to the OnAccessTokenChanged event, invoke the event with the new token
+            if (OnAccessTokenChanged is not null)
+            {
+                // Invoke the event with the new token
+                await OnAccessTokenChanged(this, newToken.AccessToken);
+            }
+        }
+
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            // Get the token from local storage
+            // Get the access token from local storage
             var accessToken = await _js.InvokeAsync<string>("localStorage.getItem", "accessToken");
 
-            // If the token is not found or is empty
+            // If the access token or refresh token is null or empty
             if (string.IsNullOrEmpty(accessToken))
             {
                 // Return an unauthenticated state
@@ -75,13 +115,13 @@ namespace H2Projekt.Web.Authentication
                 var expiresAt = DateTimeOffset.FromUnixTimeSeconds(expSeconds);
 
                 // If the token has expired
-                if (expiresAt < DateTimeOffset.UtcNow)
+                if (expiresAt < DateTimeOffset.UtcNow.AddMinutes(-1))
                 {
-                    // Remove the token from local storage if it has expired
-                    await _js.InvokeVoidAsync("localStorage.removeItem", "accessToken");
+                    // Refresh the token to get a new access token and update the authentication state
+                    await RefreshAsync();
 
-                    // Return an unauthenticated state
-                    return anonymous;
+                    // Rerun the GetAuthenticationStateAsync method to update the authentication state with the new token
+                    return await GetAuthenticationStateAsync();
                 }
             }
 

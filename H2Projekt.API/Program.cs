@@ -91,6 +91,7 @@ builder.Services.AddAuthorization();
 // Application handlers
 // - Authentication
 builder.Services.AddScoped<LoginHandler>();
+builder.Services.AddScoped<RefreshHandler>();
 builder.Services.AddScoped<RegisterHandler>();
 // - Bookings
 builder.Services.AddScoped<GetAllBookingsHandler>();
