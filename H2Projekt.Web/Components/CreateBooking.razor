@@ -1,10 +1,21 @@
-﻿@inject ApiClient Api
+﻿@inherits BasePage
+
+@inject ApiClient Api
 
 <div class="d-flex gap-3">
     <div class="card p-3 d-flex flex-column gap-3 w-100">
-        <h5 class="mb-0">Dine oplysninger</h5>
+        @if (RegisterCommandChanged.HasDelegate)
+        {
+            <h5 class="mb-0">Opret gæst</h5>
 
-        <GuestFields Model="Guest" />
+            <RegisterFields Model="RegisterCommand" />
+        }
+        else
+        {
+            <h5 class="mb-0">Dine oplysninger</h5>
+            
+            <GuestFields Model="Guest" Disabled />
+        }
     </div>
 
     <div class="card p-3 d-flex flex-column gap-3 w-100">
@@ -48,10 +59,16 @@
 
 @code {
     [Parameter]
-    public GuestDto Guest { get; set; }
+    public GuestDto? Guest { get; set; } = null;
 
     [Parameter]
     public EventCallback<GuestDto> GuestChanged { get; set; }
+
+    [Parameter]
+    public RegisterCommand RegisterCommand { get; set; } = null;
+
+    [Parameter]
+    public EventCallback<RegisterCommand> RegisterCommandChanged { get; set; }
 
     [Parameter]
     public RoomTypeDto? RoomType { get; set; }

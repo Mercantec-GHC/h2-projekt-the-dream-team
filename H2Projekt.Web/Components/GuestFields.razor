@@ -2,23 +2,26 @@
     <div>
         <label class="form-label">Fornavn</label>
 
-        <InputText class="form-control" @bind-Value="Model.FirstName" placeholder="Indtast fornavn" />
+        <InputText class="form-control" @bind-Value="Model.FirstName" placeholder="Indtast fornavn" disabled="@Disabled" />
     </div>
 
     <div>
         <label class="form-label">Efternavn</label>
 
-        <InputText class="form-control" @bind-Value="Model.LastName" placeholder="Indtast efternavn" />
+        <InputText class="form-control" @bind-Value="Model.LastName" placeholder="Indtast efternavn" disabled="@Disabled" />
     </div>
 
     <div>
         <label class="form-label">Email</label>
 
-        <InputText class="form-control" @bind-Value="Model.Email" placeholder="Indtast email" />
+        <InputText class="form-control" @bind-Value="Model.Email" placeholder="Indtast email" disabled="@Disabled" />
     </div>
 </div>
 
 @code {
     [Parameter]
     public GuestDto Model { get; set; } = new GuestDto();
+
+    [Parameter]
+    public bool Disabled { get; set; } = false;
 }

@@ -92,7 +92,14 @@
                 {
                     var roomDiscountsForRoomType = roomDiscounts.Where(roomDiscount => roomDiscount.RoomType.Id == roomType.Id).ToList();
 
-                    <CreateBooking @bind-Guest="guest" RoomType="roomType" RoomDiscounts="roomDiscountsForRoomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
+                    @if (WorkContext is null)
+                    {
+                        <CreateBooking @bind-RegisterCommand="registerCommand" RoomType="roomType" RoomDiscounts="roomDiscountsForRoomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
+                    }
+                    else
+                    {
+                        <CreateBooking @bind-Guest="guest" RoomType="roomType" RoomDiscounts="roomDiscountsForRoomType" @bind-FromDate="finalFromDate" @bind-ToDate="finalToDate" />
+                    }
                 }
             </div>
 
@@ -120,6 +127,7 @@
     private AvailableRoomTypesForStayDto? availableRoomTypesForStay;
 
     private GuestDto guest = new GuestDto();
+    private RegisterCommand registerCommand = new RegisterCommand();
 
     private RoomTypeDto? roomType;
 
@@ -186,6 +194,14 @@
 
         try
         {
+            if (!string.IsNullOrEmpty(registerCommand.FirstName) && !string.IsNullOrEmpty(registerCommand.LastName) && !string.IsNullOrEmpty(registerCommand.Email) && !string.IsNullOrEmpty(registerCommand.Password))
+            {
+                guest.Id = await Api.RegisterAsync(registerCommand);
+                guest.FirstName = registerCommand.FirstName;
+                guest.LastName = registerCommand.LastName;
+                guest.Email = registerCommand.Email;
+            }
+
             var bookingId = await Api.CreateBookingAsync(new CreateBookingCommand()
             {
                 GuestId = guest.Id,
@@ -200,6 +216,7 @@
             await JS.InvokeVoidAsync("hideModal", "#createBookingModal");
 
             guest = new GuestDto();
+            registerCommand = new RegisterCommand();
 
             exception = new ApiException(null, 200, $"Værelsestype booket fra {fromDate:dd/MM/yyyy} til {toDate:dd/MM/yyyy} for {numberOfAdults + numberOfChildren} gæster! Din booking reference er #{bookingId}.", null, null);
 

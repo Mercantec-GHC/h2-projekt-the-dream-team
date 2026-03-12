@@ -27,29 +27,7 @@
 			</div>
 		}
 
-		<div>
-			<label class="form-label">Fornavn</label>
-
-			<InputText class="form-control" @bind-Value="Model.FirstName" placeholder="Indtast fornavn" />
-		</div>
-
-		<div>
-			<label class="form-label">Efternavn</label>
-
-			<InputText class="form-control" @bind-Value="Model.LastName" placeholder="Indtast efternavn" />
-		</div>
-
-		<div>
-			<label class="form-label">Email</label>
-
-			<InputText class="form-control" @bind-Value="Model.Email" placeholder="Indtast email" />
-		</div>
-
-		<div>
-			<label class="form-label">Adgangskode</label>
-
-			<InputText type="password" class="form-control" @bind-Value="Model.Password" placeholder="Indtast adgangskode" />
-		</div>
+		<RegisterFields Model="Model" />
 
 		<button class="btn btn-primary" @onclick="HandleRegister">Registrér</button>
 	</div>
