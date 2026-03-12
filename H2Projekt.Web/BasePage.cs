@@ -37,6 +37,8 @@ namespace H2Projekt.Web
 
             WorkContext = GetWorkContextOrNull(state.User);
 
+            await OnParametersSetAsync();
+
             await InvokeAsync(StateHasChanged);
         }
 

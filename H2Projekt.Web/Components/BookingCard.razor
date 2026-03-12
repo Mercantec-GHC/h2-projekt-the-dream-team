@@ -46,10 +46,10 @@
 
 @code {
     [Parameter]
-    public BookingWithoutGuestDto Booking { get; set; }
+    public BookingDto Booking { get; set; }
 
     [Parameter]
-    public EventCallback<BookingWithoutGuestDto> OnDelete { get; set; }
+    public EventCallback<BookingDto> OnDelete { get; set; }
 
     private bool BookingIsDeletable => Booking.FromDate > DateTime.Now && Booking.ToDate > DateTime.Now;
 }

@@ -410,6 +410,119 @@
         }
       }
     },
+    "/api/Booking/GetBookingsByGuestId/{id}": {
+      "get": {
+        "tags": [
+          "Booking"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ],
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BookingDto"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "499": {
+            "description": "Client Closed Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/Booking/GetBookingOverview": {
       "get": {
         "tags": [
@@ -1189,170 +1302,6 @@
           },
           "404": {
             "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "499": {
-            "description": "Client Closed Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/Guest/CreateGuest": {
-      "post": {
-        "tags": [
-          "Guest"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateGuestCommand"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateGuestCommand"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/CreateGuestCommand"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "pattern": "^-?(?:0|[1-9]\\d*)$",
-                  "type": [
-                    "integer",
-                    "string"
-                  ],
-                  "format": "int32"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "pattern": "^-?(?:0|[1-9]\\d*)$",
-                  "type": [
-                    "integer",
-                    "string"
-                  ],
-                  "format": "int32"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "pattern": "^-?(?:0|[1-9]\\d*)$",
-                  "type": [
-                    "integer",
-                    "string"
-                  ],
-                  "format": "int32"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "Forbidden",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "409": {
-            "description": "Conflict",
             "content": {
               "text/plain": {
                 "schema": {
@@ -3243,7 +3192,7 @@
             "format": "int32"
           },
           "guest": {
-            "$ref": "#/components/schemas/GuestWithoutBookingsDto"
+            "$ref": "#/components/schemas/GuestDto"
           },
           "roomType": {
             "$ref": "#/components/schemas/RoomTypeDto"
@@ -3317,7 +3266,7 @@
             "format": "int32"
           },
           "guest": {
-            "$ref": "#/components/schemas/GuestWithoutBookingsDto"
+            "$ref": "#/components/schemas/GuestDto"
           },
           "roomType": {
             "$ref": "#/components/schemas/RoomTypeDto"
@@ -3393,67 +3342,6 @@
           }
         }
       },
-      "BookingWithoutGuestDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "roomType": {
-            "$ref": "#/components/schemas/RoomTypeDto"
-          },
-          "fromDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "toDate": {
-            "type": "string",
-            "format": "date"
-          },
-          "priceLocked": {
-            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
-            "type": [
-              "number",
-              "string"
-            ],
-            "format": "double"
-          },
-          "numberOfAdults": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "numberOfChildren": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "travelingWithPets": {
-            "type": "boolean"
-          },
-          "room": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/RoomWithoutBookingsDto"
-              }
-            ]
-          }
-        }
-      },
       "BookingWithoutRoomDto": {
         "type": "object",
         "properties": {
@@ -3466,7 +3354,7 @@
             "format": "int32"
           },
           "guest": {
-            "$ref": "#/components/schemas/GuestWithoutBookingsDto"
+            "$ref": "#/components/schemas/GuestDto"
           },
           "roomType": {
             "$ref": "#/components/schemas/RoomTypeDto"
@@ -3556,20 +3444,6 @@
           }
         }
       },
-      "CreateGuestCommand": {
-        "type": "object",
-        "properties": {
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          }
-        }
-      },
       "CreateRoomCommand": {
         "type": "object",
         "properties": {
@@ -3652,34 +3526,6 @@
         }
       },
       "GuestDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ],
-            "format": "int32"
-          },
-          "firstName": {
-            "type": "string"
-          },
-          "lastName": {
-            "type": "string"
-          },
-          "email": {
-            "type": "string"
-          },
-          "bookings": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/BookingWithoutGuestDto"
-            }
-          }
-        }
-      },
-      "GuestWithoutBookingsDto": {
         "type": "object",
         "properties": {
           "id": {

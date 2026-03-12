@@ -94,6 +94,7 @@ builder.Services.AddScoped<RefreshHandler>();
 builder.Services.AddScoped<RegisterHandler>();
 // - Bookings
 builder.Services.AddScoped<GetAllBookingsHandler>();
+builder.Services.AddScoped<GetBookingsByGuestIdHandler>();
 builder.Services.AddScoped<GetBookingByIdHandler>();
 builder.Services.AddScoped<CreateBookingHandler>();
 builder.Services.AddScoped<AssignRoomToBookingHandler>();
@@ -102,9 +103,9 @@ builder.Services.AddScoped<GetBookingsOverviewHandler>();
 // - Guests
 builder.Services.AddScoped<GetAllGuestsHandler>();
 builder.Services.AddScoped<GetGuestByIdHandler>();
+builder.Services.AddScoped<GetGuestByEmailHandler>();
 builder.Services.AddScoped<UpdateGuestHandler>();
 builder.Services.AddScoped<DeleteGuestHandler>();
-builder.Services.AddScoped<GetGuestByEmailHandler>();
 // - Rooms
 builder.Services.AddScoped<GetAllRoomsHandler>();
 builder.Services.AddScoped<GetRoomByNumberHandler>();

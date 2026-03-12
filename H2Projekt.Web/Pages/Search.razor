@@ -186,21 +186,6 @@
 
         try
         {
-            if (guest.Id > 0 && string.IsNullOrEmpty(guest.Email))
-            {
-                guest = new GuestDto();
-            }
-
-            if (guest.Id == 0)
-            {
-                guest.Id = await Api.CreateGuestAsync(new CreateGuestCommand()
-                {
-                    FirstName = guest.FirstName,
-                    LastName = guest.LastName,
-                    Email = guest.Email
-                });
-            }
-
             var bookingId = await Api.CreateBookingAsync(new CreateBookingCommand()
             {
                 GuestId = guest.Id,

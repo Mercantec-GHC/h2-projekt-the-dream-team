@@ -30,12 +30,19 @@
                 Mine Bookinger
             </h4>
 
-            <div class="d-grid gap-3" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
-                @foreach (var booking in WorkContext.Bookings)
-                {
-                    <BookingCard Booking="booking" OnDelete="PrepareBookingDeletion" />
-                }
-            </div>
+            @if (bookings is null || !bookings.Any())
+            {
+                <div class="alert alert-info p-2 m-0">Du har ingen bookinger.</div>
+            }
+            else
+            {
+                <div class="d-grid gap-3" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
+                    @foreach (var booking in bookings)
+                    {
+                        <BookingCard Booking="booking" OnDelete="PrepareBookingDeletion" />
+                    }
+                </div>
+            }
         </div>
     </div>
 
@@ -82,9 +89,23 @@
     private ApiException? exception;
     private ApiException? modalException;
 
+    private ICollection<BookingDto> bookings;
+
     private int? bookingToDelete;
 
-    public void PrepareBookingDeletion(BookingWithoutGuestDto booking)
+    protected override async Task OnParametersSetAsync()
+    {
+        if (WorkContext is null)
+        {
+            return;
+        }
+
+        bookings = await Api.GetBookingsByGuestIdAsync(WorkContext.Id);
+
+        StateHasChanged();
+    }
+
+    public void PrepareBookingDeletion(BookingDto booking)
     {
         modalException = null;
 
@@ -95,7 +116,7 @@
     {
         modalException = null;
 
-        if (!bookingToDelete.HasValue || WorkContext is null || !WorkContext.Bookings.Any(b => b.Id == bookingToDelete.Value))
+        if (!bookingToDelete.HasValue || WorkContext is null)
         {
             return;
         }
@@ -106,7 +127,7 @@
 
             await JS.InvokeVoidAsync("hideModal", "#deleteModal");
 
-            WorkContext.Bookings.Remove(WorkContext.Bookings.First(b => b.Id == bookingToDelete.Value));
+            bookings.Remove(bookings.First(b => b.Id == bookingToDelete.Value));
 
             exception = new ApiException(null, 200, $"Booking #{bookingToDelete.Value} er slettet.", null, null);
         }

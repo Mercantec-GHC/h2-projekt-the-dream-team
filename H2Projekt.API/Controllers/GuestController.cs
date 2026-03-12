@@ -1,8 +1,10 @@
 ﻿using FluentValidation;
 using H2Projekt.API.Extensions;
 using H2Projekt.Application.Commands.Guests;
+using H2Projekt.Application.Dto.Bookings;
 using H2Projekt.Application.Dto.Guests;
 using H2Projekt.Application.Exceptions;
+using H2Projekt.Application.Handlers.Bookings;
 using H2Projekt.Application.Handlers.Guests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
